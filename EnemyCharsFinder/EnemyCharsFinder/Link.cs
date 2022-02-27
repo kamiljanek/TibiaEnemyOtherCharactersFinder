@@ -9,7 +9,7 @@ namespace EnemyCharsFinder
     public class Link
     {
         public static string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
-        public List<string> Links { get; set; }
+        public List<string>? Links { get; set; }
         public void SetLinks(List<string> serverNames)
         {
             List<string> links = new List<string>();

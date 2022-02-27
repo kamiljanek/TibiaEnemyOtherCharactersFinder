@@ -25,11 +25,10 @@ namespace EnemyCharsFinder
         public void Names(string url)
         {
             var document = web.Load(url);
-            var items = document.QuerySelectorAll(".Odd, .Even");
+            var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
             foreach (var item in items)
             {
-                var tds = item.QuerySelectorAll("td");
-                var text = tds[0].InnerText;
+                var text = item.InnerText;
                 NameList.Add(text);
             }
         }
