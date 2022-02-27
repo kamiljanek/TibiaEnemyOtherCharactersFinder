@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32120.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnemyCharsFinder", "EnemyCharsFinder\EnemyCharsFinder.csproj", "{00874583-3140-4207-845E-75F343A5E680}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnemyCharFinder.Net6", "..\EnemyCharFinder.Net6\EnemyCharFinder.Net6.csproj", "{5DD75484-A59B-40C6-801C-9CCE6C92B253}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00874583-3140-4207-845E-75F343A5E680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00874583-3140-4207-845E-75F343A5E680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00874583-3140-4207-845E-75F343A5E680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00874583-3140-4207-845E-75F343A5E680}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD75484-A59B-40C6-801C-9CCE6C92B253}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD75484-A59B-40C6-801C-9CCE6C92B253}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD75484-A59B-40C6-801C-9CCE6C92B253}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD75484-A59B-40C6-801C-9CCE6C92B253}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FC00B179-AF59-4167-8549-F28CE809505E}
+	EndGlobalSection
+EndGlobal
