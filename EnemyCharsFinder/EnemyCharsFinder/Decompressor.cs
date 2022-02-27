@@ -12,8 +12,8 @@ namespace EnemyCharsFinder
     public class Decompressor
     {
         public HtmlWeb web = new HtmlWeb();
-        public List<string> NameList = new List<string>();
-        public List<string> ServersList = new List<string>();
+        public List<string>? NameList = new List<string>();
+        public List<string>? ServersList = new List<string>();
         public void Decompress()
         {
             web.PreRequest += (HttpWebRequest request) =>
@@ -22,14 +22,13 @@ namespace EnemyCharsFinder
                 return true;
             };
         }
-        public void Names(string url)
+        public void Names(string url, StringBuilder builder)
         {
             var document = web.Load(url);
             var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
             foreach (var item in items)
             {
-                var text = item.InnerText;
-                NameList.Add(text);
+                builder.AppendLine($"{item.InnerText} ");
             }
         }
         public void Servers(string url)

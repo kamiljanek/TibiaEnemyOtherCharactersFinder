@@ -22,7 +22,7 @@ namespace EnemyCharsFinder
 
             foreach (var item in link.Links)
             {
-                decompressor.Names(item);
+                //decompressor.Names(item);
             }
 
             stopwatch.Stop();
