@@ -14,13 +14,16 @@ namespace EnemyCharsFinder
         public HtmlWeb web = new HtmlWeb();
         public List<string>? NameList = new List<string>();
         public List<string>? ServersList = new List<string>();
+
+        private bool DelegatedMethod(HttpWebRequest request)
+        {
+            request.AutomaticDecompression = DecompressionMethods.All;
+            return true;
+        }
+
         public void Decompress()
         {
-            web.PreRequest += (HttpWebRequest request) =>
-            {
-                request.AutomaticDecompression = DecompressionMethods.All;
-                return true;
-            };
+            web.PreRequest += new HtmlWeb.PreRequestHandler(this.DelegatedMethod);
         }
         public void Names(string url, StringBuilder builder)
         {
