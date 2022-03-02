@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddEveryServerUrlToDb", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddScrapSesionToDb", "..\AddScrapSesionToDb\AddScrapSesionToDb.csproj", "{D3A324CB-433E-4525-B313-1FF6FEFAC842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanScrapSesionsDb", "..\CleanScrapSesionsDb\CleanScrapSesionsDb.csproj", "{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanScrapSesionsDb", "..\CleanScrapSesionsDb\CleanScrapSesionsDb.csproj", "{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HangFireHelper", "..\HangFireHelper\HangFireHelper.csproj", "{940D90AF-5485-4C0E-AD9C-225DD6B4ECCA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{940D90AF-5485-4C0E-AD9C-225DD6B4ECCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{940D90AF-5485-4C0E-AD9C-225DD6B4ECCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{940D90AF-5485-4C0E-AD9C-225DD6B4ECCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{940D90AF-5485-4C0E-AD9C-225DD6B4ECCA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

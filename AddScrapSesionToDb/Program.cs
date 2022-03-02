@@ -11,8 +11,8 @@ namespace AddScrapSesionToDb
     {
         static void Main(string[] args)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
 
             Decompressor decompressor = new Decompressor();
             decompressor.Decompress();
@@ -33,8 +33,8 @@ namespace AddScrapSesionToDb
             context.ScrapSesions.Add(scrap);
             context.SaveChanges();
 
-            stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds} ms");
+            //stopwatch.Stop();
+            //Console.WriteLine($"{stopwatch.ElapsedMilliseconds} ms");
 
         }
     }

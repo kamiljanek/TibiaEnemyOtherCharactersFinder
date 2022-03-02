@@ -22,6 +22,7 @@ namespace EnemyCharsFinder
                 return true;
             };
         }
+        
         public void Names(string url, StringBuilder builder)
         {
             var document = web.Load(url);
