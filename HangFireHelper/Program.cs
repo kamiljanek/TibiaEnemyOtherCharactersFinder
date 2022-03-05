@@ -16,7 +16,7 @@ namespace HangFireHelper
 
             GlobalConfiguration.Configuration
                          .UseSqlServerStorage(@"Data Source=(localdb)\MSSQLLocalDB; Initial Catalog=HangFireTibia; Integrated Security=True");
-           
+
             using (var connection = JobStorage.Current.GetConnection())
             {
                 foreach (var recurringJob in connection.GetRecurringJobs())
