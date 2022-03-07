@@ -10,6 +10,7 @@
 	<ItemGroup>
 		<PackageReference Include="Hangfire.Core" Version="1.7.28" />
 		<PackageReference Include="Hangfire.SqlServer" Version="1.7.28" />
+		<ProjectReference Include="..\AddScrapSesionToDb\AddScrapSesionToDb.csproj" />
 		<ProjectReference Include="..\EnemyCharsFinder\EnemyCharsFinder\EnemyCharsFinder.csproj" />
 	</ItemGroup>
 

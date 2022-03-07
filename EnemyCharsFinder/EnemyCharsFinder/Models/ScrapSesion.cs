@@ -14,6 +14,7 @@ namespace EnemyCharsFinder.Models
         [Required]
         public DateTime DatePublished { get; set; }
         
-        public string? Names { get; set; }
+        public string? OnlineCharacterNames { get; set; }
+        public string? ServerName { get; set; }
     }
 }

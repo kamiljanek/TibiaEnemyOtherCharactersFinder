@@ -6,6 +6,7 @@ using EnemyCharsFinder;
 using EnemyCharsFinder.Data;
 using EnemyCharsFinder.Models;
 using Hangfire.Storage;
+using AddScrapSesionToDb;
 
 namespace HangFireHelper
 {
@@ -30,7 +31,10 @@ namespace HangFireHelper
                 SchedulePollingInterval = TimeSpan.FromMilliseconds(1000)
             };
 
-            RecurringJob.AddOrUpdate(() => Run(), "*/2 50-59 * * * *");
+            var addScrapSesion = new AddScrapSesion();
+
+
+            RecurringJob.AddOrUpdate(() => addScrapSesion.Run(), " * * * * *");
 
             using (var server = new BackgroundJobServer(options))
             {
@@ -43,29 +47,25 @@ namespace HangFireHelper
 
         public static void RunRun()
         {
-            Console.WriteLine(DateTime.Now);
-        }
-        public static void Run()
-        {
             Decompressor decompressor = new Decompressor();
             decompressor.Decompress();
             StringBuilder builder = new StringBuilder();
 
             using TibiaArchiveContext context = new TibiaArchiveContext();
-            var urls = context.Urls;
-            foreach (var item in urls)
-            {
-                decompressor.Names(item.Adrress, builder);
-            }
+        
+                decompressor.Names("https://www.tibia.com/community/?subtopic=worlds&world=Vunira", builder);
+            
             var scrapSesion = builder.ToString();
             ScrapSesion scrap = new ScrapSesion()
             {
                 DatePublished = DateTime.Now,
-                Names = scrapSesion
+                //OnlineCharacterNamesNames = scrapSesion
             };
             context.ScrapSesions.Add(scrap);
             context.SaveChanges();
             Console.WriteLine(DateTime.Now);
         }
+  
+        
     }
 }
