@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TibiaCharFinder.Entities;
 
 namespace TibiaCharFinder.Migrations
 {
     [DbContext(typeof(EnemyCharFinderDbContext))]
-    partial class EnemyCharFinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220706192006_Changed_connection_string")]
+    partial class Changed_connection_string
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,13 +50,8 @@ namespace TibiaCharFinder.Migrations
                     b.Property<DateTime>("LogInOrLogOutDateTime")
                         .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<int>("PossibleCharacterId")
-                        .HasColumnType("int");
-=======
                     b.Property<string>("PossibleOtherCharacters")
                         .HasColumnType("nvarchar(max)");
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 
                     b.HasKey("Id");
 
@@ -82,53 +79,7 @@ namespace TibiaCharFinder.Migrations
                     b.ToTable("Scans");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("TibiaCharFinder.Entities.World", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Worlds");
-                });
-
-            modelBuilder.Entity("TibiaCharFinder.Entities.WorldCorrelation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CharacterId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("LogInOrLogOutDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PossibleCharacterId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CharacterId");
-
-                    b.ToTable("WorldCorrelations");
-                });
-
-            modelBuilder.Entity("TibiaCharFinder.Entities.WorldScan", b =>
-=======
             modelBuilder.Entity("TibiaCharFinder.Entities.ScanWorld", b =>
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -136,10 +87,6 @@ namespace TibiaCharFinder.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CharactersOnline")
-<<<<<<< HEAD
-                        .IsRequired()
-=======
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ScanCreateDateTime")
@@ -152,9 +99,6 @@ namespace TibiaCharFinder.Migrations
 
                     b.HasIndex("WorldId");
 
-<<<<<<< HEAD
-                    b.ToTable("WorldScans");
-=======
                     b.ToTable("ScanWorlds");
                 });
 
@@ -176,17 +120,12 @@ namespace TibiaCharFinder.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Worlds");
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                 });
 
             modelBuilder.Entity("TibiaCharFinder.Entities.Correlation", b =>
                 {
                     b.HasOne("TibiaCharFinder.Entities.Character", "Character")
-<<<<<<< HEAD
-                        .WithMany()
-=======
                         .WithMany("Correlations")
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                         .HasForeignKey("CharacterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -194,22 +133,7 @@ namespace TibiaCharFinder.Migrations
                     b.Navigation("Character");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("TibiaCharFinder.Entities.WorldCorrelation", b =>
-                {
-                    b.HasOne("TibiaCharFinder.Entities.Character", "Character")
-                        .WithMany()
-                        .HasForeignKey("CharacterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Character");
-                });
-
-            modelBuilder.Entity("TibiaCharFinder.Entities.WorldScan", b =>
-=======
             modelBuilder.Entity("TibiaCharFinder.Entities.ScanWorld", b =>
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                 {
                     b.HasOne("TibiaCharFinder.Entities.World", "World")
                         .WithMany()
@@ -219,14 +143,11 @@ namespace TibiaCharFinder.Migrations
 
                     b.Navigation("World");
                 });
-<<<<<<< HEAD
-=======
 
             modelBuilder.Entity("TibiaCharFinder.Entities.Character", b =>
                 {
                     b.Navigation("Correlations");
                 });
->>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 #pragma warning restore 612, 618
         }
     }
