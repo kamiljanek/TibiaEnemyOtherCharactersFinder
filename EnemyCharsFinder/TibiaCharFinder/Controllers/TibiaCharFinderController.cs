@@ -24,10 +24,10 @@ namespace TibiaCharFinder.Controllers
         [HttpGet ("{id}")]
         public ActionResult<WorldScan> Get([FromRoute] int id)
         {
-            var scanWrold = _dbContext.WorldScans.FirstOrDefault(w => w.Id == id);
-            if (scanWrold != null)
+            var scanWorld = _dbContext.WorldScans.FirstOrDefault(w => w.Id == id);
+            if (scanWorld != null)
             {
-                return Ok(scanWrold);
+                return Ok(scanWorld);
             }
             return NotFound();
         }

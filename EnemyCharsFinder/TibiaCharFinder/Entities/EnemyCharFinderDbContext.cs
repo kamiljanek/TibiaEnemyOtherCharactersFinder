@@ -36,9 +36,6 @@ namespace TibiaCharFinder.Entities
                 .Property(p=>p.ScanCreateDateTime)
                 .IsRequired();
 
-            modelBuilder.Entity<Character>()
-                .Property(p => p.Name)
-                .IsRequired();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
