@@ -14,10 +14,16 @@
   </ItemGroup>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
   <ItemGroup>
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+<<<<<<< HEAD
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
+=======
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 </Project>

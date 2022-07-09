@@ -49,8 +49,13 @@ namespace TibiaCharFinder.Migrations
                         .HasColumnType("datetime2");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.Property<int>("PossibleCharacterId")
                         .HasColumnType("int");
+=======
+                    b.Property<string>("PossibleOtherCharacters")
+                        .HasColumnType("nvarchar(max)");
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 =======
                     b.Property<string>("PossibleOtherCharacters")
                         .HasColumnType("nvarchar(max)");
@@ -82,6 +87,7 @@ namespace TibiaCharFinder.Migrations
                     b.ToTable("Scans");
                 });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             modelBuilder.Entity("TibiaCharFinder.Entities.World", b =>
                 {
@@ -129,6 +135,9 @@ namespace TibiaCharFinder.Migrations
 =======
             modelBuilder.Entity("TibiaCharFinder.Entities.ScanWorld", b =>
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
+=======
+            modelBuilder.Entity("TibiaCharFinder.Entities.ScanWorld", b =>
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -137,7 +146,10 @@ namespace TibiaCharFinder.Migrations
 
                     b.Property<string>("CharactersOnline")
 <<<<<<< HEAD
+<<<<<<< HEAD
                         .IsRequired()
+=======
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 =======
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                         .HasColumnType("nvarchar(max)");
@@ -153,8 +165,11 @@ namespace TibiaCharFinder.Migrations
                     b.HasIndex("WorldId");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.ToTable("WorldScans");
 =======
+=======
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                     b.ToTable("ScanWorlds");
                 });
 
@@ -176,6 +191,9 @@ namespace TibiaCharFinder.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Worlds");
+<<<<<<< HEAD
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
+=======
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                 });
 
@@ -183,7 +201,11 @@ namespace TibiaCharFinder.Migrations
                 {
                     b.HasOne("TibiaCharFinder.Entities.Character", "Character")
 <<<<<<< HEAD
+<<<<<<< HEAD
                         .WithMany()
+=======
+                        .WithMany("Correlations")
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 =======
                         .WithMany("Correlations")
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
@@ -194,6 +216,7 @@ namespace TibiaCharFinder.Migrations
                     b.Navigation("Character");
                 });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             modelBuilder.Entity("TibiaCharFinder.Entities.WorldCorrelation", b =>
                 {
@@ -210,6 +233,9 @@ namespace TibiaCharFinder.Migrations
 =======
             modelBuilder.Entity("TibiaCharFinder.Entities.ScanWorld", b =>
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
+=======
+            modelBuilder.Entity("TibiaCharFinder.Entities.ScanWorld", b =>
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
                 {
                     b.HasOne("TibiaCharFinder.Entities.World", "World")
                         .WithMany()
@@ -220,12 +246,18 @@ namespace TibiaCharFinder.Migrations
                     b.Navigation("World");
                 });
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 
             modelBuilder.Entity("TibiaCharFinder.Entities.Character", b =>
                 {
                     b.Navigation("Correlations");
                 });
+<<<<<<< HEAD
+>>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
+=======
 >>>>>>> 7adfd3e7255e39674243874a51dd79850ec583bd
 #pragma warning restore 612, 618
         }
