@@ -9,7 +9,6 @@ namespace TibiaCharFinder.Controllers
     public class TibiaCharFinderController : ControllerBase
     {
         private readonly EnemyCharFinderDbContext _dbContext;
-
         public TibiaCharFinderController(EnemyCharFinderDbContext dbContext)
         {
             _dbContext = dbContext;

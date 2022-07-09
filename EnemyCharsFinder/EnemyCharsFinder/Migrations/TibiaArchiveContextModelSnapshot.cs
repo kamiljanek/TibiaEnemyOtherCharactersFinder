@@ -41,7 +41,7 @@ namespace EnemyCharsFinder.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Character");
+                    b.ToTable("Character", (string)null);
                 });
 
             modelBuilder.Entity("EnemyCharsFinder.Models.ScrapSesion", b =>
@@ -63,7 +63,7 @@ namespace EnemyCharsFinder.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ScrapSesions");
+                    b.ToTable("ScrapSesions", (string)null);
                 });
 
             modelBuilder.Entity("EnemyCharsFinder.Models.Url", b =>
@@ -79,7 +79,7 @@ namespace EnemyCharsFinder.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Urls");
+                    b.ToTable("Urls", (string)null);
                 });
 #pragma warning restore 612, 618
         }

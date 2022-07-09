@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace TibiaCharFinder.Entities
+﻿namespace TibiaCharFinder.Entities
 {
     public class World
     {
