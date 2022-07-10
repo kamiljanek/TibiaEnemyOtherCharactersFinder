@@ -20,6 +20,9 @@ namespace TibiaCharFinder.Entities
                 .IsRequired();
             modelBuilder.Entity<World>()
                 .Property(p => p.Url)
+                .IsRequired();  
+            modelBuilder.Entity<World>()
+                .Property(p => p.IsActivated)
                 .IsRequired(); 
       
             modelBuilder.Entity<Scan>()
