@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TibiaCharFinder.Entities;
 
 namespace WorldSeeder
 {
@@ -6,7 +7,20 @@ namespace WorldSeeder
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            var seeder = ServiceProvider.GetService<WorldSeeder>();
+            seeder.Seed();
+        }
+        public static ServiceProvider ServiceProvider { get; private set; }
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services
+                .AddSingleton<WorldSeeder>()
+                .AddSingleton<Decompressor>()
+                .AddSingleton<EnemyCharFinderDbContext>();
         }
     }
 }
