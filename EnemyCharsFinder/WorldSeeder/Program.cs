@@ -13,6 +13,7 @@ namespace WorldSeeder
 
             var seeder = ServiceProvider.GetService<WorldSeeder>();
             seeder.Seed();
+            seeder.TurnOffIfWorldIsUnavailable();
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)
