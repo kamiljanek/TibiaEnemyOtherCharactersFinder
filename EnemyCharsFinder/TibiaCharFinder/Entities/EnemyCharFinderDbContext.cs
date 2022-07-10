@@ -22,7 +22,7 @@ namespace TibiaCharFinder.Entities
                 .Property(p => p.Url)
                 .IsRequired();  
             modelBuilder.Entity<World>()
-                .Property(p => p.IsActivated)
+                .Property(p => p.IsAvailable)
                 .IsRequired(); 
       
             modelBuilder.Entity<Scan>()
