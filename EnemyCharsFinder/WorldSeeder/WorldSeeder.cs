@@ -1,6 +1,5 @@
 using HtmlAgilityPack.CssSelectors.NetCore;
 using TibiaCharFinder.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace WorldSeeder
 {
@@ -20,12 +19,12 @@ namespace WorldSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-                var serverNames = GetServerNamesFromTibiaCom();
-                foreach (var serverName in serverNames)
+                var worldNames = GetWorldNamesFromTibiaCom();
+                foreach (var worldName in worldNames)
                 {
-                    if (!_dbContext.Worlds.Any(o => o.Name == serverName))
+                    if (!_dbContext.Worlds.Any(o => o.Name == worldName))
                     {
-                        var world = CreateWorld(serverName);
+                        var world = CreateWorld(worldName);
                         _dbContext.Worlds.Add(world);
                     }
                 }
@@ -33,38 +32,43 @@ namespace WorldSeeder
             }
         }
 
-        public void CheckIfServerIsAvailable()
+        public void TurnOffIfWorldIsUnavailable()
         {
-                var availableServerNames = GetServerNamesFromTibiaCom();
-                var dbServerNames = GetServerNamesFromDb();
-
-        }
-
-        private List<string> GetServerNamesFromDb()
-        {
-            using (var ctx = new EnemyCharFinderDbContext())
+            if (_dbContext.Database.CanConnect())
             {
-                var studentList = _dbContext.Database
-                    .SqlQuery<string>("Select * from Students")
-                    .ToList();
+                var availableWorldNames = GetWorldNamesFromTibiaCom();
+                var dbWorldNames = GetWorldsFromDb();
+                foreach (var dbWorldName in dbWorldNames)
+                {
+                    if (!availableWorldNames.Contains(dbWorldName.Name))
+                    {
+                        var worldName = _dbContext.Worlds.First(i => i.Name == dbWorldName.Name);
+                        worldName.IsAvailable = false;
+                    }
+                }
+                _dbContext.SaveChanges();
             }
-            return _dbContext.Database.SqlQuery<string>().ToList();
         }
 
-        private World CreateWorld(string serverName)
+        private List<World> GetWorldsFromDb()
         {
-            var serverUrl = ServerUrl(serverName);
+            return _dbContext.Worlds.Where(w => w.Name != null).ToList();
+        }
+
+        private World CreateWorld(string worldName)
+        {
+            var worldUrl = GenerateWorldUrl(worldName);
             var world = new World()
             {
-                Name = serverName,
-                Url = serverUrl,
+                Name = worldName,
+                Url = worldUrl,
                 IsAvailable = true
             };
             return world;
         }
-        private List<string> GetServerNamesFromTibiaCom()
+        private List<string> GetWorldNamesFromTibiaCom()
         {
-            List<string> serverNames = new List<string>();
+            List<string> worldNames = new List<string>();
             _decompressor.Decompress();
             var document = _decompressor.web.Load(_mainUrl);
             var tables = document.QuerySelectorAll(".TableContent");
@@ -73,13 +77,13 @@ namespace WorldSeeder
             {
                 var a = item.QuerySelectorAll("a");
                 var text = a[0].InnerText;
-                serverNames.Add(text);
+                worldNames.Add(text);
             }
-            return serverNames;
+            return worldNames;
         }
-        private string ServerUrl(string serverName)
+        private string GenerateWorldUrl(string worldName)
         {
-            return $"{_mainUrl}&world={serverName}";
+            return $"{_mainUrl}&world={worldName}";
         }
     }
 }
