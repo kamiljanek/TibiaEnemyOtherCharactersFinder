@@ -1,15 +1,16 @@
 using HtmlAgilityPack.CssSelectors.NetCore;
 using TibiaCharFinder.Entities;
+using TibiaCharFinder.Models;
 
 namespace WorldSeeder
 {
-    public class WorldSeeder
+    public class WorldSeeder : Model, ISeeder
     {
         private readonly string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
         private readonly EnemyCharFinderDbContext _dbContext;
         private readonly Decompressor _decompressor;
 
-        public WorldSeeder(EnemyCharFinderDbContext dbContext, Decompressor decompressor)
+        public WorldSeeder(EnemyCharFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
         {
             _dbContext = dbContext;
             _decompressor = decompressor;
@@ -50,14 +51,9 @@ namespace WorldSeeder
             }
         }
 
-        private List<World> GetWorldsFromDb()
-        {
-            return _dbContext.Worlds.Where(w => w.Name != null).ToList();
-        }
-
         private World CreateWorld(string worldName)
         {
-            var worldUrl = GenerateWorldUrl(worldName);
+            var worldUrl = GetWorldUrl(worldName);
             var world = new World()
             {
                 Name = worldName,
@@ -81,7 +77,7 @@ namespace WorldSeeder
             }
             return worldNames;
         }
-        private string GenerateWorldUrl(string worldName)
+        private string GetWorldUrl(string worldName)
         {
             return $"{_mainUrl}&world={worldName}";
         }
