@@ -52,7 +52,7 @@ namespace WorldScanSeeder
             var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
             foreach (var item in items)
             {
-                stringBuilder.AppendLine($"{item.InnerText} ");
+                stringBuilder.AppendLine($"{item.InnerText}");
             }
             return stringBuilder.ToString();
         }
