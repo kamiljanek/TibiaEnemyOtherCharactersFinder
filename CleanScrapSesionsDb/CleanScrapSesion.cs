@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TibiaCharFinder.Entities;
 
 namespace CleanScrapSesionsDb
 {
@@ -11,10 +12,10 @@ namespace CleanScrapSesionsDb
     {
         public void Run()
         {
-            using TibiaArchiveContext context = new TibiaArchiveContext();
-            foreach (var item in context.ScrapSesions)
+            using EnemyCharFinderDbContext context = new EnemyCharFinderDbContext();
+            foreach (var item in context.WorldScans)
             {
-                context.ScrapSesions.Remove(item);
+                context.WorldScans.Remove(item);
             }
             context.SaveChanges();
         }
