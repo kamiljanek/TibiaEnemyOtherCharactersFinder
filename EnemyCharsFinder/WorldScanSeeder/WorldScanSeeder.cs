@@ -32,11 +32,11 @@ namespace WorldScanSeeder
         private WorldScan CreateWorldScan(World world)
         {
             var charactersOnline = GetCharactersOnline(world.Url);
-            var worldScan = new WorldScan()
+            var worldScan = new WorldScan
             {
                 CharactersOnline = charactersOnline,
                 WorldId = world.Id,
-                //ScanCreateDateTime = DateTime.Now,
+                ScanCreateDateTime = DateTime.Now,
                 World = world
             };
             return worldScan;

@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnemyCharsFinder", "EnemyCharsFinder\EnemyCharsFinder.csproj", "{00874583-3140-4207-845E-75F343A5E680}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddEveryServerUrlToDb", "..\AddEveryServerUrlToDb\AddEveryServerUrlToDb.csproj", "{7FC85EB3-06E4-43E4-9C52-47895A77E74F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddScrapSesionToDb", "..\AddScrapSesionToDb\AddScrapSesionToDb.csproj", "{D3A324CB-433E-4525-B313-1FF6FEFAC842}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanScrapSesionsDb", "..\CleanScrapSesionsDb\CleanScrapSesionsDb.csproj", "{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}"
@@ -17,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterAnalizer", "..\Cha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaCharFinder", "TibiaCharFinder\TibiaCharFinder.csproj", "{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldSeeder", "WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldScanSeeder", "WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,6 @@ Global
 		{00874583-3140-4207-845E-75F343A5E680}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00874583-3140-4207-845E-75F343A5E680}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00874583-3140-4207-845E-75F343A5E680}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FC85EB3-06E4-43E4-9C52-47895A77E74F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FC85EB3-06E4-43E4-9C52-47895A77E74F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FC85EB3-06E4-43E4-9C52-47895A77E74F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FC85EB3-06E4-43E4-9C52-47895A77E74F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D3A324CB-433E-4525-B313-1FF6FEFAC842}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D3A324CB-433E-4525-B313-1FF6FEFAC842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A324CB-433E-4525-B313-1FF6FEFAC842}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,6 +53,10 @@ Global
 		{62683399-B294-47AD-80BE-5B6F79551C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62683399-B294-47AD-80BE-5B6F79551C32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62683399-B294-47AD-80BE-5B6F79551C32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
