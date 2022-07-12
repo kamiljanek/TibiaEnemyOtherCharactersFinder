@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TibiaCharFinder.Entities;
 
@@ -11,9 +12,10 @@ using TibiaCharFinder.Entities;
 namespace TibiaCharFinder.Migrations
 {
     [DbContext(typeof(EnemyCharFinderDbContext))]
-    partial class EnemyCharFinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220711192526_removeIsRequiredPropertyFromWorldScan")]
+    partial class removeIsRequiredPropertyFromWorldScan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +52,7 @@ namespace TibiaCharFinder.Migrations
                     b.Property<int>("CharacterId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("LogInOrLogOutDateTime")
+                    b.Property<DateTime>("LogInOrLogOutDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PossibleCharacterId")
@@ -75,7 +77,7 @@ namespace TibiaCharFinder.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ScanCreateDateTime")
+                    b.Property<DateTime>("ScanCreateDateTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -118,7 +120,7 @@ namespace TibiaCharFinder.Migrations
                     b.Property<int>("CharacterId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("LogInOrLogOutDateTime")
+                    b.Property<DateTime>("LogInOrLogOutDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PossibleCharacterId")
@@ -143,7 +145,7 @@ namespace TibiaCharFinder.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ScanCreateDateTime")
+                    b.Property<DateTime>("ScanCreateDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("WorldId")

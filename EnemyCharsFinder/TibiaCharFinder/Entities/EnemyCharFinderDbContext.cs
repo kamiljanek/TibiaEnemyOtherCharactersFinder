@@ -28,17 +28,10 @@ namespace TibiaCharFinder.Entities
             modelBuilder.Entity<Scan>()
                 .Property(p => p.CharactersOnline)
                 .IsRequired();
-            modelBuilder.Entity<Scan>()
-                .Property(p => p.ScanCreateDateTime)
-                .IsRequired();
 
             modelBuilder.Entity<WorldScan>()
                 .Property(p => p.CharactersOnline)
                 .IsRequired();
-            modelBuilder.Entity<WorldScan>()
-                .Property(p=>p.ScanCreateDateTime)
-                .IsRequired();
-
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
