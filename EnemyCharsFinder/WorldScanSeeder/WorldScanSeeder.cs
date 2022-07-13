@@ -25,8 +25,8 @@ namespace WorldScanSeeder
                     var worldScan = CreateWorldScan(world);
                     _dbContext.WorldScans.Add(worldScan);
                 }
+                _dbContext.SaveChanges();
             }
-            _dbContext.SaveChanges();
         }
 
         private WorldScan CreateWorldScan(World world)
