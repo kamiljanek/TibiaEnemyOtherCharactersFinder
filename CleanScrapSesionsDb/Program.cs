@@ -1,9 +1,4 @@
-﻿using System;
-using System.Text;
-using EnemyCharsFinder;
-using EnemyCharsFinder.Data;
-using EnemyCharsFinder.Models;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using TibiaCharFinder.Entities;
 
 namespace CleanScrapSesionsDb
