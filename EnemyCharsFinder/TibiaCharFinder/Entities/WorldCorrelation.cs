@@ -6,8 +6,9 @@ namespace TibiaCharFinder.Entities
     {
         public int Id { get; set; }
         public int CharacterId { get; set; }
+        public Character Character { get; set; }
+        public int PossibleOtherCharacterId { get; set; }
+        //public Character PossibleOtherCharacter { get; set; }
         public DateTime? LogInOrLogOutDateTime { get; set; }
-        public int PossibleCharacterId { get; set; }
-        public virtual Character Character { get; set; }
     }
 }
