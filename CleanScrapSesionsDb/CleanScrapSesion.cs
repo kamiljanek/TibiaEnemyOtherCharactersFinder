@@ -4,20 +4,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TibiaCharFinder.Entities;
+using TibiaCharFinder.Models;
 
 namespace CleanScrapSesionsDb
 {
-    public class CleanScrapSesion
+    public class CleanScrapSesion : Model
     {
-        public void Run()
+        private readonly EnemyCharFinderDbContext _dbContext;
+
+        public CleanScrapSesion(EnemyCharFinderDbContext dbContext) : base(dbContext)
         {
-            using EnemyCharFinderDbContext context = new EnemyCharFinderDbContext();
-            foreach (var item in context.WorldScans)
+            _dbContext = dbContext;
+        }
+        public void Clean()
+        {
+            foreach (var item in _dbContext.WorldCorrelations)
             {
-                context.WorldScans.Remove(item);
+                _dbContext.WorldCorrelations.Remove(item);
             }
-            context.SaveChanges();
+            _dbContext.SaveChanges();
         }
     }
 }

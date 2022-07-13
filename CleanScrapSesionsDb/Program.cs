@@ -3,6 +3,8 @@ using System.Text;
 using EnemyCharsFinder;
 using EnemyCharsFinder.Data;
 using EnemyCharsFinder.Models;
+using Microsoft.Extensions.DependencyInjection;
+using TibiaCharFinder.Entities;
 
 namespace CleanScrapSesionsDb
 {
@@ -10,8 +12,19 @@ namespace CleanScrapSesionsDb
     {
         static void Main(string[] args)
         {
-            var cleanScrapSesion = new CleanScrapSesion();
-            cleanScrapSesion.Run();
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            var seeder = ServiceProvider.GetService<CleanScrapSesion>();
+            seeder.Clean();
+        }
+        public static ServiceProvider ServiceProvider { get; private set; }
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services
+                .AddSingleton<CleanScrapSesion>()
+                .AddSingleton<EnemyCharFinderDbContext>();
         }
     }
 }
