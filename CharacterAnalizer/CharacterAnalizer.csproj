@@ -6,7 +6,4 @@
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
   </PropertyGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\EnemyCharsFinder\EnemyCharsFinder\EnemyCharsFinder.csproj" />
-	</ItemGroup>
 </Project>
