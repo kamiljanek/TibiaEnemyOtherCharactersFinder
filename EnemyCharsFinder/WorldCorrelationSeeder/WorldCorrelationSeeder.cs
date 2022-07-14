@@ -14,7 +14,6 @@ namespace WorldCorrelationSeeder
 
         public void Seed()
         {
-
             if (_dbContext.Database.CanConnect())
             {
                 var worlds = GetWorldsFromDb();
@@ -23,26 +22,24 @@ namespace WorldCorrelationSeeder
                     var worldScans = GetWorldScansFromSpecificServer(world);
                     while (worldScans.Count > 0)
                     {
+                        var logoutNames = GetLogout_Names(worldScans);
+                        SeedCharacters(logoutNames);
+                        var logoutCharacters = GetCharactersBasedOnNames(logoutNames);
 
-                        var nameThatHave_Logout = GetLogout_Names(worldScans);
-                        SeedCharacters(nameThatHave_Logout);
-                        var charactersThatHave_Logout = GetCharactersBasedOnNames(nameThatHave_Logout);
-
-                        var nameThatHave_Login = GetLogin_Names(worldScans);
-                        SeedCharacters(nameThatHave_Login);
-                        var charactersThatHave_Login = GetCharactersBasedOnNames(nameThatHave_Login);
-                        foreach (var character_Logout in charactersThatHave_Logout)
+                        var loginNames = GetLogin_Names(worldScans);
+                        SeedCharacters(loginNames);
+                        var loginCharacters = GetCharactersBasedOnNames(loginNames);
+                      
+                        foreach (var logoutCharacter in logoutCharacters)
                         {
-                            foreach (var character_Login in charactersThatHave_Login)
+                            foreach (var loginCharacter in loginCharacters)
                             {
-                                var worldCorrelation = CreateWorldCorrelation(character_Logout, character_Login);
+                                var worldCorrelation = CreateWorldCorrelation(logoutCharacter, loginCharacter);
                                 _dbContext.WorldCorrelations.Add(worldCorrelation);
                             }
                         }
-
                         worldScans.Remove(worldScans[0]);
                     }
-
                     _dbContext.SaveChanges();
                 }
             }
