@@ -8,6 +8,5 @@ namespace TibiaCharFinder.Entities
         public int CharacterId { get; set; }
         public Character Character { get; set; }
         public int PossibleOtherCharacterId { get; set; }
-        public DateTime? LogInOrLogOutDateTime { get; set; }
     }
 }
