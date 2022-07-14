@@ -12,7 +12,11 @@ namespace CleanScrapSesionsDb
             ServiceProvider = services.BuildServiceProvider();
 
             var seeder = ServiceProvider.GetService<CleanScrapSesion>();
-            seeder.Clean();
+            var context = ServiceProvider.GetService<EnemyCharFinderDbContext>();
+  
+            var dbSet = context.WorldCorrelations; //choose table before run
+            
+            seeder.Clean(dbSet);
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)

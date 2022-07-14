@@ -1,4 +1,5 @@
-﻿using TibiaCharFinder.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TibiaCharFinder.Entities;
 using TibiaCharFinder.Models;
 
 namespace CleanScrapSesionsDb
@@ -11,13 +12,14 @@ namespace CleanScrapSesionsDb
         {
             _dbContext = dbContext;
         }
-        public void Clean()
+        public void Clean<T>(DbSet<T> obj) where T : class
         {
-            foreach (var item in _dbContext.WorldCorrelations)
+            foreach (var item in obj)
             {
-                _dbContext.WorldCorrelations.Remove(item);
+                obj.Remove(item);
             }
             _dbContext.SaveChanges();
-        }
+        } 
+       
     }
 }
