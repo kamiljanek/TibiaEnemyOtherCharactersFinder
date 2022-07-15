@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TibiaCharFinder.Entities
+namespace TibiaCharFinderAPI.Entities
 {
     public class Character
     {

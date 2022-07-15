@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TibiaCharFinder.Entities;
+using TibiaCharFinderAPI.Entities;
 
 namespace WorldSeeder
 {

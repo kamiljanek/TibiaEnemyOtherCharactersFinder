@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TibiaCharFinder.Entities;
+using TibiaCharFinderAPI.Entities;
 
-namespace TibiaCharFinder
+namespace TibiaCharFinderAPI
 {
     public class Startup
     {

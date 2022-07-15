@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TibiaCharFinder.Entities
+namespace TibiaCharFinderAPI.Entities
 {
     public class Correlation
     {

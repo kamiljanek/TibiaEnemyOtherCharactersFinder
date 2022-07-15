@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using TibiaCharFinder.Entities;
+using TibiaCharFinderAPI.Entities;
 
-namespace TibiaCharFinder.Controllers
+namespace TibiaCharFinderAPI.Controllers
 {
-    [Route("api/character")]
+    [Route("api/characters")]
     public class TibiaCharFinderController : ControllerBase
     {
         private readonly EnemyCharFinderDbContext _dbContext;
@@ -21,7 +21,7 @@ namespace TibiaCharFinder.Controllers
             return Ok(scanWorldList);
         }
 
-        [HttpGet ("{id}")]
+        [HttpGet("{id}")]
         public ActionResult<WorldScan> Get([FromRoute] int id)
         {
             var scanWorld = _dbContext.WorldScans.FirstOrDefault(w => w.Id == id);

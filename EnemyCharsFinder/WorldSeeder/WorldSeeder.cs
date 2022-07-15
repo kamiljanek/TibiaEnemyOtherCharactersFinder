@@ -1,6 +1,6 @@
 using HtmlAgilityPack.CssSelectors.NetCore;
-using TibiaCharFinder.Entities;
-using TibiaCharFinder.Models;
+using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Models;
 
 namespace WorldSeeder
 {

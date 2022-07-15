@@ -1,5 +1,5 @@
-using TibiaCharFinder.Entities;
-using TibiaCharFinder.Models;
+using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Models;
 
 namespace WorldCorrelationSeeder
 {
@@ -20,7 +20,7 @@ namespace WorldCorrelationSeeder
                 foreach (var world in worlds)
                 {
                     var worldScans = GetWorldScansFromSpecificServer(world);
-                    while (worldScans.Count > 0)
+                    while (worldScans.Count > 1)
                     {
                         var logoutNames = GetLogout_Names(worldScans);
                         SeedCharacters(logoutNames);
@@ -103,11 +103,7 @@ namespace WorldCorrelationSeeder
         }
         private List<string> GetNextNamesOnline(List<WorldScan> worldScans)
         {
-            if (worldScans.Count > 1)
-            {
                 return worldScans[1].CharactersOnline.Split("\r\n").ToList();
-            }
-            return worldScans[0].CharactersOnline.Split("\r\n").ToList();
         }
     }
 }

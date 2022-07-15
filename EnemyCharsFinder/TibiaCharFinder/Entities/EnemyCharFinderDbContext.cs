@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace TibiaCharFinder.Entities
+namespace TibiaCharFinderAPI.Entities
 {
     public class EnemyCharFinderDbContext : DbContext
     {
@@ -19,8 +19,8 @@ namespace TibiaCharFinder.Entities
                     w.Property(wo => wo.Url).IsRequired();
                     w.Property(wo => wo.IsAvailable).IsRequired();
                     w.HasMany(ws => ws.WorldScans)
-                        .WithOne(ws=>ws.World)
-                        .HasForeignKey(ws=>ws.WorldId);
+                        .WithOne(ws => ws.World)
+                        .HasForeignKey(ws => ws.WorldId);
                 });
 
             modelBuilder.Entity<WorldScan>(ws =>
