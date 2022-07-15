@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TibiaCharFinder.Entities;
-using TibiaCharFinder.Models;
+using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Models;
 
 namespace CleanScrapSesionsDb
 {

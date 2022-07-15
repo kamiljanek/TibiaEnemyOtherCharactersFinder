@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TibiaCharFinder.Entities;
+using TibiaCharFinderAPI.Entities;
 
 namespace CleanScrapSesionsDb
 {
@@ -14,9 +14,9 @@ namespace CleanScrapSesionsDb
             var seeder = ServiceProvider.GetService<CleanScrapSesion>();
             var context = ServiceProvider.GetService<EnemyCharFinderDbContext>();
   
-            var dbSet = context.WorldCorrelations; //choose table before run
+            var tableName = context.WorldCorrelations; //choose table before run
             
-            seeder.Clean(dbSet);
+            seeder.Clean(tableName);
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)
