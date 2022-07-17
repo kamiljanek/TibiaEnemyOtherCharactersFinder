@@ -27,13 +27,6 @@ namespace TibiaCharFinderAPI.Entities
             {
                 ws.Property(w => w.CharactersOnline).IsRequired();
             });
-
-            modelBuilder.Entity<Character>(c =>
-            {
-                c.HasMany(ch => ch.WorldCorrelationsLogout)
-                    .WithOne(co => co.Character)
-                    .HasForeignKey(co => co.CharacterId);
-            });
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

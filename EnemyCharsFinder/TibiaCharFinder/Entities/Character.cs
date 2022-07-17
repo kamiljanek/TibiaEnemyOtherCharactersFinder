@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TibiaCharFinderAPI.Entities
 {
@@ -6,6 +7,8 @@ namespace TibiaCharFinderAPI.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<WorldCorrelation> WorldCorrelationsLogout { get; set; } = new List<WorldCorrelation>();
+
+        [ForeignKey("CharacterId")]
+        public List<WorldCorrelation> WorldCorrelations { get; set; }
     }
 }
