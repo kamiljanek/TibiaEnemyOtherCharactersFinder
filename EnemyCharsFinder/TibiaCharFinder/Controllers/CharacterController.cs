@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Models;
 
 namespace TibiaCharFinderAPI.Controllers
 {
@@ -8,38 +10,48 @@ namespace TibiaCharFinderAPI.Controllers
     public class CharacterController : ControllerBase
     {
         private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public CharacterController(EnemyCharFinderDbContext dbContext)
+        public CharacterController(EnemyCharFinderDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
         [HttpGet]
-        public ActionResult<IEnumerable<Character>> GetExamples()
+        public ActionResult<IEnumerable<CharacterDto>> GetExamples()
         {
             List<Character> characters = new List<Character>()
             {
-                _dbContext.Characters.First(),
+                _dbContext.Characters.Include(c=>c.WorldCorrelations).First(),
                 _dbContext.Characters.Skip(1).First(),
                 _dbContext.Characters.Skip(4).First(),
                 _dbContext.Characters.Skip(16).First(),
             };
-            return Ok(characters);
+
+            var charactersDto = _mapper.Map<List<CharacterDto>>(characters);
+
+            return Ok(charactersDto);
         }
         [HttpGet("{amount}")]
-        public ActionResult<IEnumerable<Character>> GetFew([FromRoute] int amount)
+        public ActionResult<IEnumerable<CharacterDto>> GetAmount([FromRoute] int amount)
         {
-            var characters = _dbContext.Characters.Take(amount);
-            return Ok(characters);
+            var characters = _dbContext.Characters.Take(amount).Include(c => c.WorldCorrelations);
+
+            var charactersDto = _mapper.Map<List<CharacterDto>>(characters);
+
+            return Ok(charactersDto);
         }
-        [HttpGet("id/{id}")]
-        public ActionResult<Character> GetFromId([FromRoute] int id)
+        [HttpGet("name")]
+        public ActionResult<CharacterDto> GetById([FromQuery] int id)
         {
-            var character = _dbContext.Characters.FirstOrDefault(w => w.Id == id);
-            if (character != null)
+            var character = _dbContext.Characters.Include(c=>c.WorldCorrelations).FirstOrDefault(w => w.Id == id);
+            var characterDto = _mapper.Map<CharacterDto>(character);
+
+            if (characterDto != null)
             {
-                return Ok(character);
+                return Ok(characterDto);
             }
-            return NotFound();
-        }
+            return NotFound($"No character with id={id}");
+        }  
     }
 }
