@@ -6,6 +6,7 @@ namespace TibiaCharFinderAPI
 {
     public class TibiaCharFinderMapperProfile : Profile
     {
+
         public TibiaCharFinderMapperProfile()
         {
             CreateMap<Character, CharacterDto>();
@@ -16,6 +17,9 @@ namespace TibiaCharFinderAPI
 
             CreateMap<WorldScan, WorldScanDto>()
             .ForMember(m => m.World, c => c.MapFrom(s => s.World.Name));
+
+            CreateMap<CreateWorldDto, World>();
+
 
         }
     }

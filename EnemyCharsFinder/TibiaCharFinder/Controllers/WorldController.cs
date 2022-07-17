@@ -30,5 +30,14 @@ namespace TibiaCharFinderAPI.Controllers
             }
             return NotFound($"No world with id={id}");
         }
+
+        [HttpPost]
+        public ActionResult CreateWorld([FromBody] CreateWorldDto dto)
+        {
+            var world = _mapper.Map<World>(dto);
+            _dbContext.Worlds.Add(world);
+            _dbContext.SaveChanges();
+            return Created($"api/world/{world.Id}", null);
+        }
     }
 }
