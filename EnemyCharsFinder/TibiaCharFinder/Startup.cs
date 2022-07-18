@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Services;
 
 namespace TibiaCharFinderAPI
 {
@@ -22,6 +23,7 @@ namespace TibiaCharFinderAPI
             services.AddControllers();
             services.AddDbContext<EnemyCharFinderDbContext>();
             services.AddAutoMapper(this.GetType().Assembly);
+            services.AddScoped<IWorldService, WorldService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

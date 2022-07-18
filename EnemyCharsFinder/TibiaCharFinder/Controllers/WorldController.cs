@@ -1,28 +1,23 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TibiaCharFinderAPI.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using TibiaCharFinderAPI.Models;
+using TibiaCharFinderAPI.Services;
 
 namespace TibiaCharFinderAPI.Controllers
 {
     [Route("api/world")]
     public class WorldController : ControllerBase
     {
-        private readonly EnemyCharFinderDbContext _dbContext;
-        private readonly IMapper _mapper;
+        private readonly IWorldService _worldService;
 
-        public WorldController(EnemyCharFinderDbContext dbContext, IMapper mapper)
+        public WorldController(IWorldService worldService)
         {
-            _dbContext = dbContext;
-            _mapper = mapper;
+            _worldService = worldService;
         }
 
         [HttpGet("{id}")]
         public ActionResult<WorldDto> GetById([FromRoute] int id)
         {
-            var world = _dbContext.Worlds.Include(w=>w.WorldScans).FirstOrDefault(w => w.Id == id);
-            var worldDto = _mapper.Map<WorldDto>(world);
+            var worldDto = _worldService.GetById(id);
 
             if (worldDto != null)
             {
@@ -30,14 +25,32 @@ namespace TibiaCharFinderAPI.Controllers
             }
             return NotFound($"No world with id={id}");
         }
+        [HttpGet()]
+        public ActionResult<WorldDto> GetAll()
+        {
+            var worldDtos = _worldService.GetAll();
+
+            return Ok(worldDtos);
+        }
 
         [HttpPost]
-        public ActionResult CreateWorld([FromBody] CreateWorldDto dto)
+        public ActionResult Create([FromBody] CreateWorldDto dto)
         {
-            var world = _mapper.Map<World>(dto);
-            _dbContext.Worlds.Add(world);
-            _dbContext.SaveChanges();
-            return Created($"api/world/{world.Id}", null);
+            var id = _worldService.Create(dto);
+            return Created($"api/world/{id}", null);
+        } 
+        [HttpDelete("{id}")]
+        public ActionResult Delete([FromRoute] int id)
+        {
+            var isDeleted = _worldService.Delete(id);
+           
+            if (isDeleted)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }
+
