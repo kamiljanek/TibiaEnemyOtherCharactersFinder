@@ -19,7 +19,7 @@ namespace WorldScanSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-                var worlds = GetWorldsFromDb();
+                var worlds = GetWorldsFromDbIfIsAvailable();
                 foreach (var world in worlds)
                 {
                     var worldScan = CreateWorldScan(world);

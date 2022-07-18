@@ -11,9 +11,9 @@ namespace TibiaCharFinderAPI.Models
             _dbContext = dbContext;
         }
 
-        protected List<World> GetWorldsFromDb()
+        protected List<World> GetWorldsFromDbIfIsAvailable()
         {
-            return _dbContext.Worlds.Where(w => w.Name != null).ToList();
+            return _dbContext.Worlds.Where(w => w.IsAvailable == true).ToList();
         }
     }
 }
