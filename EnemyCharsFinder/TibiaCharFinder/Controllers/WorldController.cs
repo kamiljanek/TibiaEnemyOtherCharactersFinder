@@ -51,6 +51,17 @@ namespace TibiaCharFinderAPI.Controllers
 
             return NotFound();
         }
+
+        [HttpPut("{id}")]
+        public ActionResult Update([FromBody] UpdateWorldDto dto, [FromRoute] int id)
+        {
+            var isUpdated = _worldService.Update(dto, id);
+            if (isUpdated)
+            {
+                return Ok();
+            }
+            return NotFound();
+        }
     }
 }
 

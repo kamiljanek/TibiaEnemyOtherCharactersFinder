@@ -11,6 +11,7 @@ namespace TibiaCharFinderAPI.Services
         IEnumerable<WorldDto> GetAll();
         int Create(CreateWorldDto dto);
         bool Delete(int id);
+        bool Update(UpdateWorldDto dto, int id);
     }
 
     public class WorldService : IWorldService
@@ -51,7 +52,7 @@ namespace TibiaCharFinderAPI.Services
         } 
         public bool Delete(int id)
         {
-            var world = _dbContext.Worlds.SingleOrDefault(w=>w.Id==id);
+            var world = _dbContext.Worlds.FirstOrDefault(w=>w.Id==id);
             if (world is null)
             {
                 return false;
@@ -60,6 +61,24 @@ namespace TibiaCharFinderAPI.Services
             _dbContext.SaveChanges();
 
             return true;
+        }
+
+        public bool Update(UpdateWorldDto dto, int id)
+        {
+            var world = _dbContext.Worlds.FirstOrDefault(e => e.Id == id);
+            if (world is null)
+            {
+                return false;
+            }
+
+            world.Name = dto.Name;
+            world.Url = dto.Url;
+            world.IsAvailable = dto.IsAvailable;
+
+            _dbContext.SaveChanges();
+
+            return true;
+
         }
     }
 }
