@@ -24,11 +24,11 @@ namespace TibiaCharFinderAPI.Controllers
         public ActionResult<IEnumerable<CharacterDto>> GetAmount([FromRoute] int amount)
         {
             var characters = _dbContext.Characters
-                .Take(amount)
-                .Include(c => c.LogoutWorldCorrelations)
-                .Include(c => c.LoginWorldCorrelations);
+                .Take(amount);
+                //.Include(c => c.LogoutWorldCorrelations)
+                //.Include(c => c.LoginWorldCorrelations);
 
-            var charactersDto = _mapper.Map<IEnumerable<CharacterDto>>(characters);
+            var charactersDto = _mapper.ProjectTo<CharacterDto>(characters);
 
             return Ok(charactersDto);
         }
