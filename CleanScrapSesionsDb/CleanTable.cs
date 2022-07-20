@@ -4,11 +4,11 @@ using TibiaCharFinderAPI.Models;
 
 namespace CleanScrapSesionsDb
 {
-    public class CleanScrapSesion : Model
+    public class CleanTable : Model
     {
         private readonly TibiaCharacterFinderDbContext _dbContext;
 
-        public CleanScrapSesion(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
+        public CleanTable(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }

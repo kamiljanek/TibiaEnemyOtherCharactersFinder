@@ -11,7 +11,7 @@ namespace CleanScrapSesionsDb
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            var seeder = ServiceProvider.GetService<CleanScrapSesion>();
+            var seeder = ServiceProvider.GetService<CleanTable>();
             var context = ServiceProvider.GetService<TibiaCharacterFinderDbContext>();
   
             var tableName = context.WorldCorrelations; //choose table before run
@@ -22,7 +22,7 @@ namespace CleanScrapSesionsDb
         private static void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSingleton<CleanScrapSesion>()
+                .AddSingleton<CleanTable>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
         }
     }
