@@ -55,12 +55,14 @@ namespace WorldCorrelationSeeder
             }
             return listOfCharacters;
         }
-        public WorldCorrelation CreateWorldCorrelation(Character character, Character possibleOtherCharacter)
+        public WorldCorrelation CreateWorldCorrelation(Character logoutCharacter, Character loginCharacter)
         {
             return new WorldCorrelation
             {
-                CharacterId = character.Id,
-                PossibleOtherCharacterId = possibleOtherCharacter.Id,
+                LogoutCharacterId = logoutCharacter.Id,
+                LogoutCharacter = logoutCharacter,
+                LoginCharacterId = loginCharacter.Id,
+                LoginCharacter = loginCharacter
             };
         }
 
