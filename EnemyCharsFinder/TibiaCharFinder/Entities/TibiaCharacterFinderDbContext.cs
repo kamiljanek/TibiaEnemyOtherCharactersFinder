@@ -2,7 +2,7 @@
 
 namespace TibiaCharFinderAPI.Entities
 {
-    public class EnemyCharFinderDbContext : DbContext
+    public class TibiaCharacterFinderDbContext : DbContext
     {
         private readonly string _connectionString = @"Data Source=(localdb)\MSSQLLocalDB; Initial Catalog=TibiaCharFinderDb; Trusted_Connection=True";
 

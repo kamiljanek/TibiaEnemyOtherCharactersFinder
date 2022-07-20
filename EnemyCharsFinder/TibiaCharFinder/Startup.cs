@@ -22,7 +22,7 @@ namespace TibiaCharFinderAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<EnemyCharFinderDbContext>();
+            services.AddDbContext<TibiaCharacterFinderDbContext>();
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddScoped<IWorldService, WorldService>();
             services.AddControllers().AddJsonOptions(x =>

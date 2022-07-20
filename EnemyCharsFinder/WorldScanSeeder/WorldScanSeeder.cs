@@ -7,10 +7,10 @@ namespace WorldScanSeeder
 {
     public class WorldScanSeeder : Model, ISeeder
     {
-        private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly TibiaCharacterFinderDbContext _dbContext;
         private readonly Decompressor _decompressor;
 
-        public WorldScanSeeder(EnemyCharFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
+        public WorldScanSeeder(TibiaCharacterFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
         {
             _dbContext = dbContext;
             _decompressor = decompressor;

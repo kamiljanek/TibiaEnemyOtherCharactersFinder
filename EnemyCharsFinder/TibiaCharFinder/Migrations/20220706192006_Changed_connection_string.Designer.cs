@@ -9,7 +9,7 @@ using TibiaCharFinderAPI.Entities;
 
 namespace TibiaCharFinder.Migrations
 {
-    [DbContext(typeof(EnemyCharFinderDbContext))]
+    [DbContext(typeof(TibiaCharacterFinderDbContext))]
     [Migration("20220706192006_Changed_connection_string")]
     partial class Changed_connection_string
     {

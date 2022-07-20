@@ -21,7 +21,7 @@ namespace WorldCorrelationSeeder
             services
                 .AddSingleton<WorldCorrelationSeeder>()
                 .AddSingleton<Decompressor>()
-                .AddSingleton<EnemyCharFinderDbContext>();
+                .AddSingleton<TibiaCharacterFinderDbContext>();
         }
     }
 }

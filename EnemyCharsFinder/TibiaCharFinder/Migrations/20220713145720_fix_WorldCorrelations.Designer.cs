@@ -11,7 +11,7 @@ using TibiaCharFinderAPI.Entities;
 
 namespace TibiaCharFinder.Migrations
 {
-    [DbContext(typeof(EnemyCharFinderDbContext))]
+    [DbContext(typeof(TibiaCharacterFinderDbContext))]
     [Migration("20220713145720_fix_WorldCorrelations")]
     partial class fix_WorldCorrelations
     {

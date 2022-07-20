@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanScrapSesionsDb", "..\CleanScrapSesionsDb\CleanScrapSesionsDb.csproj", "{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaCharFinderAPI", "TibiaCharFinder\TibiaCharFinderAPI.csproj", "{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaCharacterFinderAPI", "TibiaCharFinder\TibiaCharacterFinderAPI.csproj", "{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
 EndProject

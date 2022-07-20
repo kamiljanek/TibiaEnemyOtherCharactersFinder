@@ -4,10 +4,10 @@ using TibiaCharFinderAPI.Models;
 
 namespace TibiaCharFinderAPI
 {
-    public class TibiaCharFinderMapperProfile : Profile
+    public class TibiaCharacterFinderMapperProfile : Profile
     {
 
-        public TibiaCharFinderMapperProfile()
+        public TibiaCharacterFinderMapperProfile()
         {
             CreateMap<Character, CharacterDto>();
 

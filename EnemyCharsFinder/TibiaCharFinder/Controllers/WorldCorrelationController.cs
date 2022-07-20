@@ -14,10 +14,10 @@ namespace TibiaCharFinderAPI.Controllers
     [Route("api/correlation")]
     public class WorldCorrelationController : ControllerBase
     {
-        private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly TibiaCharacterFinderDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public WorldCorrelationController(EnemyCharFinderDbContext dbContext, IMapper mapper)
+        public WorldCorrelationController(TibiaCharacterFinderDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

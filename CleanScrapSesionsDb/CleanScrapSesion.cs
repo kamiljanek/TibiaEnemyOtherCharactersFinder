@@ -6,9 +6,9 @@ namespace CleanScrapSesionsDb
 {
     public class CleanScrapSesion : Model
     {
-        private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly TibiaCharacterFinderDbContext _dbContext;
 
-        public CleanScrapSesion(EnemyCharFinderDbContext dbContext) : base(dbContext)
+        public CleanScrapSesion(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }

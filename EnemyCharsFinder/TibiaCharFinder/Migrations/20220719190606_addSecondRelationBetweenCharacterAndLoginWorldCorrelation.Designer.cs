@@ -11,7 +11,7 @@ using TibiaCharFinderAPI.Entities;
 
 namespace TibiaCharFinder.Migrations
 {
-    [DbContext(typeof(EnemyCharFinderDbContext))]
+    [DbContext(typeof(TibiaCharacterFinderDbContext))]
     [Migration("20220719190606_addSecondRelationBetweenCharacterAndLoginWorldCorrelation")]
     partial class addSecondRelationBetweenCharacterAndLoginWorldCorrelation
     {

@@ -4,9 +4,9 @@ namespace TibiaCharFinderAPI.Models
 {
     public class Model
     {
-        private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly TibiaCharacterFinderDbContext _dbContext;
 
-        public Model(EnemyCharFinderDbContext dbContext)
+        public Model(TibiaCharacterFinderDbContext dbContext)
         {
             _dbContext = dbContext;
         }

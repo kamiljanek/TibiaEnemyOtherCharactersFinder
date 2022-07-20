@@ -7,10 +7,10 @@ namespace WorldSeeder
     public class WorldSeeder : Model, ISeeder
     {
         private readonly string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
-        private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly TibiaCharacterFinderDbContext _dbContext;
         private readonly Decompressor _decompressor;
 
-        public WorldSeeder(EnemyCharFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
+        public WorldSeeder(TibiaCharacterFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
         {
             _dbContext = dbContext;
             _decompressor = decompressor;

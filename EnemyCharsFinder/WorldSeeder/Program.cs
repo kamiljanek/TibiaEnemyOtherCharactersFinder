@@ -21,7 +21,7 @@ namespace WorldSeeder
             services
                 .AddSingleton<WorldSeeder>()
                 .AddSingleton<Decompressor>()
-                .AddSingleton<EnemyCharFinderDbContext>();
+                .AddSingleton<TibiaCharacterFinderDbContext>();
         }
     }
 }

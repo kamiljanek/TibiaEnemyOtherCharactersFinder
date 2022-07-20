@@ -21,7 +21,7 @@ namespace WorldScanSeeder
             services
                 .AddSingleton<WorldScanSeeder>()
                 .AddSingleton<Decompressor>()
-                .AddSingleton<EnemyCharFinderDbContext>();
+                .AddSingleton<TibiaCharacterFinderDbContext>();
         }
     }
 }

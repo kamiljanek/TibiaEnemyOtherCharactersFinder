@@ -5,9 +5,9 @@ namespace WorldCorrelationSeeder
 {
     public class WorldCorrelationSeeder : Model, ISeeder
     {
-        private readonly EnemyCharFinderDbContext _dbContext;
+        private readonly TibiaCharacterFinderDbContext _dbContext;
 
-        public WorldCorrelationSeeder(EnemyCharFinderDbContext dbContext) : base(dbContext)
+        public WorldCorrelationSeeder(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }

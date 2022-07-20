@@ -11,7 +11,7 @@ using TibiaCharFinderAPI.Entities;
 
 namespace TibiaCharFinder.Migrations
 {
-    [DbContext(typeof(EnemyCharFinderDbContext))]
+    [DbContext(typeof(TibiaCharacterFinderDbContext))]
     [Migration("20220711194118_changedAllDateTimePropertyToNullable")]
     partial class changedAllDateTimePropertyToNullable
     {

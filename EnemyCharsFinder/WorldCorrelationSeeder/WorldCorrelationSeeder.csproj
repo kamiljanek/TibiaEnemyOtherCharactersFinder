@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TibiaCharFinder\TibiaCharFinderAPI.csproj" />
+    <ProjectReference Include="..\TibiaCharFinder\TibiaCharacterFinderAPI.csproj" />
   </ItemGroup>
 
 </Project>
