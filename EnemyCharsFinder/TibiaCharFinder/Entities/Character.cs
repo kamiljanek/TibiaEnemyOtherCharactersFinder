@@ -8,7 +8,8 @@ namespace TibiaCharFinderAPI.Entities
         public int Id { get; set; }
         public string Name { get; set; }
 
-        [ForeignKey("CharacterId")]
-        public List<WorldCorrelation> WorldCorrelations { get; set; }
+        public virtual List<WorldCorrelation> LoginWorldCorrelations { get; set; }
+        public virtual List<WorldCorrelation> LogoutWorldCorrelations { get; set; }
+
     }
 }

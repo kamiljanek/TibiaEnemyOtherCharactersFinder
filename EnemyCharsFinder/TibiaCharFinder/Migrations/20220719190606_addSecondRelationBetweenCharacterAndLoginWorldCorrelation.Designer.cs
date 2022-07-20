@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TibiaCharFinderAPI.Entities;
 
@@ -11,9 +12,10 @@ using TibiaCharFinderAPI.Entities;
 namespace TibiaCharFinder.Migrations
 {
     [DbContext(typeof(EnemyCharFinderDbContext))]
-    partial class EnemyCharFinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220719190606_addSecondRelationBetweenCharacterAndLoginWorldCorrelation")]
+    partial class addSecondRelationBetweenCharacterAndLoginWorldCorrelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,11 +118,13 @@ namespace TibiaCharFinder.Migrations
                     b.HasOne("TibiaCharFinderAPI.Entities.Character", "LoginCharacter")
                         .WithMany("LoginWorldCorrelations")
                         .HasForeignKey("LoginCharacterId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.HasOne("TibiaCharFinderAPI.Entities.Character", "LogoutCharacter")
                         .WithMany("LogoutWorldCorrelations")
                         .HasForeignKey("LogoutCharacterId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.Navigation("LoginCharacter");
