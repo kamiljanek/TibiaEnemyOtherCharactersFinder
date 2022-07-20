@@ -11,18 +11,15 @@ namespace CleanScrapSesionsDb
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            var seeder = ServiceProvider.GetService<CleanTable>();
-            var context = ServiceProvider.GetService<TibiaCharacterFinderDbContext>();
+            var dbContext = ServiceProvider.GetService<TibiaCharacterFinderDbContext>();
   
-            var tableName = context.WorldCorrelations; //choose table before run
-            
-            seeder.Clean(tableName);
+            dbContext.WorldCorrelations.Clear(); //change "table" before run
+            dbContext.SaveChanges();
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSingleton<CleanTable>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
         }
     }
