@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Text.Json.Serialization;
 using TibiaCharFinderAPI.Entities;
 using TibiaCharFinderAPI.Services;
 
@@ -24,6 +25,8 @@ namespace TibiaCharFinderAPI
             services.AddDbContext<EnemyCharFinderDbContext>();
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddScoped<IWorldService, WorldService>();
+            services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
