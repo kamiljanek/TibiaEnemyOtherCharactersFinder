@@ -9,7 +9,9 @@ namespace TibiaCharFinderAPI.Models
 {
     public class WorldCorrelationDto
     {
-        public int PossibleOtherCharacterId { get; set; }
-        public string PossibleOtherCharacterName { get; set; }
+        public int LogoutCharacterId { get; set; }
+        public string LogoutCharacterName { get; set; }
+        public int LoginCharacterId { get; set; }
+        public string LoginCharacterName { get; set; }
     }
 }
