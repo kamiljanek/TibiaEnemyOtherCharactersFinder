@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TibiaCharFinderAPI.Entities;
 
@@ -11,9 +12,10 @@ using TibiaCharFinderAPI.Entities;
 namespace TibiaCharFinder.Migrations
 {
     [DbContext(typeof(TibiaCharacterFinderDbContext))]
-    partial class EnemyCharFinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220803210408_AddOptimizedWorldCorrelationTable")]
+    partial class AddOptimizedWorldCorrelationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

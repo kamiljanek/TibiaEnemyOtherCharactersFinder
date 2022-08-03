@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using TibiaCharacterFinderAPI.Entities;
 
 namespace TibiaCharFinderAPI.Entities
 {
@@ -10,6 +11,8 @@ namespace TibiaCharFinderAPI.Entities
 
         public virtual List<WorldCorrelation> LoginWorldCorrelations { get; set; }
         public virtual List<WorldCorrelation> LogoutWorldCorrelations { get; set; }
+        public virtual List<OptimizedWorldCorrelation> OptimizedWorldCorrelations { get; set; }
+
 
     }
 }

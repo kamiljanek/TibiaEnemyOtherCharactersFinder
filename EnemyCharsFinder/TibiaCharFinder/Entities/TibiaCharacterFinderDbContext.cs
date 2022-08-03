@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TibiaCharacterFinderAPI.Entities;
 
 namespace TibiaCharFinderAPI.Entities
 {
@@ -10,6 +11,7 @@ namespace TibiaCharFinderAPI.Entities
         public DbSet<WorldScan> WorldScans { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<WorldCorrelation> WorldCorrelations { get; set; }
+        public DbSet<OptimizedWorldCorrelation> OptimizedWorldCorrelations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +40,11 @@ namespace TibiaCharFinderAPI.Entities
                 .WithMany(t => t.LogoutWorldCorrelations)
                 .HasForeignKey(m => m.LogoutCharacterId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<OptimizedWorldCorrelation>()
+                .HasOne(o => o.LogoutOrLoginCharacter)
+                .WithMany(c => c.OptimizedWorldCorrelations)
+                .HasForeignKey(o => o.LogoutOrLoginCharacterId);
 
         }
 
