@@ -38,7 +38,7 @@ namespace WorldSeeder
             if (_dbContext.Database.CanConnect())
             {
                 var availableWorldNames = GetWorldNamesFromTibiaCom();
-                var dbWorldNames = GetWorldsFromDbIfIsAvailable();
+                var dbWorldNames = GetAvailableWorlds();
                 foreach (var dbWorldName in dbWorldNames)
                 {
                     if (!availableWorldNames.Contains(dbWorldName.Name))

@@ -16,25 +16,25 @@ namespace WorldCorrelationSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-                var worlds = GetWorldsFromDbIfIsAvailable();
+                var worlds = GetAvailableWorlds();
                 foreach (var world in worlds)
                 {
                     var worldScans = GetWorldScansFromSpecificServer(world);
                     while (worldScans.Count > 1)
                     {
-                        var logoutNames = GetLogout_Names(worldScans);
-                        SeedCharacters(logoutNames);
-                        var logoutCharacters = GetCharactersBasedOnNames(logoutNames);
+                        var namesThatLogged_Out = GetLogout_Names(worldScans);
+                        SeedCharacters(namesThatLogged_Out);
+                        var charactersThatLogged_Out = GetCharactersBasedOnNames(namesThatLogged_Out);
 
-                        var loginNames = GetLogin_Names(worldScans);
-                        SeedCharacters(loginNames);
-                        var loginCharacters = GetCharactersBasedOnNames(loginNames);
+                        var namesThatLogged_In = GetLogin_Names(worldScans);
+                        SeedCharacters(namesThatLogged_In);
+                        var charactersThatLogged_In = GetCharactersBasedOnNames(namesThatLogged_In);
                       
-                        foreach (var logoutCharacter in logoutCharacters)
+                        foreach (var loggedOutCharacter in charactersThatLogged_Out)
                         {
-                            foreach (var loginCharacter in loginCharacters)
+                            foreach (var loggedInCharacter in charactersThatLogged_In)
                             {
-                                var worldCorrelation = CreateWorldCorrelation(logoutCharacter, loginCharacter);
+                                var worldCorrelation = CreateWorldCorrelation(loggedOutCharacter, loggedInCharacter);
                                 _dbContext.WorldCorrelations.Add(worldCorrelation);
                             }
                         }
@@ -89,23 +89,28 @@ namespace WorldCorrelationSeeder
         }
         private List<string> GetLogout_Names(List<WorldScan> worldScans)
         {
-            var firstOnlineNames = GetFirstNamesOnline(worldScans);
-            var nextOnlineNames = GetNextNamesOnline(worldScans);
+            var firstOnlineNames = GetFirstOnlineNames(worldScans);
+            var nextOnlineNames = GetNextOnlineNames(worldScans);
             return firstOnlineNames.Except(nextOnlineNames).ToList();
         }
         private List<string> GetLogin_Names(List<WorldScan> worldScans)
         {
-            var firstOnlineNames = GetFirstNamesOnline(worldScans);
-            var nextOnlineNames = GetNextNamesOnline(worldScans);
+            var firstOnlineNames = GetFirstOnlineNames(worldScans);
+            var nextOnlineNames = GetNextOnlineNames(worldScans);
             return nextOnlineNames.Except(firstOnlineNames).ToList();
         }
-        private List<string> GetFirstNamesOnline(List<WorldScan> worldScans)
+        private List<string> GetFirstOnlineNames(List<WorldScan> worldScans)
         {
-            return worldScans[0].CharactersOnline.Split("\r\n").ToList();
+                return GetOnlineNames(worldScans, 0);
         }
-        private List<string> GetNextNamesOnline(List<WorldScan> worldScans)
+        private List<string> GetNextOnlineNames(List<WorldScan> worldScans)
         {
-                return worldScans[1].CharactersOnline.Split("\r\n").ToList();
+                return GetOnlineNames(worldScans, 1);
         }
+        private List<string> GetOnlineNames(List<WorldScan> worldScans, int index)
+        {
+                return worldScans[index].CharactersOnline.Split("|").ToList();
+        }
+
     }
 }

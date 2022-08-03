@@ -19,7 +19,7 @@ namespace WorldScanSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-                var worlds = GetWorldsFromDbIfIsAvailable();
+                var worlds = GetAvailableWorlds();
                 foreach (var world in worlds)
                 {
                     var worldScan = CreateWorldScan(world);
@@ -31,7 +31,7 @@ namespace WorldScanSeeder
 
         private WorldScan CreateWorldScan(World world)
         {
-            var charactersOnline = GetCharactersOnline(world.Url);
+            var charactersOnline = FetchOnlineCharacters(world.Url);
             var worldScan = new WorldScan
             {
                 CharactersOnline = charactersOnline,
@@ -43,7 +43,7 @@ namespace WorldScanSeeder
         }
 
 
-        private string GetCharactersOnline(string world)
+        private string FetchOnlineCharacters(string world)
         {
             _decompressor.Decompress();
 
@@ -52,7 +52,8 @@ namespace WorldScanSeeder
             var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
             foreach (var item in items)
             {
-                stringBuilder.AppendLine($"{item.InnerText}");
+                string name = item.InnerHtml.Replace("&#160;", " "); 
+                stringBuilder.Append($"{name}|");
             }
             return stringBuilder.ToString();
         }
