@@ -48,13 +48,15 @@ namespace WorldScanSeeder
             _decompressor.Decompress();
 
             var stringBuilder = new StringBuilder();
+            var names = new List<string>();
             var document = _decompressor.web.Load(world);
             var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
             foreach (var item in items)
             {
-                string name = item.InnerHtml.Replace("&#160;", " "); 
-                stringBuilder.Append($"{name}|");
+                string name = item.InnerHtml.Replace("&#160;", " ");
+                names.Add(name);
             }
+            stringBuilder.AppendJoin('|', names);
             return stringBuilder.ToString();
         }
     }
