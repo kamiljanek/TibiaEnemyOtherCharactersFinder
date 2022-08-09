@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "WorldSca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldCorrelationSeeder", "WorldCorrelationSeeder\WorldCorrelationSeeder.csproj", "{F531749B-7B81-480E-B363-14B836323D50}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OptimizedWorldCorrelationSeeder", "OptimizedWorldCorrelationSeeder\OptimizedWorldCorrelationSeeder.csproj", "{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharacterSeeder", "CharacterSeeder\CharacterSeeder.csproj", "{96261717-EAD1-448B-8AF9-3AF4A599C074}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{F531749B-7B81-480E-B363-14B836323D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F531749B-7B81-480E-B363-14B836323D50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F531749B-7B81-480E-B363-14B836323D50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
