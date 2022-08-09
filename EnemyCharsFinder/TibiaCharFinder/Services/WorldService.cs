@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Models;
+using TibiaCharacterFinderAPI.Entities;
+using TibiaCharacterFinderAPI.Models;
 
-namespace TibiaCharFinderAPI.Services
+namespace TibiaCharacterFinderAPI.Services
 {
     public interface IWorldService
     {
@@ -49,10 +49,10 @@ namespace TibiaCharFinderAPI.Services
             _dbContext.SaveChanges();
 
             return world.Id;
-        } 
+        }
         public bool Delete(int id)
         {
-            var world = _dbContext.Worlds.FirstOrDefault(w=>w.Id==id);
+            var world = _dbContext.Worlds.FirstOrDefault(w => w.Id == id);
             if (world is null)
             {
                 return false;

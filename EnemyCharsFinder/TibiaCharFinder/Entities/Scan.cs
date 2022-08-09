@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TibiaCharFinderAPI.Entities
+namespace TibiaCharacterFinderAPI.Entities
 {
     public class Scan
     {

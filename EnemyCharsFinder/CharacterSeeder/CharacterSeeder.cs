@@ -1,5 +1,5 @@
-﻿using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Models;
+﻿using TibiaCharacterFinderAPI.Entities;
+using TibiaCharacterFinderAPI.Models;
 
 namespace CharacterSeeder
 {

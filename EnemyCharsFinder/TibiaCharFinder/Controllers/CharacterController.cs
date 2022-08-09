@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.WebEncoders.Testing;
-using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Models;
+using TibiaCharacterFinderAPI.Entities;
+using TibiaCharacterFinderAPI.Models;
 
-namespace TibiaCharFinderAPI.Controllers
+namespace TibiaCharacterFinderAPI.Controllers
 {
     [Route("api/character")]
     public class CharacterController : ControllerBase
@@ -19,37 +19,37 @@ namespace TibiaCharFinderAPI.Controllers
             _dbContext = dbContext;
             _mapper = mapper;
         }
- 
+
         [HttpGet("{amount}")]
         public ActionResult<IEnumerable<CharacterDto>> GetAmount([FromRoute] int amount)
         {
             var characters = _dbContext.Characters
                 .Take(amount);
-                //.Include(c => c.LogoutWorldCorrelations)
-                //.Include(c => c.LoginWorldCorrelations);
+            //.Include(c => c.LogoutWorldCorrelations)
+            //.Include(c => c.LoginWorldCorrelations);
 
             var charactersDto = _mapper.ProjectTo<CharacterDto>(characters);
 
             return Ok(charactersDto);
         }
 
-        [HttpGet("name")]
-        public ActionResult<CharacterDto> GetById([FromQuery] int id)
-        {
-            var character = _dbContext.Characters
-                .Include(c => c.LogoutWorldCorrelations)
-                .Include(c => c.LoginWorldCorrelations)
-                .FirstOrDefault(w => w.Id == id);
-            var characterDto = _mapper.Map<CharacterDto>(character);
+        //[HttpGet("name")]
+        //public ActionResult<CharacterDto> GetById([FromQuery] int id)
+        //{
+        //    var character = _dbContext.Characters
+        //        .Include(c => c.LogoutWorldCorrelations)
+        //        .Include(c => c.LoginWorldCorrelations)
+        //        .FirstOrDefault(w => w.Id == id);
+        //    var characterDto = _mapper.Map<CharacterDto>(character);
 
 
 
-            if (characterDto != null)
-            {
-                return Ok(characterDto);
-            }
-            return NotFound($"No character with id={id}");
-        }
+        //    if (characterDto != null)
+        //    {
+        //        return Ok(characterDto);
+        //    }
+        //    return NotFound($"No character with id={id}");
+        //}
 
     }
 }

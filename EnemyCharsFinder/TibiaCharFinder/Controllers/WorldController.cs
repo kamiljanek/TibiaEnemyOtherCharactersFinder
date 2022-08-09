@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TibiaCharFinderAPI.Models;
-using TibiaCharFinderAPI.Services;
+using TibiaCharacterFinderAPI.Models;
+using TibiaCharacterFinderAPI.Services;
 
-namespace TibiaCharFinderAPI.Controllers
+namespace TibiaCharacterFinderAPI.Controllers
 {
     [Route("api/world")]
     public class WorldController : ControllerBase
@@ -38,12 +38,12 @@ namespace TibiaCharFinderAPI.Controllers
         {
             var id = _worldService.Create(dto);
             return Created($"api/world/{id}", null);
-        } 
+        }
         [HttpDelete("{id}")]
         public ActionResult Delete([FromRoute] int id)
         {
             var isDeleted = _worldService.Delete(id);
-           
+
             if (isDeleted)
             {
                 return NoContent();

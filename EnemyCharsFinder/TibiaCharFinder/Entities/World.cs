@@ -1,4 +1,4 @@
-﻿namespace TibiaCharFinderAPI.Entities
+﻿namespace TibiaCharacterFinderAPI.Entities
 {
     public class World
     {

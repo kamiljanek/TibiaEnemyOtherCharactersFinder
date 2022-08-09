@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System.Net;
 
-namespace TibiaCharFinderAPI.Entities
+namespace TibiaCharacterFinderAPI.Entities
 {
     public class Decompressor
     {

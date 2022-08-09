@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TibiaCharFinderAPI.Entities
+namespace TibiaCharacterFinderAPI.Entities
 {
     public class Correlation
     {
@@ -8,6 +8,6 @@ namespace TibiaCharFinderAPI.Entities
         public int CharacterId { get; set; }
         public int PossibleCharacterId { get; set; }
         public DateTime? LogInOrLogOutDateTime { get; set; }
-        public virtual Character Character { get; set; }
+        public Character Character { get; set; }
     }
 }

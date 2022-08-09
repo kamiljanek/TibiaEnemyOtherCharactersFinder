@@ -1,15 +1,14 @@
 ﻿using System.Text;
 using TibiaCharacterFinderAPI.Entities;
-using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Models;
+using TibiaCharacterFinderAPI.Models;
 
-namespace OptimizedWorldCorrelationSeeder
+namespace WorldCorrelationSeeder
 {
-    public class OptimizedWorldCorrelationSeeder : Model, ISeeder
+    public class WorldCorrelationSeeder : Model, ISeeder
     {
         private readonly TibiaCharacterFinderDbContext _dbContext;
 
-        public OptimizedWorldCorrelationSeeder(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
+        public WorldCorrelationSeeder(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }
@@ -40,14 +39,14 @@ namespace OptimizedWorldCorrelationSeeder
 
                             foreach (var loggedOutCharacter in charactersThatLogged_Out)
                             {
-                                var worldCorrelation = CreateOptimizedWorldCorrelation(loggedOutCharacter, charactersThatLogged_In);
-                                _dbContext.OptimizedWorldCorrelations.Add(worldCorrelation);
+                                var worldCorrelation = CreateWorldCorrelation(loggedOutCharacter, charactersThatLogged_In);
+                                _dbContext.WorldCorrelations.Add(worldCorrelation);
                             }
 
                             foreach (var loggedInCharacter in charactersThatLogged_In)
                             {
-                                var worldCorrelation = CreateOptimizedWorldCorrelation(loggedInCharacter, charactersThatLogged_Out);
-                                _dbContext.OptimizedWorldCorrelations.Add(worldCorrelation);
+                                var worldCorrelation = CreateWorldCorrelation(loggedInCharacter, charactersThatLogged_Out);
+                                _dbContext.WorldCorrelations.Add(worldCorrelation);
                             }
 
 
@@ -75,7 +74,7 @@ namespace OptimizedWorldCorrelationSeeder
             }
             return listOfCharacters;
         }
-        public OptimizedWorldCorrelation CreateOptimizedWorldCorrelation(Character character, List<Character> possibleOtherCharacters)
+        public WorldCorrelation CreateWorldCorrelation(Character character, List<Character> possibleOtherCharacters)
         {
             var stringBuilder = new StringBuilder();
 
@@ -84,9 +83,9 @@ namespace OptimizedWorldCorrelationSeeder
                 stringBuilder.Append($"{possibleOtherCharacter.Id}|");
             }
 
-            return new OptimizedWorldCorrelation
+            return new WorldCorrelation
             {
-                LogoutOrLoginCharacterId = character.Id,
+                CharacterId = character.Id,
                 PossibleOtherCharactersId = stringBuilder.ToString(),
             };
         }

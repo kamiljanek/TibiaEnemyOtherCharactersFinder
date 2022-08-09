@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TibiaCharFinderAPI.Entities;
+using TibiaCharacterFinderAPI.Entities;
 
-namespace CleanScrapSesionsDb
+namespace CleanDbTable
 {
     internal class Program
     {
@@ -12,8 +12,8 @@ namespace CleanScrapSesionsDb
             ServiceProvider = services.BuildServiceProvider();
 
             var dbContext = ServiceProvider.GetService<TibiaCharacterFinderDbContext>();
-  
-            dbContext.WorldCorrelations.Clear(); //change "table" before run
+
+            dbContext.Characters.Clear(); //change "table" before run
             dbContext.SaveChanges();
         }
         public static ServiceProvider ServiceProvider { get; private set; }

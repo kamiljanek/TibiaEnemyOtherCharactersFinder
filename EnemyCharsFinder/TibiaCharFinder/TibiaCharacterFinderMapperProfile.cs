@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Models;
+using TibiaCharacterFinderAPI.Entities;
+using TibiaCharacterFinderAPI.Models;
 
-namespace TibiaCharFinderAPI
+namespace TibiaCharacterFinderAPI
 {
     public class TibiaCharacterFinderMapperProfile : Profile
     {

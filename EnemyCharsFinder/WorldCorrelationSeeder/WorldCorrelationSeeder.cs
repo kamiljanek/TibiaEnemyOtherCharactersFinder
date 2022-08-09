@@ -55,9 +55,9 @@ namespace WorldCorrelationSeeder
             }
             return listOfCharacters;
         }
-        public WorldCorrelation CreateWorldCorrelation(Character logoutCharacter, Character loginCharacter)
+        public WorldCorrelationToDelete CreateWorldCorrelation(Character logoutCharacter, Character loginCharacter)
         {
-            return new WorldCorrelation
+            return new WorldCorrelationToDelete
             {
                 LogoutCharacterId = logoutCharacter.Id,
                 LogoutCharacter = logoutCharacter,

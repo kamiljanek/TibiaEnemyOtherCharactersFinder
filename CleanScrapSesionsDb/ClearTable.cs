@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Models;
 
-namespace CleanScrapSesionsDb
+namespace CleanDbTable
 {
     public static class ClearTable
     {

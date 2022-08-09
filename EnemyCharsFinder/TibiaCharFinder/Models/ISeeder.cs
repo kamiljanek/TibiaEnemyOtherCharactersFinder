@@ -1,4 +1,4 @@
-﻿namespace TibiaCharFinderAPI.Models
+﻿namespace TibiaCharacterFinderAPI.Models
 {
     public interface ISeeder
     {

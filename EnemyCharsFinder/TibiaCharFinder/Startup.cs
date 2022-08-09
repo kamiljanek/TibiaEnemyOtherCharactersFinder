@@ -4,10 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
-using TibiaCharFinderAPI.Entities;
-using TibiaCharFinderAPI.Services;
+using TibiaCharacterFinderAPI.Entities;
+using TibiaCharacterFinderAPI.Services;
 
-namespace TibiaCharFinderAPI
+namespace TibiaCharacterFinderAPI
 {
     public class Startup
     {
@@ -23,7 +23,7 @@ namespace TibiaCharFinderAPI
         {
             services.AddControllers();
             services.AddDbContext<TibiaCharacterFinderDbContext>();
-            services.AddAutoMapper(this.GetType().Assembly);
+            services.AddAutoMapper(GetType().Assembly);
             services.AddScoped<IWorldService, WorldService>();
             services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

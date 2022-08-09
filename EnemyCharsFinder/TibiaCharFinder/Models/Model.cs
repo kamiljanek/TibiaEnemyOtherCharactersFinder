@@ -1,6 +1,6 @@
-﻿using TibiaCharFinderAPI.Entities;
+﻿using TibiaCharacterFinderAPI.Entities;
 
-namespace TibiaCharFinderAPI.Models
+namespace TibiaCharacterFinderAPI.Models
 {
     public class Model
     {
