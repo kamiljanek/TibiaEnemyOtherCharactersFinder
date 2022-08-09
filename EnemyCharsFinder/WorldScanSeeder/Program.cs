@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Models;
 
 namespace WorldScanSeeder
 {
@@ -12,14 +13,14 @@ namespace WorldScanSeeder
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            var seeder = ServiceProvider.GetService<WorldScanSeeder>();
+            var seeder = ServiceProvider.GetService<ISeeder>();
             seeder.Seed();
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSingleton<WorldScanSeeder>()
+                .AddSingleton<ISeeder, WorldScanSeeder>()
                 .AddSingleton<Decompressor>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
         }

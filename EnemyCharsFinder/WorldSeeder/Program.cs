@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TibiaCharFinderAPI.Entities;
+using TibiaCharFinderAPI.Models;
 
 namespace WorldSeeder
 {
@@ -19,7 +20,7 @@ namespace WorldSeeder
         private static void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSingleton<WorldSeeder>()
+                .AddSingleton<ISeeder, WorldSeeder>()
                 .AddSingleton<Decompressor>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
         }
