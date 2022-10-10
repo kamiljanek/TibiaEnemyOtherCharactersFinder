@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using TibiaCharacterFinderAPI.Entities;
-using TibiaCharacterFinderAPI.Models;
 
-namespace WorldSeeder
+namespace CharacterLogoutOrLoginSeeder
 {
     internal class Program
     {
@@ -12,16 +12,14 @@ namespace WorldSeeder
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            var seeder = ServiceProvider.GetService<WorldSeeder>();
+            var seeder = ServiceProvider.GetService<CharacterLogoutOrLoginSeeder>();
             seeder.Seed();
-            seeder.TurnOffIfWorldIsUnavailable();
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSingleton<WorldSeeder>()
-                .AddSingleton<Decompressor>()
+                .AddSingleton<CharacterLogoutOrLoginSeeder>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
         }
     }

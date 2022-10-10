@@ -26,7 +26,7 @@ namespace TibiaCharacterFinderAPI.Services
         }
         public WorldDto GetById(int id)
         {
-            var world = _dbContext.Worlds.Include(w => w.WorldScans).FirstOrDefault(w => w.Id == id);
+            var world = _dbContext.Worlds.Include(w => w.WorldScans).FirstOrDefault(w => w.WorldId == id);
             if (world is null)
             {
                 return null;
@@ -48,11 +48,11 @@ namespace TibiaCharacterFinderAPI.Services
             _dbContext.Worlds.Add(world);
             _dbContext.SaveChanges();
 
-            return world.Id;
+            return world.WorldId;
         }
         public bool Delete(int id)
         {
-            var world = _dbContext.Worlds.FirstOrDefault(w => w.Id == id);
+            var world = _dbContext.Worlds.FirstOrDefault(w => w.WorldId == id);
             if (world is null)
             {
                 return false;
@@ -65,7 +65,7 @@ namespace TibiaCharacterFinderAPI.Services
 
         public bool Update(UpdateWorldDto dto, int id)
         {
-            var world = _dbContext.Worlds.FirstOrDefault(e => e.Id == id);
+            var world = _dbContext.Worlds.FirstOrDefault(e => e.WorldId == id);
             if (world is null)
             {
                 return false;

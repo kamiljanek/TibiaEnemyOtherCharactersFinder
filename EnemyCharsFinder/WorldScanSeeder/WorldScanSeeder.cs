@@ -35,7 +35,7 @@ namespace WorldScanSeeder
             var worldScan = new WorldScan
             {
                 CharactersOnline = charactersOnline,
-                WorldId = world.Id,
+                WorldId = world.WorldId,
                 ScanCreateDateTime = DateTime.Now,
                 World = world
             };

@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldCorrelationSeeder", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterSeeder", "CharacterSeeder\CharacterSeeder.csproj", "{96261717-EAD1-448B-8AF9-3AF4A599C074}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharacterLogoutOrLoginSeeder", "CharacterLogoutOrLoginSeeder\CharacterLogoutOrLoginSeeder.csproj", "{FF513A22-68A9-46F9-9028-0377777FA52F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF513A22-68A9-46F9-9028-0377777FA52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF513A22-68A9-46F9-9028-0377777FA52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF513A22-68A9-46F9-9028-0377777FA52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF513A22-68A9-46F9-9028-0377777FA52F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

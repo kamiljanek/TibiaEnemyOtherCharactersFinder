@@ -11,7 +11,7 @@ namespace TibiaCharacterFinderAPI
         {
             CreateMap<Character, CharacterDto>();
 
-            CreateMap<WorldCorrelation, WorldCorrelationDto>();
+            CreateMap<CharacterCorrelation, WorldCorrelationDto>();
 
             CreateMap<World, WorldDto>();
 

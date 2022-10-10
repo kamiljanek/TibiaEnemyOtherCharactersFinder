@@ -5,8 +5,13 @@ namespace TibiaCharacterFinderAPI.Entities
 {
     public class Character
     {
-        public int Id { get; set; }
+        public int CharacterId { get; set; }
         public string Name { get; set; }
-        public List<WorldCorrelation> WorldCorrelations { get; set; }
+        public short WorldId { get; set; }
+        public World World { get; set; }
+        public List<CharacterCorrelation> LogoutWorldCorrelations{ get; set; }
+        public List<CharacterCorrelation> LoginWorldCorrelations{ get; set; }
+
+
     }
 }

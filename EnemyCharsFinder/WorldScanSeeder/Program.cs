@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
 using TibiaCharacterFinderAPI.Entities;
 using TibiaCharacterFinderAPI.Models;
 
@@ -14,7 +13,19 @@ namespace WorldScanSeeder
             ServiceProvider = services.BuildServiceProvider();
 
             var seeder = ServiceProvider.GetService<ISeeder>();
-            seeder.Seed();
+            while (true)
+            {
+                try
+                {
+                    seeder.Seed();
+                    Console.WriteLine("Success" + DateTime.Now);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                System.Threading.Thread.Sleep(1000 * 60 * 5);
+            }
         }
         public static ServiceProvider ServiceProvider { get; private set; }
         private static void ConfigureServices(IServiceCollection services)

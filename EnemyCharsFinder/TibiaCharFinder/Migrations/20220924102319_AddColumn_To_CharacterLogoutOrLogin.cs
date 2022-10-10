@@ -1,14 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace TibiaCharFinder.Migrations
+#nullable disable
+
+namespace TibiaCharacterFinderAPI.Migrations
 {
-    public partial class AddIsActivatedColumnToWorldTable : Migration
+    public partial class AddColumn_To_CharacterLogoutOrLogin : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
-                name: "IsActivated",
-                table: "Worlds",
+                name: "IsOnline",
+                table: "CharacterLogoutOrLogins",
                 type: "bit",
                 nullable: false,
                 defaultValue: false);
@@ -17,8 +19,8 @@ namespace TibiaCharFinder.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "IsActivated",
-                table: "Worlds");
+                name: "IsOnline",
+                table: "CharacterLogoutOrLogins");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Castle.Core.Internal;
+using System.Text;
 using TibiaCharacterFinderAPI.Entities;
 using TibiaCharacterFinderAPI.Models;
 
@@ -17,123 +18,180 @@ namespace WorldCorrelationSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-
                 var worlds = GetAvailableWorlds();
 
-                _dbContext.Database.BeginTransaction();
-
-                try
+                for (int i = 29; i < worlds.Count; i++)
                 {
-                    foreach (var world in worlds)
+                    var characterLogoutOrLoginIds = GetCharacterLogoutOrLoginIds(worlds[i]).OrderBy(x=>x.WorldScanId).ToList();
+                    while (!characterLogoutOrLoginIds.IsNullOrEmpty())
                     {
-                        var worldScans = GetWorldScansFromSpecificServer(world);
-                        while (worldScans.Count > 1)
+                        try
                         {
-                            var namesThatLogged_Out = GetLogout_Names(worldScans);
-                            SeedCharacters(namesThatLogged_Out);
-                            var charactersThatLogged_Out = GetCharactersBasedOnNames(namesThatLogged_Out);
-
-                            var namesThatLogged_In = GetLogin_Names(worldScans);
-                            SeedCharacters(namesThatLogged_In);
-                            var charactersThatLogged_In = GetCharactersBasedOnNames(namesThatLogged_In);
-
-                            foreach (var loggedOutCharacter in charactersThatLogged_Out)
+                            _dbContext.Database.BeginTransaction();
+                            var firstLogoutCharacters = GetFirstLogoutCharacters(characterLogoutOrLoginIds);
+                            var firstLoginCharacters = GetFirstLoginCharacters(characterLogoutOrLoginIds);
+                            foreach (var characterLogout in firstLogoutCharacters)
                             {
-                                var worldCorrelation = CreateWorldCorrelation(loggedOutCharacter, charactersThatLogged_In);
-                                _dbContext.WorldCorrelations.Add(worldCorrelation);
+                                foreach (var characterLogin in firstLoginCharacters)
+                                {
+                                    SeedCharacterCorrelation(characterLogout, characterLogin);
+                                }
                             }
-
-                            foreach (var loggedInCharacter in charactersThatLogged_In)
-                            {
-                                var worldCorrelation = CreateWorldCorrelation(loggedInCharacter, charactersThatLogged_Out);
-                                _dbContext.WorldCorrelations.Add(worldCorrelation);
-                            }
-
-
-                            worldScans.Remove(worldScans[0]);
+                            DeleteRecords(firstLogoutCharacters);
+                            DeleteRecords(firstLoginCharacters);
+                            _dbContext.SaveChanges();
+                            _dbContext.Database.CommitTransaction();
+                            characterLogoutOrLoginIds = GetCharacterLogoutOrLoginIds(worlds[i]).OrderBy(x => x.WorldScanId).ToList();
+                            Console.WriteLine(characterLogoutOrLoginIds.Count);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            _dbContext.Database.RollbackTransaction();
                         }
                     }
-                    _dbContext.SaveChanges();
-                    _dbContext.Database.CommitTransaction();
+
                 }
-                catch (Exception e)
+            }
+        }
+
+        private void DeleteRecords(List<CharacterLogoutOrLogin> firstLogCharacters)
+        {
+            foreach (var logCharacter in firstLogCharacters)
+            {
+                _dbContext.CharacterLogoutOrLogins.Remove(logCharacter);
+            }
+            //_dbContext.SaveChanges();
+        }
+
+        private void SeedCharacterCorrelation(CharacterLogoutOrLogin characterLogout, CharacterLogoutOrLogin characterLogin)
+        {
+            var characterCorrelation = _dbContext.CharacterCorrelations.Where(x => x.LogoutCharacterId == characterLogout.CharacterId)
+                .FirstOrDefault(x => x.LoginCharacterId == characterLogin.CharacterId);
+            if (characterCorrelation == null)
+            {
+                var nextCharacterCorrelation = _dbContext.CharacterCorrelations.Where(x => x.LogoutCharacterId == characterLogin.CharacterId)
+                    .FirstOrDefault(x => x.LoginCharacterId == characterLogout.CharacterId);
+                if (nextCharacterCorrelation != null)
                 {
-                    Console.WriteLine(e);
-                    _dbContext.Database.RollbackTransaction();
+                    AutoIncreaseNumberOfMatches(nextCharacterCorrelation);
                 }
+                else
+                {
+                    var newCharacterCorrelation = CreateCharacterCorrelation(characterLogout, characterLogin);
+                    _dbContext.CharacterCorrelations.Add(newCharacterCorrelation);
+                }
+
             }
+            else
+            {
+                AutoIncreaseNumberOfMatches(characterCorrelation);
+            }
+
         }
 
-        public List<Character> GetCharactersBasedOnNames(List<string> charactersName)
+        private void AutoIncreaseNumberOfMatches(CharacterCorrelation characterCorrelation)
         {
-            var listOfCharacters = new List<Character>();
-            foreach (var character in charactersName)
-            {
-                var foundCharacter = _dbContext.Characters.FirstOrDefault(c => c.Name == character);
-                listOfCharacters.Add(foundCharacter);
-            }
-            return listOfCharacters;
+            characterCorrelation.NumberOfMatches += 1;
+            //_dbContext.SaveChanges();
         }
-        public WorldCorrelation CreateWorldCorrelation(Character character, List<Character> possibleOtherCharacters)
+
+        private CharacterCorrelation CreateCharacterCorrelation(CharacterLogoutOrLogin characterLogout, CharacterLogoutOrLogin characterLogin)
         {
-            var stringBuilder = new StringBuilder();
-
-            foreach (var possibleOtherCharacter in possibleOtherCharacters)
+            return new CharacterCorrelation()
             {
-                stringBuilder.Append($"{possibleOtherCharacter.Id}|");
-            }
-
-            return new WorldCorrelation
-            {
-                CharacterId = character.Id,
-                PossibleOtherCharactersId = stringBuilder.ToString(),
+                LogoutCharacterId = characterLogout.CharacterId,
+                LoginCharacterId = characterLogin.CharacterId,
+                NumberOfMatches = 1
             };
         }
 
-        public void SeedCharacters(List<string> charactersName)
+        private List<CharacterLogoutOrLogin> GetFirstLogoutCharacters(List<CharacterLogoutOrLogin> characterLogoutOrLoginIds)
         {
-            foreach (var characterName in charactersName)
-            {
-                if (!_dbContext.Characters.Any(x => x.Name == characterName))
-                {
-                    var character = CreateCharacter(characterName);
-                    _dbContext.Characters.Add(character);
-                }
-            }
-            _dbContext.SaveChanges();
+            var worldScanId = characterLogoutOrLoginIds.Where(y => y.IsOnline == false).FirstOrDefault().WorldScanId;
+            return characterLogoutOrLoginIds.Where(y => y.IsOnline == false).Where(x => x.WorldScanId == worldScanId).ToList();
+        }
+        private List<CharacterLogoutOrLogin> GetFirstLoginCharacters(List<CharacterLogoutOrLogin> characterLogoutOrLoginIds)
+        {
+            var worldScanId = characterLogoutOrLoginIds.Where(y => y.IsOnline == true).FirstOrDefault().WorldScanId;
+            return characterLogoutOrLoginIds.Where(y => y.IsOnline == true).Where(x => x.WorldScanId == worldScanId).ToList();
         }
 
-        public Character CreateCharacter(string characterName)
+        private List<CharacterLogoutOrLogin> GetCharacterLogoutOrLoginIds(World world)
         {
-            return new Character { Name = characterName };
+            return _dbContext.CharacterLogoutOrLogins.Where(x => x.WorldId == world.WorldId).ToList();
         }
-        private List<WorldScan> GetWorldScansFromSpecificServer(World world)
-        {
-            return _dbContext.WorldScans.Where(w => w.World == world).ToList();
-        }
-        private List<string> GetLogout_Names(List<WorldScan> worldScans)
-        {
-            var firstOnlineNames = GetFirstOnlineNames(worldScans);
-            var nextOnlineNames = GetNextOnlineNames(worldScans);
-            return firstOnlineNames.Except(nextOnlineNames).ToList();
-        }
-        private List<string> GetLogin_Names(List<WorldScan> worldScans)
-        {
-            var firstOnlineNames = GetFirstOnlineNames(worldScans);
-            var nextOnlineNames = GetNextOnlineNames(worldScans);
-            return nextOnlineNames.Except(firstOnlineNames).ToList();
-        }
-        private List<string> GetFirstOnlineNames(List<WorldScan> worldScans)
-        {
-            return GetOnlineNames(worldScans, 0);
-        }
-        private List<string> GetNextOnlineNames(List<WorldScan> worldScans)
-        {
-            return GetOnlineNames(worldScans, 1);
-        }
-        private List<string> GetOnlineNames(List<WorldScan> worldScans, int index)
-        {
-            return worldScans[index].CharactersOnline.Split("|").ToList();
-        }
+
+        //public List<Character> GetCharactersBasedOnNames(List<string> charactersName)
+        //{
+        //    var listOfCharacters = new List<Character>();
+        //    foreach (var character in charactersName)
+        //    {
+        //        var foundCharacter = _dbContext.Characters.FirstOrDefault(c => c.Name == character);
+        //        listOfCharacters.Add(foundCharacter);
+        //    }
+        //    return listOfCharacters;
+        //}
+        //public CharacterCorrelation CreateWorldCorrelation(Character character, List<Character> possibleOtherCharacters)
+        //{
+        //    var stringBuilder = new StringBuilder();
+
+        //    foreach (var possibleOtherCharacter in possibleOtherCharacters)
+        //    {
+        //        stringBuilder.Append($"{possibleOtherCharacter.CharacterId}|");
+        //    }
+
+        //    return new CharacterCorrelation
+        //    {
+        //        LogoutCharacterId = character.CharacterId,
+        //        //PossibleOtherCharacterId = stringBuilder.ToString(),
+        //    };
+        //}
+
+        //public void SeedCharacters(List<string> charactersName)
+        //{
+        //    foreach (var characterName in charactersName)
+        //    {
+        //        if (!_dbContext.Characters.Any(x => x.Name == characterName))
+        //        {
+        //            var character = CreateCharacter(characterName);
+        //            _dbContext.Characters.Add(character);
+        //        }
+        //    }
+        //    _dbContext.SaveChanges();
+        //}
+
+        //public Character CreateCharacter(string characterName)
+        //{
+        //    return new Character { Name = characterName };
+        //}
+        //private List<WorldScan> GetWorldScansFromSpecificServer(World world)
+        //{
+        //    return _dbContext.WorldScans.Where(w => w.World == world).ToList();
+        //}
+        //private List<string> GetLogout_Names(List<WorldScan> worldScans)
+        //{
+        //    var firstOnlineNames = GetFirstOnlineNames(worldScans);
+        //    var nextOnlineNames = GetNextOnlineNames(worldScans);
+        //    return firstOnlineNames.Except(nextOnlineNames).ToList();
+        //}
+        //private List<string> GetLogin_Names(List<WorldScan> worldScans)
+        //{
+        //    var firstOnlineNames = GetFirstOnlineNames(worldScans);
+        //    var nextOnlineNames = GetNextOnlineNames(worldScans);
+        //    return nextOnlineNames.Except(firstOnlineNames).ToList();
+        //}
+        //private List<string> GetFirstOnlineNames(List<WorldScan> worldScans)
+        //{
+        //    return GetOnlineNames(worldScans, 0);
+        //}
+        //private List<string> GetNextOnlineNames(List<WorldScan> worldScans)
+        //{
+        //    return GetOnlineNames(worldScans, 1);
+        //}
+        //private List<string> GetOnlineNames(List<WorldScan> worldScans, int index)
+        //{
+        //    return worldScans[index].CharactersOnline.Split("|").ToList();
+        //}
     }
 }

@@ -23,9 +23,11 @@ namespace CharacterSeeder
                     //    CharacterSeed(worldScan);
                     //}
 
-                    for (int i = 0; i < _dbContext.WorldScans.Count(); i++)
+                    //for (int i = 0; i < _dbContext.WorldScans.Count(); i++)
+                    for (int i = 2500; i < 4650; i++)
                     {
                         CharacterSeed(_dbContext.WorldScans.Skip(i).FirstOrDefault());
+                        Console.WriteLine(i);
                     }
 
                     _dbContext.SaveChanges();
@@ -47,7 +49,7 @@ namespace CharacterSeeder
             {
                 if (!_dbContext.Characters.Any(x => x.Name == names[a]))
                 {
-                    var character = new Character() { Name = names[a] };
+                    var character = new Character() { Name = names[a], WorldId = worldScan.WorldId};
                     _dbContext.Characters.Add(character);
                 }
             }

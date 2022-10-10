@@ -2,11 +2,12 @@
 {
     public class World
     {
-        public int Id { get; set; }
+        public short WorldId { get; set; }
         public string Name { get; set; }
         public string Url { get; set; }
         public bool IsAvailable { get; set; }
         public List<WorldScan> WorldScans { get; set; }
-
+        public List<Character> Characters { get; set; }
+        public List<CharacterLogoutOrLogin> CharacterLogoutOrLogins { get; set; }
     }
 }
