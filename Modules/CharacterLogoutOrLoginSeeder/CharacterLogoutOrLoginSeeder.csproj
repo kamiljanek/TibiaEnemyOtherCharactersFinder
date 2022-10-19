@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\API\TibiaEnemyOtherCharactersFinderApi\TibiaEnemyOtherCharactersFinderApi.csproj" />
     <ProjectReference Include="..\..\Shered\Shered.csproj" />
-    <ProjectReference Include="..\..\API\TibiaCharFinder\TibiaCharacterFinderAPI.csproj" />
   </ItemGroup>
 
 </Project>
