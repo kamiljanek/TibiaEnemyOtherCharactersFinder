@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaCharacterFinderAPI", "TibiaCharFinder\TibiaCharacterFinderAPI.csproj", "{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaCharacterFinderAPI", "API\TibiaCharFinder\TibiaCharacterFinderAPI.csproj", "{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "Modules\WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "Modules\WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterLogoutOrLoginSeeder", "CharacterLogoutOrLoginSeeder\CharacterLogoutOrLoginSeeder.csproj", "{FF513A22-68A9-46F9-9028-0377777FA52F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterLogoutOrLoginSeeder", "Modules\CharacterLogoutOrLoginSeeder\CharacterLogoutOrLoginSeeder.csproj", "{FF513A22-68A9-46F9-9028-0377777FA52F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shered", "..\Shered\Shered.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shered", "Shered\Shered.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{DCB2AD71-21DC-404B-9696-395813705E3D}"
 EndProject
