@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shered\Shered.csproj" />
     <ProjectReference Include="..\TibiaCharFinder\TibiaCharacterFinderAPI.csproj" />
   </ItemGroup>
 

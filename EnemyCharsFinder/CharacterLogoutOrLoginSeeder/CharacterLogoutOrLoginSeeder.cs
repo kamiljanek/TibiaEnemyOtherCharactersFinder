@@ -1,3 +1,8 @@
+using Castle.Core.Internal;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using Shared.Database.Queries.Sql;
+using Shered.Enums;
 using TibiaCharacterFinderAPI.Entities;
 using TibiaCharacterFinderAPI.Models;
 
@@ -6,6 +11,10 @@ namespace CharacterLogoutOrLoginSeeder
     public class CharacterLogoutOrLoginSeeder : Model, ISeeder
     {
         private readonly TibiaCharacterFinderDbContext _dbContext;
+        private List<string> firstScanNames;
+        private List<string> secondScanNames;
+        private List<string> logoutNames;
+        private List<string> loginNames;
 
         public CharacterLogoutOrLoginSeeder(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
         {
@@ -14,48 +23,51 @@ namespace CharacterLogoutOrLoginSeeder
 
         public void Seed()
         {
-
-            var firstScanNames = new List<string>();
-            var nextScanNames = new List<string>();
-            var logoutNames = new List<string>();
-            var loginNames = new List<string>();
-
             if (_dbContext.Database.CanConnect())
             {
                 var worlds = GetAvailableWorlds();
-                var premia = worlds.FirstOrDefault(x => x.Name == "Premia");
-                var worldScansFromSpecificServer = GetWorldScansFromSpecificServer(premia);
-                for (int b = 0; b < worldScansFromSpecificServer.Count - 1; b++)
-                {
-                    firstScanNames = GetNamesFromSpecificScan(worldScansFromSpecificServer[b]);
-                    nextScanNames = GetNamesFromSpecificScan(worldScansFromSpecificServer[b + 1]);
-                    logoutNames = firstScanNames.Except(nextScanNames).ToList();
-                    loginNames = nextScanNames.Except(firstScanNames).ToList();
-                    var logoutAndLoginNames = new List<string>();
-                    logoutAndLoginNames.AddRange(loginNames);
-                    logoutAndLoginNames.AddRange(logoutNames);
-                    try
-                    {
-                        _dbContext.Database.BeginTransaction();
-                        SeedCharacters(logoutAndLoginNames, premia);
-                        _dbContext.SaveChanges();
-                        _dbContext.Database.CommitTransaction();
-                        Console.WriteLine($"Create Characters - World = {premia.Name}, World Scan ID= {b}");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        _dbContext.Database.RollbackTransaction();
-                    }
+                var choosenWorld = worlds.FirstOrDefault(x => x.Name == WorldType.Premia.ToString());
 
+                if (choosenWorld == null)
+                {
+                    return;
+                }
+
+                var twoWorldScans = GetFirstTwoWorldScansFromSpecificWorld(choosenWorld);
+
+                if (twoWorldScans == null)
+                {
+                    return;
+                }
+
+                firstScanNames = GetNames(twoWorldScans[0]);
+                secondScanNames = GetNames(twoWorldScans[1]);
+                logoutNames = firstScanNames.Except(secondScanNames).ToList();
+
+                if (!logoutNames.IsNullOrEmpty())
+                {
+                    loginNames = secondScanNames.Except(firstScanNames).ToList();
+                }
+
+                if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
+                {
                     try
                     {
                         _dbContext.Database.BeginTransaction();
-                        SeedLogoutCharacters(logoutNames, worldScansFromSpecificServer[b]);
-                        SeedLoginCharacters(loginNames, worldScansFromSpecificServer[b+1]);
+                        SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
+                        SeedLoginCharacters(loginNames, twoWorldScans[1]);
                         _dbContext.SaveChanges();
                         _dbContext.Database.CommitTransaction();
-                        Console.WriteLine($"Create LogoutOrLogin - World = {premia.Name}, World Scan ID= {b}");
+
+                        using (var connection = new SqlConnection(_dbContext.GetConnectionString()))
+                        {
+                            var createCharacters = connection.Execute(Queries.CreateCharacterIfNotExist);
+                        }
+
+                        using (var connection = new SqlConnection(_dbContext.GetConnectionString()))
+                        {
+                            var createCharactersCorrelations = connection.Execute(Queries.CreateCharacterCorrelation);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -63,6 +75,32 @@ namespace CharacterLogoutOrLoginSeeder
                         _dbContext.Database.RollbackTransaction();
                     }
                 }
+
+                using (var connection = new SqlConnection(_dbContext.GetConnectionString()))
+                {
+                    var clearTable = connection.Execute(Queries.ClearCharacterLogoutOrLogins);
+                }
+
+                SoftDeleteWorldScan(twoWorldScans[0]);
+
+
+                Console.WriteLine(twoWorldScans[0].WorldScanId);
+            }
+        }
+
+        private void SoftDeleteWorldScan(WorldScan worldScan)
+        {
+            worldScan.IsDeleted = true;
+            _dbContext.SaveChanges();
+        }
+
+        private void SeedLogoutCharacters(List<string> loginNames, WorldScan worldScan)
+        {
+            foreach (var loginName in loginNames)
+            {
+                var loginCharacter = CreateCharacterLogoutOrLogin(loginName, false, worldScan);
+                _dbContext.CharacterLogoutOrLogins.Add(loginCharacter);
+
             }
         }
 
@@ -70,98 +108,44 @@ namespace CharacterLogoutOrLoginSeeder
         {
             foreach (var loginName in loginNames)
             {
-                var character = _dbContext.Characters.FirstOrDefault(x => x.Name == loginName);
-                var loginCharacter = CreateLoginCharacter(character, worldScan);
+                var loginCharacter = CreateCharacterLogoutOrLogin(loginName, true, worldScan);
                 _dbContext.CharacterLogoutOrLogins.Add(loginCharacter);
 
             }
         }
-        private CharacterLogoutOrLogin CreateLoginCharacter(Character character, WorldScan worldScan)
+
+        private CharacterLogoutOrLogin CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)
         {
             return new CharacterLogoutOrLogin()
             {
-                CharacterId = character.CharacterId,
+                CharacterName = characterName,
                 WorldScanId = worldScan.WorldScanId,
                 WorldId = worldScan.WorldId,
-                IsOnline = true
-                
+                IsOnline = isOnline
             };
         }
 
-        private void SeedLogoutCharacters(List<string> logoutNames, WorldScan worldScan)
+        private List<WorldScan> GetFirstTwoWorldScansFromSpecificWorld(World world)
         {
-            foreach (var logoutName in logoutNames)
-            {
-                var character = _dbContext.Characters.FirstOrDefault(x => x.Name == logoutName);
-                var logoutCharacter = CreateLogoutCharacter(character, worldScan);
-                _dbContext.CharacterLogoutOrLogins.Add(logoutCharacter);
+            var firstTwoWorldScans = new List<WorldScan>();
+            var scanListOrderById = _dbContext.WorldScans.Where(w => w.WorldId == world.WorldId && w.IsDeleted == false).OrderBy(w => w.WorldScanId);
+            var firstScan = scanListOrderById.FirstOrDefault();
+            var secondScan = scanListOrderById.Skip(1).FirstOrDefault();
 
+            if (firstScan != null && secondScan != null)
+            {
+                firstTwoWorldScans.Add(firstScan);
+                firstTwoWorldScans.Add(secondScan);
+                return firstTwoWorldScans;
             }
+            return null;
         }
 
-        private CharacterLogoutOrLogin CreateLogoutCharacter(Character character, WorldScan worldScan)
+        private List<string> GetNames(WorldScan worldScan)
         {
-            return new CharacterLogoutOrLogin()
-            {
-                CharacterId = character.CharacterId,
-                WorldScanId = worldScan.WorldScanId,
-                WorldId = worldScan.WorldId,
-                IsOnline = false
-            };
-        }
-
-        private void SeedCharacters(List<string> names, World world)
-        {
-            foreach (var name in names)
-            {
-                if (!_dbContext.Characters.Any(x => x.Name == name))
-                {
-                    var character = CreateCharacter(name, world);
-                    _dbContext.Characters.Add(character);
-                }
-            }
-        }
-
-        private Character CreateCharacter(string name, World world)
-        {
-            return new Character()
-            {
-                Name = name,
-                WorldId = world.WorldId
-            };
-        }
-        private List<WorldScan> GetWorldScansFromSpecificServer(World world)
-        {
-            return _dbContext.WorldScans.Where(w => w.World == world).ToList();
-        }
-
-        private List<string> GetLogout_Names(List<WorldScan> worldScans)
-        {
-            var firstOnlineNames = GetNamesFromFirstScan(worldScans);
-            var nextOnlineNames = GetNamesFromNextScan(worldScans);
-            return firstOnlineNames.Except(nextOnlineNames).ToList();
-        }
-        private List<string> GetLogin_Names(List<WorldScan> worldScans)
-        {
-            var firstOnlineNames = GetNamesFromFirstScan(worldScans);
-            var nextOnlineNames = GetNamesFromNextScan(worldScans);
-            return nextOnlineNames.Except(firstOnlineNames).ToList();
-        }
-        private List<string> GetNamesFromFirstScan(List<WorldScan> worldScans)
-        {
-            return GetNamesFromScan(worldScans, 0);
-        }
-        private List<string> GetNamesFromNextScan(List<WorldScan> worldScans)
-        {
-            return GetNamesFromScan(worldScans, 1);
-        }
-        private List<string> GetNamesFromScan(List<WorldScan> worldScans, int index)
-        {
-            return worldScans[index].CharactersOnline.Split("|").ToList();
-        }
-        private List<string> GetNamesFromSpecificScan(WorldScan worldScan)
-        {
-            return worldScan.CharactersOnline.Split("|").ToList();
+            var names = worldScan.CharactersOnline.Split("|").ToList();
+            names.RemoveAll(string.IsNullOrWhiteSpace);
+            return names;
         }
     }
 }

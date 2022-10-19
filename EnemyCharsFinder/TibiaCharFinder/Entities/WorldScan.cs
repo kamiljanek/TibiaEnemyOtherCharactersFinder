@@ -9,5 +9,6 @@ namespace TibiaCharacterFinderAPI.Entities
         public short WorldId { get; set; }
         public World World { get; set; }
         public DateTime ScanCreateDateTime { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

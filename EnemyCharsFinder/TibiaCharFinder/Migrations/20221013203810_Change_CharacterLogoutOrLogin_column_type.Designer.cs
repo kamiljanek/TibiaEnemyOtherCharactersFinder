@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TibiaCharacterFinderAPI.Entities;
 
@@ -11,9 +12,10 @@ using TibiaCharacterFinderAPI.Entities;
 namespace TibiaCharacterFinderAPI.Migrations
 {
     [DbContext(typeof(TibiaCharacterFinderDbContext))]
-    partial class TibiaCharacterFinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221013203810_Change_CharacterLogoutOrLogin_column_type")]
+    partial class Change_CharacterLogoutOrLogin_column_type
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

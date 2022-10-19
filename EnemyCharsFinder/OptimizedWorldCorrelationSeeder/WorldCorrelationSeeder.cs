@@ -66,12 +66,12 @@ namespace WorldCorrelationSeeder
 
         private void SeedCharacterCorrelation(CharacterLogoutOrLogin characterLogout, CharacterLogoutOrLogin characterLogin)
         {
-            var characterCorrelation = _dbContext.CharacterCorrelations.Where(x => x.LogoutCharacterId == characterLogout.CharacterId)
-                .FirstOrDefault(x => x.LoginCharacterId == characterLogin.CharacterId);
+            var characterCorrelation = _dbContext.CharacterCorrelations.Where(x => x.LogoutCharacterId == 7)
+                .FirstOrDefault(x => x.LoginCharacterId == 3);
             if (characterCorrelation == null)
             {
-                var nextCharacterCorrelation = _dbContext.CharacterCorrelations.Where(x => x.LogoutCharacterId == characterLogin.CharacterId)
-                    .FirstOrDefault(x => x.LoginCharacterId == characterLogout.CharacterId);
+                var nextCharacterCorrelation = _dbContext.CharacterCorrelations.Where(x => x.LogoutCharacterId == 3)
+                    .FirstOrDefault(x => x.LoginCharacterId == 5);
                 if (nextCharacterCorrelation != null)
                 {
                     AutoIncreaseNumberOfMatches(nextCharacterCorrelation);
@@ -100,8 +100,8 @@ namespace WorldCorrelationSeeder
         {
             return new CharacterCorrelation()
             {
-                LogoutCharacterId = characterLogout.CharacterId,
-                LoginCharacterId = characterLogin.CharacterId,
+                LogoutCharacterId = 1,
+                LoginCharacterId = 2,
                 NumberOfMatches = 1
             };
         }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TibiaCharacterFinderAPI.Entities;
 
@@ -11,9 +12,10 @@ using TibiaCharacterFinderAPI.Entities;
 namespace TibiaCharacterFinderAPI.Migrations
 {
     [DbContext(typeof(TibiaCharacterFinderDbContext))]
-    partial class TibiaCharacterFinderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221012203527_Add_column_to_WorldScans")]
+    partial class Add_column_to_WorldScans
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,9 +80,8 @@ namespace TibiaCharacterFinderAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CharacterLogoutOrLoginId"), 1L, 1);
 
-                    b.Property<string>("CharacterName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CharacterId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
@@ -92,6 +93,8 @@ namespace TibiaCharacterFinderAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CharacterLogoutOrLoginId");
+
+                    b.HasIndex("CharacterId");
 
                     b.HasIndex("WorldId");
 
@@ -186,6 +189,12 @@ namespace TibiaCharacterFinderAPI.Migrations
 
             modelBuilder.Entity("TibiaCharacterFinderAPI.Entities.CharacterLogoutOrLogin", b =>
                 {
+                    b.HasOne("TibiaCharacterFinderAPI.Entities.Character", "Character")
+                        .WithMany()
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TibiaCharacterFinderAPI.Entities.World", "World")
                         .WithMany("CharacterLogoutOrLogins")
                         .HasForeignKey("WorldId")
@@ -197,6 +206,8 @@ namespace TibiaCharacterFinderAPI.Migrations
                         .HasForeignKey("WorldScanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Character");
 
                     b.Navigation("World");
 

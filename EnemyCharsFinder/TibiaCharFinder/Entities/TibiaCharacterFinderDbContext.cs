@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using Microsoft.EntityFrameworkCore;
 
 namespace TibiaCharacterFinderAPI.Entities
 {
@@ -36,6 +37,7 @@ namespace TibiaCharacterFinderAPI.Entities
                 ws.Property(ws => ws.CharactersOnline).IsRequired();
                 ws.Property(ws => ws.WorldId).IsRequired();
                 ws.Property(ws => ws.ScanCreateDateTime).IsRequired();
+                ws.Property(ws => ws.IsDeleted).IsRequired().HasDefaultValue(false);
             });
 
             modelBuilder.Entity<Character>(c =>
@@ -53,7 +55,7 @@ namespace TibiaCharacterFinderAPI.Entities
             modelBuilder.Entity<CharacterLogoutOrLogin>(c =>
             {
                 c.Property(ch => ch.CharacterLogoutOrLoginId).IsRequired();
-                c.Property(ch => ch.CharacterId).IsRequired();
+                c.Property(ch => ch.CharacterName).IsRequired();
                 c.Property(ch => ch.WorldScanId).IsRequired();
                 c.Property(ch => ch.IsOnline).IsRequired();
                 c.Property(ch => ch.WorldId).IsRequired();
@@ -72,5 +74,7 @@ namespace TibiaCharacterFinderAPI.Entities
         {
             optionsBuilder.UseSqlServer(_connectionString);
         }
+
+        public string GetConnectionString() => _connectionString;
     }
 }

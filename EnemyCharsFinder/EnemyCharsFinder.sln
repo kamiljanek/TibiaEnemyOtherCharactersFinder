@@ -3,19 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanDbTable", "..\CleanScrapSesionsDb\CleanDbTable.csproj", "{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaCharacterFinderAPI", "TibiaCharFinder\TibiaCharacterFinderAPI.csproj", "{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldCorrelationSeeder", "OptimizedWorldCorrelationSeeder\WorldCorrelationSeeder.csproj", "{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterLogoutOrLoginSeeder", "CharacterLogoutOrLoginSeeder\CharacterLogoutOrLoginSeeder.csproj", "{FF513A22-68A9-46F9-9028-0377777FA52F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterSeeder", "CharacterSeeder\CharacterSeeder.csproj", "{96261717-EAD1-448B-8AF9-3AF4A599C074}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharacterLogoutOrLoginSeeder", "CharacterLogoutOrLoginSeeder\CharacterLogoutOrLoginSeeder.csproj", "{FF513A22-68A9-46F9-9028-0377777FA52F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shered", "..\Shered\Shered.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F1D0547-9F45-40FB-979A-B4ADB48AC29C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE7FD001-A0BF-4E83-8EAB-D806843B0BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,18 +31,14 @@ Global
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4A183BF-E1AC-45B6-BA21-1C6DCFF8B48D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96261717-EAD1-448B-8AF9-3AF4A599C074}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FF513A22-68A9-46F9-9028-0377777FA52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FF513A22-68A9-46F9-9028-0377777FA52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF513A22-68A9-46F9-9028-0377777FA52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF513A22-68A9-46F9-9028-0377777FA52F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C67C3DA-4429-4865-9895-E69966D87A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C67C3DA-4429-4865-9895-E69966D87A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C67C3DA-4429-4865-9895-E69966D87A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C67C3DA-4429-4865-9895-E69966D87A32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
