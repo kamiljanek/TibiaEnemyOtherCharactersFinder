@@ -17,9 +17,9 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Tibia API": {
+    "TibiaEnemyOtherCharactersFinderApi": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
+      //"dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",

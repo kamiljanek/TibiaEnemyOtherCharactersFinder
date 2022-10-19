@@ -19,7 +19,11 @@ namespace TibiaCharacterFinderAPI.Controllers
             _dbContext = dbContext;
             _mapper = mapper;
         }
-
+        /// <summary>
+        /// Get as much characters as you wish
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
         [HttpGet("{amount}")]
         public ActionResult<IEnumerable<CharacterDto>> GetAmount([FromRoute] int amount)
         {
