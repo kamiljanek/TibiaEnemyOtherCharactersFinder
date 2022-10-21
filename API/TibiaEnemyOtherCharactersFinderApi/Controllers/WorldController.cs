@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TibiaCharacterFinderAPI.Models;
-using TibiaCharacterFinderAPI.Services;
+using TibiaEnemyOtherCharactersFinderApi.Models;
+using TibiaEnemyOtherCharactersFinderApi.Services;
 
-namespace TibiaCharacterFinderAPI.Controllers
+namespace TibiaEnemyOtherCharactersFinderApi.Controllers
 {
     [Route("api/world")]
     public class WorldController : ControllerBase

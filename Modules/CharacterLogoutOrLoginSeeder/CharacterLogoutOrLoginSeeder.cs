@@ -3,8 +3,8 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Shared.Database.Queries.Sql;
 using Shered.Enums;
-using TibiaCharacterFinderAPI.Entities;
-using TibiaCharacterFinderAPI.Models;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Models;
 
 namespace CharacterLogoutOrLoginSeeder
 {

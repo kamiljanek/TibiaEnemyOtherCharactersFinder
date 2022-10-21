@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TibiaCharacterFinderAPI.Models
+namespace TibiaEnemyOtherCharactersFinderApi.Models
 {
     public class UpdateWorldDto
     {

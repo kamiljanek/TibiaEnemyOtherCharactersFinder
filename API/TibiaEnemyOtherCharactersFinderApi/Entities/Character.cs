@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TibiaCharacterFinderAPI.Entities
+namespace TibiaEnemyOtherCharactersFinderApi.Entities
 {
     public class Character
     {
@@ -9,8 +9,8 @@ namespace TibiaCharacterFinderAPI.Entities
         public string Name { get; set; }
         public short WorldId { get; set; }
         public World World { get; set; }
-        public List<CharacterCorrelation> LogoutWorldCorrelations{ get; set; }
-        public List<CharacterCorrelation> LoginWorldCorrelations{ get; set; }
+        public List<CharacterCorrelation> LogoutWorldCorrelations { get; set; }
+        public List<CharacterCorrelation> LoginWorldCorrelations { get; set; }
 
 
     }

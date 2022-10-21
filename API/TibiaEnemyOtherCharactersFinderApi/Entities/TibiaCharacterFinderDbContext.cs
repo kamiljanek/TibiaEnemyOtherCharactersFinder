@@ -1,7 +1,7 @@
 ﻿using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Microsoft.EntityFrameworkCore;
 
-namespace TibiaCharacterFinderAPI.Entities
+namespace TibiaEnemyOtherCharactersFinderApi.Entities
 {
     public class TibiaCharacterFinderDbContext : DbContext
     {
@@ -51,7 +51,7 @@ namespace TibiaCharacterFinderAPI.Entities
                     .WithOne(ws => ws.LoginCharacter)
                     .HasForeignKey(ch => ch.LoginCharacterId).OnDelete(DeleteBehavior.NoAction);
             });
-            
+
             modelBuilder.Entity<CharacterLogoutOrLogin>(c =>
             {
                 c.Property(ch => ch.CharacterLogoutOrLoginId).IsRequired();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shered.Services;
-using TibiaCharacterFinderAPI.Entities;
-using TibiaCharacterFinderAPI.Models;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Models;
 
 namespace WorldScanSeeder
 {

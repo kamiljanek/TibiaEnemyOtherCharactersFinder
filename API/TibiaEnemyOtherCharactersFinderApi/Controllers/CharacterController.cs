@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.WebEncoders.Testing;
-using TibiaCharacterFinderAPI.Entities;
-using TibiaCharacterFinderAPI.Models;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Models;
 
-namespace TibiaCharacterFinderAPI.Controllers
+namespace TibiaEnemyOtherCharactersFinderApi.Controllers
 {
     [Route("api/character")]
     public class CharacterController : ControllerBase

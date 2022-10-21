@@ -1,9 +1,9 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
-using TibiaCharacterFinderAPI.Entities;
-using TibiaCharacterFinderAPI.Services;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Services;
 
-namespace TibiaCharacterFinderAPI
+namespace TibiaEnemyOtherCharactersFinderApi
 {
     public class Startup
     {
@@ -25,7 +25,6 @@ namespace TibiaCharacterFinderAPI
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             services.AddSwaggerGen(s =>
             {
-
                 s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
                 {
                     Version = "v1",
@@ -35,7 +34,6 @@ namespace TibiaCharacterFinderAPI
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
-
             });
         }
 
@@ -45,9 +43,7 @@ namespace TibiaCharacterFinderAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
                 app.UseSwagger();
-
                 app.UseSwaggerUI(c =>
                     {
                         c.SwaggerEndpoint("/swagger/v1/swagger.json", "TibiaEnemyOtherCharactersFinder API v1");
@@ -56,9 +52,7 @@ namespace TibiaCharacterFinderAPI
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

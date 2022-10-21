@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TibiaCharacterFinderAPI.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
 
 namespace CharacterLogoutOrLoginSeeder
 {

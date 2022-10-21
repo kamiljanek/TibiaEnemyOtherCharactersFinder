@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using TibiaCharacterFinderAPI.Entities;
-using TibiaCharacterFinderAPI.Models;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Models;
 
-namespace TibiaCharacterFinderAPI.Services
+namespace TibiaEnemyOtherCharactersFinderApi.Services
 {
     public interface IWorldService
     {

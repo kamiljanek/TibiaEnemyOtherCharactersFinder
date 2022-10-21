@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using TibiaCharacterFinderAPI.Entities;
 using TibiaCharacterFinderAPI.Models;
+using TibiaEnemyOtherCharactersFinderApi.Entities;
 
-namespace TibiaCharacterFinderAPI.Controllers
+namespace TibiaEnemyOtherCharactersFinderApi.Controllers
 {
     [Route("api/correlation")]
     public class WorldCorrelationController : ControllerBase

@@ -1,4 +1,4 @@
-﻿namespace TibiaCharacterFinderAPI.Models
+﻿namespace TibiaEnemyOtherCharactersFinderApi.Models
 {
     public class WorldCorrelationDto
     {

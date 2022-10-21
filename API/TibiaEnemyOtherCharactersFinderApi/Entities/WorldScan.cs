@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TibiaCharacterFinderAPI.Entities
+namespace TibiaEnemyOtherCharactersFinderApi.Entities
 {
     public class WorldScan
     {
