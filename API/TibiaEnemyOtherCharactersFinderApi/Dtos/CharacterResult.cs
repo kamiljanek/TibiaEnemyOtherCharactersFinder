@@ -1,6 +1,8 @@
-﻿namespace TibiaEnemyOtherCharactersFinderApi.Models
+﻿using TibiaEnemyOtherCharactersFinderApi.Models;
+
+namespace TibiaEnemyOtherCharactersFinderApi.Dtos
 {
-    public class CharacterDto
+    public class CharacterResult
     {
         public int Id { get; set; }
         public string Name { get; set; }

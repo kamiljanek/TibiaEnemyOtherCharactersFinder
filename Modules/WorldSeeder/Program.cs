@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shered.Services;
-using TibiaCharacterFinderAPI.Models;
 using TibiaEnemyOtherCharactersFinderApi.Entities;
 
 namespace WorldSeeder
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {

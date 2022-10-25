@@ -1,6 +1,8 @@
+using MediatR;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using TibiaEnemyOtherCharactersFinderApi.Entities;
+using TibiaEnemyOtherCharactersFinderApi.Providers;
 using TibiaEnemyOtherCharactersFinderApi.Services;
 
 namespace TibiaEnemyOtherCharactersFinderApi
@@ -18,11 +20,19 @@ namespace TibiaEnemyOtherCharactersFinderApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+
+            //services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
+            //.UseSqlServer(Configuration.GetConnectionString("TibiaDB")));
+
             services.AddDbContext<TibiaCharacterFinderDbContext>();
+
             services.AddAutoMapper(GetType().Assembly);
             services.AddScoped<IWorldService, WorldService>();
+            services.AddScoped<IDapperConnectionProvider, DapperConnectionProvider>();
             services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            services.AddMediatR(typeof(Startup));
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -35,6 +45,7 @@ namespace TibiaEnemyOtherCharactersFinderApi
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
             });
+            ConfigureOptions(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +68,11 @@ namespace TibiaEnemyOtherCharactersFinderApi
             {
                 endpoints.MapControllers();
             });
+        }
+        public static void ConfigureOptions(IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<ConnectionStringsSection>(options => configuration.GetSection("ConnectionStrings").Bind(options));
+            services.Configure<DapperConfigurationSection>(options => configuration.GetSection("Dapper").Bind(options));
         }
     }
 }

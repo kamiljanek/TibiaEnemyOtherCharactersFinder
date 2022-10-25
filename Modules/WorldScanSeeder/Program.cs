@@ -5,7 +5,7 @@ using TibiaEnemyOtherCharactersFinderApi.Models;
 
 namespace WorldScanSeeder
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {

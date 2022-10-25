@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using TibiaEnemyOtherCharactersFinderApi.Dtos;
 using TibiaEnemyOtherCharactersFinderApi.Entities;
 using TibiaEnemyOtherCharactersFinderApi.Models;
 
@@ -9,7 +10,7 @@ namespace TibiaEnemyOtherCharactersFinderApi
 
         public TibiaCharacterFinderMapperProfile()
         {
-            CreateMap<Character, CharacterDto>();
+            CreateMap<Character, CharacterResult>();
 
             CreateMap<CharacterCorrelation, WorldCorrelationDto>();
 

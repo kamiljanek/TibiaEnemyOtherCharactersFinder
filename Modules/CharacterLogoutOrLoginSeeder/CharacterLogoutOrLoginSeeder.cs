@@ -1,10 +1,10 @@
 using Castle.Core.Internal;
 using Dapper;
-using Microsoft.Data.SqlClient;
 using Shared.Database.Queries.Sql;
 using Shered.Enums;
 using TibiaEnemyOtherCharactersFinderApi.Entities;
 using TibiaEnemyOtherCharactersFinderApi.Models;
+using TibiaEnemyOtherCharactersFinderApi.Providers;
 
 namespace CharacterLogoutOrLoginSeeder
 {
@@ -15,77 +15,84 @@ namespace CharacterLogoutOrLoginSeeder
         private List<string> secondScanNames;
         private List<string> logoutNames;
         private List<string> loginNames;
+        private readonly IDapperConnectionProvider _connectionProvider;
 
-        public CharacterLogoutOrLoginSeeder(TibiaCharacterFinderDbContext dbContext) : base(dbContext)
+        public CharacterLogoutOrLoginSeeder(TibiaCharacterFinderDbContext dbContext, IDapperConnectionProvider dapperConnectionProvider) : base(dbContext)
         {
             _dbContext = dbContext;
+            _connectionProvider = dapperConnectionProvider;
         }
 
         public void Seed()
         {
-            if (_dbContext.Database.CanConnect())
+            var worlds = GetAvailableWorlds();
+            var choosenWorld = worlds.FirstOrDefault(x => x.Name == WorldType.Premia.ToString());
+
+            if (choosenWorld == null)
             {
-                var worlds = GetAvailableWorlds();
-                var choosenWorld = worlds.FirstOrDefault(x => x.Name == WorldType.Premia.ToString());
+                return;
+            }
 
-                if (choosenWorld == null)
+            var twoWorldScans = GetFirstTwoWorldScansFromSpecificWorld(choosenWorld);
+
+            if (twoWorldScans == null)
+            {
+                return;
+            }
+
+            firstScanNames = GetNames(twoWorldScans[0]);
+            secondScanNames = GetNames(twoWorldScans[1]);
+            logoutNames = firstScanNames.Except(secondScanNames).ToList();
+
+            if (!logoutNames.IsNullOrEmpty())
+            {
+                loginNames = secondScanNames.Except(firstScanNames).ToList();
+            }
+
+            if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
+            {
+                try
                 {
-                    return;
-                }
+                    _dbContext.Database.BeginTransaction();
+                    SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
+                    SeedLoginCharacters(loginNames, twoWorldScans[1]);
+                    _dbContext.SaveChanges();
+                    _dbContext.Database.CommitTransaction();
 
-                var twoWorldScans = GetFirstTwoWorldScansFromSpecificWorld(choosenWorld);
-
-                if (twoWorldScans == null)
-                {
-                    return;
-                }
-
-                firstScanNames = GetNames(twoWorldScans[0]);
-                secondScanNames = GetNames(twoWorldScans[1]);
-                logoutNames = firstScanNames.Except(secondScanNames).ToList();
-
-                if (!logoutNames.IsNullOrEmpty())
-                {
-                    loginNames = secondScanNames.Except(firstScanNames).ToList();
-                }
-
-                if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
-                {
                     try
                     {
-                        _dbContext.Database.BeginTransaction();
-                        SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
-                        SeedLoginCharacters(loginNames, twoWorldScans[1]);
-                        _dbContext.SaveChanges();
-                        _dbContext.Database.CommitTransaction();
-
-                        using (var connection = new SqlConnection(_dbContext.GetConnectionString()))
+                        using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
                         {
-                            var createCharacters = connection.Execute(Queries.CreateCharacterIfNotExist);
+                            connection.Execute(Queries.CreateCharacterIfNotExist);
                         }
-
-                        using (var connection = new SqlConnection(_dbContext.GetConnectionString()))
+                        using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
                         {
-                            var createCharactersCorrelations = connection.Execute(Queries.CreateCharacterCorrelation);
+                            connection.Execute(Queries.CreateCharacterCorrelation);
                         }
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
-                        _dbContext.Database.RollbackTransaction();
+                        using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
+                        {
+                            connection.Execute(Queries.ClearCharacterLogoutOrLogins);
+                        }
                     }
                 }
-
-                using (var connection = new SqlConnection(_dbContext.GetConnectionString()))
+                catch (Exception e)
                 {
-                    var clearTable = connection.Execute(Queries.ClearCharacterLogoutOrLogins);
+                    Console.WriteLine(e);
+                    _dbContext.Database.RollbackTransaction();
                 }
-
-                SoftDeleteWorldScan(twoWorldScans[0]);
-
-
-                Console.WriteLine(twoWorldScans[0].WorldScanId);
             }
+
+            using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
+            {
+                connection.Execute(Queries.ClearCharacterLogoutOrLogins);
+            }
+
+            SoftDeleteWorldScan(twoWorldScans[0]);
+            Console.WriteLine(twoWorldScans[0].WorldScanId);
         }
 
         private void SoftDeleteWorldScan(WorldScan worldScan)

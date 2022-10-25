@@ -2,10 +2,9 @@
 using TibiaEnemyOtherCharactersFinderApi.Models;
 using TibiaEnemyOtherCharactersFinderApi.Services;
 
-namespace TibiaEnemyOtherCharactersFinderApi.Controllers
+namespace TibiaEnemyOtherCharactersFinderApi.Controllers.World
 {
-    [Route("api/world")]
-    public class WorldController : ControllerBase
+    public class WorldController : WorldBaseController
     {
         private readonly IWorldService _worldService;
 
