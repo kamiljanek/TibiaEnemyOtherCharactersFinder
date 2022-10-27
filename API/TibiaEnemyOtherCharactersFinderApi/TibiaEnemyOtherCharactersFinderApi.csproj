@@ -37,7 +37,6 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <Folder Include="Commands\Character\" />
     <Folder Include="Migrations\" />
     <Folder Include="Services\Character\" />
     <Folder Include="Services\World\" />
