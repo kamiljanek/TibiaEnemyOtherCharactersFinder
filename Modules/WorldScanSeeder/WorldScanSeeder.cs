@@ -47,7 +47,7 @@ namespace WorldScanSeeder
         private string FetchOnlineCharacters(string world)
         {
             _decompressor.Decompress();
-
+            
             var stringBuilder = new StringBuilder();
             var names = new List<string>();
             var document = _decompressor.web.Load(world);

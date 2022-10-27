@@ -63,11 +63,11 @@ namespace CharacterLogoutOrLoginSeeder
                     {
                         using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
                         {
-                            connection.Execute(Queries.CreateCharacterIfNotExist);
+                            connection.Execute(GenerateQueries.CreateCharacterIfNotExist);
                         }
                         using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
                         {
-                            connection.Execute(Queries.CreateCharacterCorrelation);
+                            connection.Execute(GenerateQueries.CreateCharacterCorrelation);
                         }
                     }
                     catch (Exception e)
@@ -75,7 +75,7 @@ namespace CharacterLogoutOrLoginSeeder
                         Console.WriteLine(e);
                         using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
                         {
-                            connection.Execute(Queries.ClearCharacterLogoutOrLogins);
+                            connection.Execute(GenerateQueries.ClearCharacterLogoutOrLogins);
                         }
                     }
                 }
@@ -88,7 +88,7 @@ namespace CharacterLogoutOrLoginSeeder
 
             using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
             {
-                connection.Execute(Queries.ClearCharacterLogoutOrLogins);
+                connection.Execute(GenerateQueries.ClearCharacterLogoutOrLogins);
             }
 
             SoftDeleteWorldScan(twoWorldScans[0]);

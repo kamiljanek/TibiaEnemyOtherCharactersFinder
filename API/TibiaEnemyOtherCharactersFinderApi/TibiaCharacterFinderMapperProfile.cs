@@ -10,7 +10,7 @@ namespace TibiaEnemyOtherCharactersFinderApi
 
         public TibiaCharacterFinderMapperProfile()
         {
-            CreateMap<Character, CharacterResult>();
+            CreateMap<Character, CharacterWithCorrelationsResult>();
 
             CreateMap<CharacterCorrelation, WorldCorrelationDto>();
 

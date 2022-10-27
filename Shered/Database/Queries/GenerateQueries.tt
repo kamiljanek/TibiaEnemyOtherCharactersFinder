@@ -30,7 +30,7 @@ namespace Shared.Database.Queries.Sql
 
 	private void HandleDirectory(string path, int level)
     {
-        string dirName = level == 1 ? "Queries" : Path.GetFileName(path);
+        string dirName = level == 1 ? "GenerateQueries" : Path.GetFileName(path);
         string[] files = Directory.GetFiles(path, "*.sql", SearchOption.TopDirectoryOnly);
 		string[] subDirs = Directory.GetDirectories(path, "*", SearchOption.TopDirectoryOnly);
 		
