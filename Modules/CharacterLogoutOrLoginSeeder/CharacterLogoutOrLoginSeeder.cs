@@ -2,9 +2,9 @@ using Castle.Core.Internal;
 using Dapper;
 using Shared.Database.Queries.Sql;
 using Shered.Enums;
-using TibiaEnemyOtherCharactersFinderApi.Entities;
-using TibiaEnemyOtherCharactersFinderApi.Models;
-using TibiaEnemyOtherCharactersFinderApi.Providers;
+using TibiaEnemyOtherCharactersFinder.Api.Entities;
+using TibiaEnemyOtherCharactersFinder.Api.Models;
+using TibiaEnemyOtherCharactersFinder.Api.Providers;
 
 namespace CharacterLogoutOrLoginSeeder
 {

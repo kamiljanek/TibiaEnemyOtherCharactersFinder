@@ -1,8 +1,8 @@
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Shered.Services;
 using System.Text;
-using TibiaEnemyOtherCharactersFinderApi.Entities;
-using TibiaEnemyOtherCharactersFinderApi.Models;
+using TibiaEnemyOtherCharactersFinder.Api.Entities;
+using TibiaEnemyOtherCharactersFinder.Api.Models;
 
 namespace WorldScanSeeder
 {
@@ -47,7 +47,7 @@ namespace WorldScanSeeder
         private string FetchOnlineCharacters(string world)
         {
             _decompressor.Decompress();
-            
+
             var stringBuilder = new StringBuilder();
             var names = new List<string>();
             var document = _decompressor.web.Load(world);

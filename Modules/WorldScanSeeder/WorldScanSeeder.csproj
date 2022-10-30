@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\API\TibiaEnemyOtherCharactersFinderApi\TibiaEnemyOtherCharactersFinderApi.csproj" />
+    <ProjectReference Include="..\..\API\TibiaEnemyOtherCharactersFinder.Api\TibiaEnemyOtherCharactersFinder.Api.csproj" />
     <ProjectReference Include="..\..\Shered\Shered.csproj" />
   </ItemGroup>
 

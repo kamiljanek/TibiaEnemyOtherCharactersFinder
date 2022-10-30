@@ -1,7 +1,7 @@
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Shered.Services;
-using TibiaEnemyOtherCharactersFinderApi.Entities;
-using TibiaEnemyOtherCharactersFinderApi.Models;
+using TibiaEnemyOtherCharactersFinder.Api.Entities;
+using TibiaEnemyOtherCharactersFinder.Api.Models;
 
 namespace WorldSeeder
 {

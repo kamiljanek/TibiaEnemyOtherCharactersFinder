@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TibiaEnemyOtherCharactersFinderApi;
-using TibiaEnemyOtherCharactersFinderApi.Entities;
-using TibiaEnemyOtherCharactersFinderApi.Providers;
+using TibiaEnemyOtherCharactersFinder.Api;
+using TibiaEnemyOtherCharactersFinder.Api.Entities;
+using TibiaEnemyOtherCharactersFinder.Api.Providers;
 
 namespace CharacterLogoutOrLoginSeeder
 {
