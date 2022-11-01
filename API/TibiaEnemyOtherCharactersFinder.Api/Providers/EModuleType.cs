@@ -3,6 +3,7 @@
 {
     public enum EModuleType
     {
-        TibiaDB
+        SqlServer,
+        PostgreSql
     }
 }

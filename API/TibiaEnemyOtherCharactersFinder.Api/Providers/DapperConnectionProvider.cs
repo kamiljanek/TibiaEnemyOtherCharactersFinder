@@ -21,8 +21,25 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Providers
         {
             switch (module)
             {
-                case EModuleType.TibiaDB:
-                    return GetConnection(_connectionStringsOptions.TibiaDB, _dapperOptions.CommandTimeout);
+                case EModuleType.SqlServer:
+                    return GetConnection(_connectionStringsOptions.SqlServer, _dapperOptions.CommandTimeout);
+
+                case EModuleType.PostgreSql:
+                    return GetConnection(_connectionStringsOptions.PostgreSql, _dapperOptions.CommandTimeout);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(module), module, null);
+            }
+        }
+        public string GetConnectionString(EModuleType module)
+        {
+            switch (module)
+            {
+                case EModuleType.SqlServer:
+                    return _connectionStringsOptions.SqlServer;
+
+                case EModuleType.PostgreSql:
+                    return _connectionStringsOptions.PostgreSql;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(module), module, null);

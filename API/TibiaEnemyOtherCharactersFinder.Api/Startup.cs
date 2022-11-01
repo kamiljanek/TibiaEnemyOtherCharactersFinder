@@ -1,9 +1,11 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
 using TibiaEnemyOtherCharactersFinder.Api.Providers;
 using TibiaEnemyOtherCharactersFinder.Api.Services;
+
 
 namespace TibiaEnemyOtherCharactersFinder.Api
 {
@@ -21,11 +23,9 @@ namespace TibiaEnemyOtherCharactersFinder.Api
         {
             services.AddControllers();
 
-
-            //services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
-            //.UseSqlServer(Configuration.GetConnectionString("TibiaDB")));
-
-            services.AddDbContext<TibiaCharacterFinderDbContext>();
+            services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
+               .UseNpgsql(Configuration.GetConnectionString("PostgreSql"))
+                .UseSnakeCaseNamingConvention());
 
             services.AddAutoMapper(GetType().Assembly);
             services.AddScoped<IWorldService, WorldService>();

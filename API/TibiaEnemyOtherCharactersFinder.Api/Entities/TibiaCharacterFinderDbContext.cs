@@ -1,20 +1,28 @@
-﻿using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TibiaEnemyOtherCharactersFinder.Api.Providers;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Entities
 {
+    //EntityFrameworkCore\Add-Migration <MIGRATION_NAME>
     public class TibiaCharacterFinderDbContext : DbContext
     {
-        private readonly string _connectionString = @"Data Source=(localdb)\MSSQLLocalDB; Initial Catalog=TibiaCharFinderDb; Trusted_Connection=True";
+        private readonly IDapperConnectionProvider _connectionProvider;
+
+        public TibiaCharacterFinderDbContext(DbContextOptions<TibiaCharacterFinderDbContext> options, IDapperConnectionProvider connectionProvider) : base(options)
+        {
+            _connectionProvider = connectionProvider;
+        }
 
         public DbSet<World> Worlds { get; set; }
         public DbSet<WorldScan> WorldScans { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<CharacterCorrelation> CharacterCorrelations { get; set; }
-        public DbSet<CharacterLogoutOrLogin> CharacterLogoutOrLogins { get; set; }
+        public DbSet<CharacterAction> CharacterActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("public");
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<World>(w =>
             {
                 w.Property(wo => wo.Name).IsRequired();
@@ -52,9 +60,9 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Entities
                     .HasForeignKey(ch => ch.LoginCharacterId).OnDelete(DeleteBehavior.NoAction);
             });
 
-            modelBuilder.Entity<CharacterLogoutOrLogin>(c =>
+            modelBuilder.Entity<CharacterAction>(c =>
             {
-                c.Property(ch => ch.CharacterLogoutOrLoginId).IsRequired();
+                c.Property(ch => ch.CharacterActionId).IsRequired();
                 c.Property(ch => ch.CharacterName).IsRequired();
                 c.Property(ch => ch.WorldScanId).IsRequired();
                 c.Property(ch => ch.IsOnline).IsRequired();
@@ -69,12 +77,10 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Entities
                 o.Property(wc => wc.NumberOfMatches).IsRequired();
             });
         }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseNpgsql(_connectionProvider.GetConnectionString(EModuleType.PostgreSql))
+                .UseSnakeCaseNamingConvention();
         }
-
-        public string GetConnectionString() => _connectionString;
     }
 }

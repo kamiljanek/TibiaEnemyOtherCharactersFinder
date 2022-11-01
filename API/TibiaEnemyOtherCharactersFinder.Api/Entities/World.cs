@@ -8,6 +8,6 @@
         public bool IsAvailable { get; set; }
         public List<WorldScan> WorldScans { get; set; }
         public List<Character> Characters { get; set; }
-        public List<CharacterLogoutOrLogin> CharacterLogoutOrLogins { get; set; }
+        public List<CharacterAction> CharacterLogoutOrLogins { get; set; }
     }
 }

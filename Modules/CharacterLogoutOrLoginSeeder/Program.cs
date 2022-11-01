@@ -18,10 +18,6 @@ namespace CharacterLogoutOrLoginSeeder
 
             var serviceProvider = services.BuildServiceProvider();
 
-
-
-
-
             var seeder = serviceProvider.GetService<CharacterLogoutOrLoginSeeder>();
             while (true)
             {
@@ -31,15 +27,11 @@ namespace CharacterLogoutOrLoginSeeder
         private static void ConfigureServices(IServiceCollection services)
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
-            //services.AddSingleton<IConfiguration>(configuration);
             services
-                //.AddSingleton<Startup>()
                 .AddSingleton<CharacterLogoutOrLoginSeeder>()
                 .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
             Startup.ConfigureOptions(services, configuration);
-            //services.Configure<ConnectionStringsSection>(opt => configuration.GetSection("ConnectionStrings").Bind(opt));
-            //services.Configure<DapperConfigurationSection>(options => configuration.GetSection("Dapper").Bind(options));
         }
     }
 }

@@ -6,5 +6,6 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Providers
     public interface IDapperConnectionProvider
     {
         IDbConnection GetConnection(EModuleType eModule);
+        string GetConnectionString(EModuleType eModule);
     }
 }

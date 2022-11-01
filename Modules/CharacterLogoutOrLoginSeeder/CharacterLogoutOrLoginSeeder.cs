@@ -61,11 +61,11 @@ namespace CharacterLogoutOrLoginSeeder
 
                     try
                     {
-                        using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
+                        using (var connection = _connectionProvider.GetConnection(EModuleType.SqlServer))
                         {
                             connection.Execute(GenerateQueries.CreateCharacterIfNotExist);
                         }
-                        using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
+                        using (var connection = _connectionProvider.GetConnection(EModuleType.SqlServer))
                         {
                             connection.Execute(GenerateQueries.CreateCharacterCorrelation);
                         }
@@ -73,7 +73,7 @@ namespace CharacterLogoutOrLoginSeeder
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
-                        using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
+                        using (var connection = _connectionProvider.GetConnection(EModuleType.SqlServer))
                         {
                             connection.Execute(GenerateQueries.ClearCharacterLogoutOrLogins);
                         }
@@ -86,7 +86,7 @@ namespace CharacterLogoutOrLoginSeeder
                 }
             }
 
-            using (var connection = _connectionProvider.GetConnection(EModuleType.TibiaDB))
+            using (var connection = _connectionProvider.GetConnection(EModuleType.SqlServer))
             {
                 connection.Execute(GenerateQueries.ClearCharacterLogoutOrLogins);
             }
@@ -106,7 +106,7 @@ namespace CharacterLogoutOrLoginSeeder
             foreach (var loginName in loginNames)
             {
                 var loginCharacter = CreateCharacterLogoutOrLogin(loginName, false, worldScan);
-                _dbContext.CharacterLogoutOrLogins.Add(loginCharacter);
+                _dbContext.CharacterActions.Add(loginCharacter);
 
             }
         }
@@ -116,14 +116,14 @@ namespace CharacterLogoutOrLoginSeeder
             foreach (var loginName in loginNames)
             {
                 var loginCharacter = CreateCharacterLogoutOrLogin(loginName, true, worldScan);
-                _dbContext.CharacterLogoutOrLogins.Add(loginCharacter);
+                _dbContext.CharacterActions.Add(loginCharacter);
 
             }
         }
 
-        private CharacterLogoutOrLogin CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)
+        private CharacterAction CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)
         {
-            return new CharacterLogoutOrLogin()
+            return new CharacterAction()
             {
                 CharacterName = characterName,
                 WorldScanId = worldScan.WorldScanId,

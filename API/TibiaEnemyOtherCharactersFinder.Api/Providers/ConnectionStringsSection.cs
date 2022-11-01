@@ -3,6 +3,7 @@
 {
     public class ConnectionStringsSection
     {
-        public string TibiaDB { get; set; }
+        public string SqlServer { get; set; }
+        public string PostgreSql { get; set; }
     }
 }

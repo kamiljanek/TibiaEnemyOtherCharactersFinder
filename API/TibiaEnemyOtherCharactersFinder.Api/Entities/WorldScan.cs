@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Entities
 {
@@ -7,8 +8,8 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Entities
         public int WorldScanId { get; set; }
         public string CharactersOnline { get; set; }
         public short WorldId { get; set; }
+        public bool IsDeleted { get; set; }
         public World World { get; set; }
         public DateTime ScanCreateDateTime { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }

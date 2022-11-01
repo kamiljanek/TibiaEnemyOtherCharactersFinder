@@ -1,8 +1,10 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Api.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TibiaEnemyOtherCharactersFinder.Api.Entities
 {
-    public class CharacterLogoutOrLogin
+    public class CharacterAction
     {
-        public int CharacterLogoutOrLoginId { get; set; }
+        public int CharacterActionId { get; set; }
         public string CharacterName { get; set; }
         public int WorldScanId { get; set; }
         public bool IsOnline { get; set; }
