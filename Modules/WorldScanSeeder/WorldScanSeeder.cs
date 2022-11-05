@@ -39,6 +39,7 @@ namespace WorldScanSeeder
         private WorldScan CreateWorldScan(World world)
         {
             var charactersOnline = FetchOnlineCharacters(world.Url);
+
             Console.WriteLine(world.Url);
             Console.WriteLine(charactersOnline);
 
@@ -60,6 +61,9 @@ namespace WorldScanSeeder
             var stringBuilder = new StringBuilder();
             var names = new List<string>();
             var document = _decompressor.web.Load(world);
+
+            Console.WriteLine(document.ParsedText);
+
             var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
             foreach (var item in items)
             {
