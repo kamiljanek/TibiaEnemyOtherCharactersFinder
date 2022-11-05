@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFinder.Infrastructure", "API\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj", "{B1A02783-D5EB-4F68-A15A-CA9D53819A05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharacterAnalyser", "Modules\CharacterAnalyser\CharacterAnalyser.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{B1A02783-D5EB-4F68-A15A-CA9D53819A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1A02783-D5EB-4F68-A15A-CA9D53819A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1A02783-D5EB-4F68-A15A-CA9D53819A05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6C05A9C-3668-4026-BD72-93741CBB4069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6C05A9C-3668-4026-BD72-93741CBB4069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6C05A9C-3668-4026-BD72-93741CBB4069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6C05A9C-3668-4026-BD72-93741CBB4069}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{99E16C7A-3BE7-413A-A54F-6D300B8A8880} = {DCB2AD71-21DC-404B-9696-395813705E3D}
 		{D8B7A54B-4B18-4FF6-ADFA-DF98DD606ACE} = {DCB2AD71-21DC-404B-9696-395813705E3D}
 		{B1A02783-D5EB-4F68-A15A-CA9D53819A05} = {DCB2AD71-21DC-404B-9696-395813705E3D}
+		{C6C05A9C-3668-4026-BD72-93741CBB4069} = {0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FC00B179-AF59-4167-8549-F28CE809505E}

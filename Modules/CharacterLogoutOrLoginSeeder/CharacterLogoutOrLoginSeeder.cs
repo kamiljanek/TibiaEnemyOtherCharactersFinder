@@ -26,7 +26,7 @@ namespace CharacterLogoutOrLoginSeeder
         public void Seed()
         {
             var worlds = GetAvailableWorlds();
-            var choosenWorld = worlds.FirstOrDefault(x => x.Name == WorldType.Premia.ToString());
+            var choosenWorld = worlds.FirstOrDefault(x => x.Name == EWorldType.Premia.ToString());
 
             if (choosenWorld == null)
             {

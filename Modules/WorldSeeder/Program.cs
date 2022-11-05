@@ -25,7 +25,7 @@ namespace WorldSeeder
         }
         private static void ConfigureServices(IServiceCollection services)
         {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
             services
                 .AddSingleton<WorldSeeder>()
                 .AddSingleton<Decompressor>()

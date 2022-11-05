@@ -94,6 +94,55 @@ SELECT TOP 10 CorrelationId
   ORDER BY NumberOfMatches DESC
 ";
 
+        public const string NpgsqlClearCharacterActions = @"DELETE FROM character_actions;";
+
+        public const string NpgsqlCreateCharacterCorrelation = @"WITH cartesian_product AS 
+(
+SELECT 
+ f.character_id AS logout_character_id
+,t.character_id AS login_character_id
+FROM 
+	(SELECT ch.character_name, c.character_id
+	FROM character_actions ch
+	INNER JOIN characters c ON ch.character_name = c.name
+	WHERE ch.is_online = 0) AS f, 
+	(SELECT character_name, c.character_id
+	FROM character_actions ch
+	INNER JOIN characters c ON ch.character_name = c.name
+	WHERE is_online = 1) AS t 
+)
+
+ MERGE character_correlations AS target
+ USING cartesian_product AS source ON 
+	(target.logout_character_id = source.logout_character_id AND target.login_character_id = source.login_character_id) OR 
+	(target.logout_character_id = source.login_character_id AND target.login_character_id = source.logout_character_id)
+
+ WHEN MATCHED
+ THEN
+     UPDATE SET
+         target.number_of_matches += 1
+  
+ WHEN NOT MATCHED
+ THEN
+     INSERT (
+	 logout_character_id, 
+	 login_character_id, 
+	 number_of_matches
+	 )
+     VALUES (
+	 source.logout_character_id, 
+	 source.login_character_id, 
+	 1
+	 );";
+
+        public const string NpgsqlCreateCharacterIfNotExist = @"INSERT INTO characters (name, world_id)
+SELECT DISTINCT character_name, world_id
+FROM character_actions ca
+WHERE NOT EXISTS (
+          SELECT Name
+          FROM characters c
+          WHERE ca.character_name = c.name);";
+
     }
 
 }

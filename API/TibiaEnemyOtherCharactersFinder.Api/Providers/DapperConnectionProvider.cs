@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using Npgsql;
 using System.Data;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Providers
@@ -48,7 +49,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Providers
 
         private static IDbConnection GetConnection(string connectionString, int? commandTimeout)
         {
-            var connection = new SqlConnection(connectionString);
+            var connection = new NpgsqlConnection(connectionString);
             SqlMapper.Settings.CommandTimeout = commandTimeout;
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             connection.Open();

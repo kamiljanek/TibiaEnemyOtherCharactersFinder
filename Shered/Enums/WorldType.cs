@@ -1,6 +1,6 @@
 ﻿namespace Shered.Enums
 {
-    public enum WorldType
+    public enum EWorldType
     {
         Adra,
         Antica,
