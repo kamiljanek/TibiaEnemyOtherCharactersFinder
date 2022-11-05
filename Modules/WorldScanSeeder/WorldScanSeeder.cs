@@ -37,7 +37,7 @@ namespace WorldScanSeeder
             {
                 CharactersOnline = charactersOnline,
                 WorldId = world.WorldId,
-                ScanCreateDateTime = DateTime.Now,
+                ScanCreateDateTime = DateTime.UtcNow,
                 World = world
             };
             return worldScan;
