@@ -3,6 +3,7 @@ using Dapper;
 using Shared.Database.Queries.Sql;
 using Shered.Enums;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
+using TibiaEnemyOtherCharactersFinder.Api.Models;
 using TibiaEnemyOtherCharactersFinder.Api.Providers;
 
 namespace CharacterAnalyser
@@ -12,7 +13,7 @@ namespace CharacterAnalyser
         private readonly TibiaCharacterFinderDbContext _dbContext;
         private readonly IDapperConnectionProvider _connectionProvider;
 
-        public CharacterActionSeeder(TibiaCharacterFinderDbContext dbContext, IDapperConnectionProvider connectionProvider) : base ()
+        public CharacterActionSeeder(TibiaCharacterFinderDbContext dbContext, IDapperConnectionProvider connectionProvider)
         {
             _dbContext = dbContext;
             _connectionProvider = connectionProvider;
@@ -20,8 +21,6 @@ namespace CharacterAnalyser
 
         public void Seed()
         {
-            //var firstScanNames = new List<string>();
-            //var secondScanNames = new List<string>();
             var logoutNames = new List<string>();
             var loginNames = new List<string>();
             var world = GetSpecificWorldIdIfAvailable(EWorldType.Premia);
@@ -33,13 +32,11 @@ namespace CharacterAnalyser
 
             var twoWorldScans = GetFirstTwoWorldScansFromSpecificWorld(world).ToList();
 
-            if (twoWorldScans == null)
+            if (twoWorldScans.Count < 2)
             {
                 return;
             }
 
-            //firstScanNames = GetNames(twoWorldScans[0]);
-            //secondScanNames = GetNames(twoWorldScans[1]);
             logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
 
             if (!logoutNames.IsNullOrEmpty())

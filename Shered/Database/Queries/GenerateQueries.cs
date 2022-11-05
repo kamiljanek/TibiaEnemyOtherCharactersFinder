@@ -96,44 +96,48 @@ SELECT TOP 10 CorrelationId
 
         public const string NpgsqlClearCharacterActions = @"DELETE FROM character_actions;";
 
-        public const string NpgsqlCreateCharacterCorrelation = @"WITH cartesian_product AS 
-(
-SELECT 
- f.character_id AS logout_character_id
-,t.character_id AS login_character_id
+        public const string NpgsqlCreateCharacterCorrelation = @"WITH cp AS (SELECT 
+ f.character_id AS logout
+,t.character_id AS login
 FROM 
 	(SELECT ch.character_name, c.character_id
 	FROM character_actions ch
 	INNER JOIN characters c ON ch.character_name = c.name
-	WHERE ch.is_online = 0) AS f, 
+	WHERE ch.is_online = false) AS f, 
 	(SELECT character_name, c.character_id
 	FROM character_actions ch
 	INNER JOIN characters c ON ch.character_name = c.name
-	WHERE is_online = 1) AS t 
-)
+	WHERE is_online = true) AS t )
+	
+UPDATE character_correlations
+SET number_of_matches = number_of_matches + 1
+WHERE 
+(logout_character_id IN (SELECT logout FROM cp) AND login_character_id IN (SELECT login FROM cp))
+OR 
+(logout_character_id IN (SELECT login FROM cp) AND login_character_id IN (SELECT logout FROM cp));
 
- MERGE character_correlations AS target
- USING cartesian_product AS source ON 
-	(target.logout_character_id = source.logout_character_id AND target.login_character_id = source.login_character_id) OR 
-	(target.logout_character_id = source.login_character_id AND target.login_character_id = source.logout_character_id)
-
- WHEN MATCHED
- THEN
-     UPDATE SET
-         target.number_of_matches += 1
-  
- WHEN NOT MATCHED
- THEN
-     INSERT (
-	 logout_character_id, 
-	 login_character_id, 
-	 number_of_matches
-	 )
-     VALUES (
-	 source.logout_character_id, 
-	 source.login_character_id, 
-	 1
-	 );";
+WITH cp AS (SELECT 
+ f.character_id AS logout
+,t.character_id AS login
+FROM 
+	(SELECT ch.character_name, c.character_id
+	FROM character_actions ch
+	INNER JOIN characters c ON ch.character_name = c.name
+	WHERE ch.is_online = false) AS f, 
+	(SELECT character_name, c.character_id
+	FROM character_actions ch
+	INNER JOIN characters c ON ch.character_name = c.name
+	WHERE is_online = true) AS t )
+	
+INSERT INTO character_correlations (logout_character_id, login_character_id, number_of_matches)
+       SELECT 
+	   logout, login, 1
+	   FROM cp
+       WHERE NOT EXISTS (SELECT 1 FROM character_correlations WHERE 
+		(logout_character_id IN (SELECT logout FROM cp) AND login_character_id IN (SELECT login FROM cp))
+		OR 
+		(logout_character_id IN (SELECT login FROM cp) AND login_character_id IN (SELECT logout FROM cp)));
+";
 
         public const string NpgsqlCreateCharacterIfNotExist = @"INSERT INTO characters (name, world_id)
 SELECT DISTINCT character_name, world_id
