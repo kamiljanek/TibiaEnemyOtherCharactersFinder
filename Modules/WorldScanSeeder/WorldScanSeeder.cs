@@ -21,9 +21,14 @@ namespace WorldScanSeeder
             if (_dbContext.Database.CanConnect())
             {
                 var worlds = GetAvailableWorlds();
+                Console.WriteLine(worlds[0].Name);
+
                 foreach (var world in worlds)
                 {
                     var worldScan = CreateWorldScan(world);
+
+                    Console.WriteLine(worldScan.CharactersOnline);
+
                     _dbContext.WorldScans.Add(worldScan);
                 }
                 _dbContext.SaveChanges();
