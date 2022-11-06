@@ -1,22 +1,23 @@
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Shered.Services;
+using System.Net.Http.Json;
 using System.Text;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
 using TibiaEnemyOtherCharactersFinder.Api.Models;
 
 namespace WorldScanSeeder
 {
-    public class WorldScanSeeder : Model, ISeeder
+    public class WorldScanSeeder : Model
     {
         private readonly TibiaCharacterFinderDbContext _dbContext;
-        private readonly Decompressor _decompressor;
+        private readonly HttpClient _httpClient;
 
-        public WorldScanSeeder(TibiaCharacterFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
+        public WorldScanSeeder(TibiaCharacterFinderDbContext dbContext, HttpClient httpClient) : base(dbContext)
         {
             _dbContext = dbContext;
-            _decompressor = decompressor;
+            _httpClient = httpClient;
         }
-        public void Seed()
+        public async Task Seed()
         {
             if (_dbContext.Database.CanConnect())
             {
@@ -26,7 +27,7 @@ namespace WorldScanSeeder
 
                 foreach (var world in worlds)
                 {
-                    var worldScan = CreateWorldScan(world);
+                    var worldScan = await CreateWorldScan(world);
 
                     Console.WriteLine(worldScan.CharactersOnline);
 
@@ -36,9 +37,9 @@ namespace WorldScanSeeder
             }
         }
 
-        private WorldScan CreateWorldScan(World world)
+        private async Task<WorldScan> CreateWorldScan(World world)
         {
-            var charactersOnline = FetchOnlineCharacters(world.Url);
+            var charactersOnline = await FetchCharactersOnlineFromApi(world.Name);
 
             Console.WriteLine(world.Url);
             Console.WriteLine(charactersOnline);
@@ -50,29 +51,41 @@ namespace WorldScanSeeder
                 ScanCreateDateTime = DateTime.UtcNow,
                 World = world
             };
+
             return worldScan;
         }
 
-
-        private string FetchOnlineCharacters(string world)
+        private async Task<string> FetchCharactersOnlineFromApi(string name)
         {
-            _decompressor.Decompress();
+            var response = await _httpClient.GetAsync($"https://api.tibiadata.com/v3/world/{name}");
 
-            var stringBuilder = new StringBuilder();
-            var names = new List<string>();
-            var document = _decompressor.web.Load(world);
+            var world = await response.Content.ReadFromJsonAsync<WorldApiResult>();
 
-            Console.WriteLine(document.ParsedText);
+            var onlinePlayers = world.worlds.world.online_players.Select(x => x.name).ToList();
 
-            var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
-            foreach (var item in items)
-            {
-                string name = item.InnerHtml.Replace("&#160;", " ");
-                names.Add(name);
-            }
-            stringBuilder.AppendJoin('|', names);
-            return stringBuilder.ToString();
+            return string.Join("|", onlinePlayers);
+
         }
+
+        //private string FetchOnlineCharacters(string world)
+        //{
+        //    _decompressor.Decompress();
+
+        //    var stringBuilder = new StringBuilder();
+        //    var names = new List<string>();
+        //    var document = _decompressor.web.Load(world);
+
+        //    Console.WriteLine(document.ParsedText);
+
+        //    var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
+        //    foreach (var item in items)
+        //    {
+        //        string name = item.InnerHtml.Replace("&#160;", " ");
+        //        names.Add(name);
+        //    }
+        //    stringBuilder.AppendJoin('|', names);
+        //    return stringBuilder.ToString();
+        //}
     }
 }
 

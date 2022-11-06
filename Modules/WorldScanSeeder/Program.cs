@@ -11,17 +11,17 @@ namespace WorldScanSeeder
 {
     public class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            var seeder = ServiceProvider.GetService<ISeeder>();
+            var seeder = ServiceProvider.GetService<WorldScanSeeder>();
 
             try
             {
-                seeder.Seed();
+                await seeder.Seed();
                 Console.WriteLine("Success" + DateTime.Now);
             }
             catch (Exception e)
@@ -37,7 +37,8 @@ namespace WorldScanSeeder
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
 
             services
-                .AddSingleton<ISeeder, WorldScanSeeder>()
+                .AddHttpClient()
+                .AddSingleton<WorldScanSeeder>()
                 .AddSingleton<Decompressor>()
                 .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>()
                 .AddSingleton<DbContextOptions<TibiaCharacterFinderDbContext>>()
