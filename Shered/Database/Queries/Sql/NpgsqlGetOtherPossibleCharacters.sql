@@ -7,7 +7,7 @@ SELECT
   FROM character_correlations cc
   INNER JOIN characters f on f.character_id = cc.logout_character_id
   INNER JOIN characters t on t.character_id = cc.login_character_id
-  where t.name = @CharacterName OR f.name = @CharacterName
+  where t.name ILIKE @CharacterName OR f.name ILIKE @CharacterName
   ORDER BY number_of_matches DESC LIMIT 10
   )
 
@@ -15,7 +15,7 @@ SELECT
         ,LoginName AS OtherCharacterName
         ,NumberOfMatches
   FROM cor
-  WHERE NOT LoginName = @CharacterName
+  WHERE NOT LoginName ILIKE @CharacterName
   
   UNION
 
@@ -23,5 +23,5 @@ SELECT
         ,LogoutName AS OtherCharacterName
         ,NumberOfMatches
   FROM cor
-  WHERE NOT LogoutName = @CharacterName
+  WHERE NOT LogoutName ILIKE @CharacterName
   ORDER BY NumberOfMatches DESC

@@ -13,6 +13,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.Character
         {
             _mediator = mediator;
         }
+
         /// <summary>
         /// Get 10 most scores enemy characters
         /// </summary>
