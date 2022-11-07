@@ -41,9 +41,6 @@ namespace WorldScanSeeder
         {
             var charactersOnline = await FetchCharactersOnlineFromApi(world.Name);
 
-            Console.WriteLine(world.Url);
-            Console.WriteLine(charactersOnline);
-
             var worldScan = new WorldScan
             {
                 CharactersOnline = charactersOnline,
@@ -66,26 +63,6 @@ namespace WorldScanSeeder
             return string.Join("|", onlinePlayers);
 
         }
-
-        //private string FetchOnlineCharacters(string world)
-        //{
-        //    _decompressor.Decompress();
-
-        //    var stringBuilder = new StringBuilder();
-        //    var names = new List<string>();
-        //    var document = _decompressor.web.Load(world);
-
-        //    Console.WriteLine(document.ParsedText);
-
-        //    var items = document.QuerySelectorAll(".Odd [href], .Even [href]");
-        //    foreach (var item in items)
-        //    {
-        //        string name = item.InnerHtml.Replace("&#160;", " ");
-        //        names.Add(name);
-        //    }
-        //    stringBuilder.AppendJoin('|', names);
-        //    return stringBuilder.ToString();
-        //}
     }
 }
 
