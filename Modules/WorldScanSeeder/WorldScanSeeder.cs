@@ -57,7 +57,7 @@ namespace WorldScanSeeder
         {
             var response = await _httpClient.GetAsync($"https://api.tibiadata.com/v3/world/{name}");
 
-            var world = await response.Content.ReadFromJsonAsync<WorldApiResult>();
+            var world = await response.Content.ReadFromJsonAsync<TibiaApiWorldResult>();
 
             var onlinePlayers = world.worlds.world.online_players.Select(x => x.name).ToList();
 

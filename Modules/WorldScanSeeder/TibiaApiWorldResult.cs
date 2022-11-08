@@ -1,23 +1,23 @@
 ﻿namespace WorldScanSeeder
 {
-    public class WorldApiResult
+    public class TibiaApiWorldResult
     {
-        public WorldsApi worlds { get; set; }
-        public InformationApi information { get; set; }
+        public ApiWorldsResult worlds { get; set; }
+        public ApiInformationResult information { get; set; }
     }
 
-    public class WorldsApi
+    public class ApiWorldsResult
     {
-        public WorldApi world { get; set; }
+        public ApiWorldResult world { get; set; }
     }
 
-    public class InformationApi
+    public class ApiInformationResult
     {
         public int api_version { get; set; }
         public DateTime timestamp { get; set; }
     }
 
-    public class WorldApi
+    public class ApiWorldResult
     {
         public string name { get; set; }
         public string status { get; set; }
@@ -34,10 +34,10 @@
         public string battleye_date { get; set; }
         public string game_world_type { get; set; }
         public string tournament_world_type { get; set; }
-        public List<OnlinePlayerApi> online_players { get; set; }
+        public List<ApiOnlinePlayerResult> online_players { get; set; }
     }
 
-    public class OnlinePlayerApi
+    public class ApiOnlinePlayerResult
     {
         public string name { get; set; }
         public int level { get; set; }

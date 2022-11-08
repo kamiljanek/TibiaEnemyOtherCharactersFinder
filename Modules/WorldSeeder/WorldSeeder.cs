@@ -1,84 +1,94 @@
-using HtmlAgilityPack.CssSelectors.NetCore;
-using Shered.Services;
+using System.Net.Http.Json;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
 using TibiaEnemyOtherCharactersFinder.Api.Models;
 
 namespace WorldSeeder
 {
-    public class WorldSeeder : Model, ISeeder
+    public class WorldSeeder : Model
     {
-        private readonly string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
+        private const string _getWorldsUrl = "https://api.tibiadata.com/v3/worlds";
+        private const string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
         private readonly TibiaCharacterFinderDbContext _dbContext;
-        private readonly Decompressor _decompressor;
+        private readonly HttpClient _httpClient;
 
-        public WorldSeeder(TibiaCharacterFinderDbContext dbContext, Decompressor decompressor) : base(dbContext)
+        public WorldSeeder(TibiaCharacterFinderDbContext dbContext, HttpClient httpClient) : base(dbContext)
         {
             _dbContext = dbContext;
-            _decompressor = decompressor;
+            _httpClient = httpClient;
         }
 
-        public void Seed()
+        public async Task Seed()
         {
             if (_dbContext.Database.CanConnect())
             {
-                var worldNames = GetWorldNamesFromTibiaCom();
-                foreach (var worldName in worldNames)
+                try
                 {
-                    if (!_dbContext.Worlds.Any(o => o.Name == worldName))
+                    var worldNames = await GetWorldNamesFromTibiaApi();
+                    foreach (var worldName in worldNames)
                     {
-                        var world = CreateWorld(worldName);
-                        _dbContext.Worlds.Add(world);
+                        if (!_dbContext.Worlds.Any(o => o.Name == worldName))
+                        {
+                            var world = CreateWorld(worldName);
+                            _dbContext.Worlds.Add(world);
+                        }
                     }
+                    _dbContext.SaveChanges();
                 }
-                _dbContext.SaveChanges();
+                catch (Exception e)
+                {
+                    Console.WriteLine(@"Cannot get worlds from ""api.tibiadata""");
+                    Console.WriteLine(e);
+                }
             }
         }
 
-        public void TurnOffIfWorldIsUnavailable()
+        private async Task<List<string>> GetWorldNamesFromTibiaApi()
+        {
+            var response = await _httpClient.GetAsync(_getWorldsUrl);
+
+            var result = await response.Content.ReadFromJsonAsync<TibiaApiWorldsResult>();
+
+            return result.worlds.regular_worlds.Select(world => world.name).ToList();
+        }
+
+        public async Task TurnOffIfWorldIsUnavailable()
         {
             if (_dbContext.Database.CanConnect())
             {
-                var availableWorldNames = GetWorldNamesFromTibiaCom();
-                var dbWorldNames = GetAvailableWorlds();
-                foreach (var dbWorldName in dbWorldNames)
+                try
                 {
-                    if (!availableWorldNames.Contains(dbWorldName.Name))
+                    var availableWorldNamesFromTibiaApi = await GetWorldNamesFromTibiaApi();
+                    var worldNamesFromDb = GetAvailableWorlds();
+
+                    foreach (var worldNameFromDb in worldNamesFromDb)
                     {
-                        var worldName = _dbContext.Worlds.First(i => i.Name == dbWorldName.Name);
-                        worldName.IsAvailable = false;
+                        if (!availableWorldNamesFromTibiaApi.Contains(worldNameFromDb.Name))
+                        {
+                            var worldName = _dbContext.Worlds.First(i => i.Name == worldNameFromDb.Name);
+                            worldName.IsAvailable = false;
+                        }
                     }
+                    _dbContext.SaveChanges();
                 }
-                _dbContext.SaveChanges();
+                catch (Exception e)
+                {
+                    Console.WriteLine(@"Cannot get worlds from ""api.tibiadata""");
+                    Console.WriteLine(e);
+                }
             }
         }
 
         private World CreateWorld(string worldName)
         {
-            var worldUrl = GetWorldUrl(worldName);
-            var world = new World()
+            return new World()
             {
                 Name = worldName,
-                Url = worldUrl,
+                Url = BuildWorldUrl(worldName),
                 IsAvailable = true
             };
-            return world;
         }
-        private List<string> GetWorldNamesFromTibiaCom()
-        {
-            List<string> worldNames = new List<string>();
-            _decompressor.Decompress();
-            var document = _decompressor.web.Load(_mainUrl);
-            var tables = document.QuerySelectorAll(".TableContent");
-            var items = tables[2].QuerySelectorAll(".Odd, .Even");
-            foreach (var item in items)
-            {
-                var a = item.QuerySelectorAll("a");
-                var text = a[0].InnerText;
-                worldNames.Add(text);
-            }
-            return worldNames;
-        }
-        private string GetWorldUrl(string worldName)
+
+        private string BuildWorldUrl(string worldName)
         {
             return $"{_mainUrl}&world={worldName}";
         }
