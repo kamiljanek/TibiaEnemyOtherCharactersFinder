@@ -10,7 +10,7 @@ namespace WorldSeeder
 {
     public class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
 
             var services = new ServiceCollection();
@@ -20,15 +20,15 @@ namespace WorldSeeder
             var serviceProvider = services.BuildServiceProvider();
 
             var seeder = serviceProvider.GetService<WorldSeeder>();
-            seeder.Seed();
-            seeder.TurnOffIfWorldIsUnavailable();
+            await seeder.Seed();
+            await seeder.TurnOffIfWorldIsUnavailable();
         }
         private static void ConfigureServices(IServiceCollection services)
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
             services
                 .AddSingleton<WorldSeeder>()
-                .AddSingleton<Decompressor>()
+                .AddHttpClient()
                 .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>()
                 .AddSingleton<DbContextOptions<TibiaCharacterFinderDbContext>>()
                 .AddSingleton<TibiaCharacterFinderDbContext>();
