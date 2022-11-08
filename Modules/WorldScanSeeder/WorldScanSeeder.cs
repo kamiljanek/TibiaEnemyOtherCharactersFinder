@@ -1,7 +1,4 @@
-using HtmlAgilityPack.CssSelectors.NetCore;
-using Shered.Services;
 using System.Net.Http.Json;
-using System.Text;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
 using TibiaEnemyOtherCharactersFinder.Api.Models;
 
@@ -23,15 +20,19 @@ namespace WorldScanSeeder
             {
                 var worlds = GetAvailableWorlds();
 
-                Console.WriteLine(worlds[0].Name);
-
                 foreach (var world in worlds)
                 {
-                    var worldScan = await CreateWorldScan(world);
-
-                    Console.WriteLine(worldScan.CharactersOnline);
-
-                    _dbContext.WorldScans.Add(worldScan);
+                    try
+                    {
+                        var worldScan = await CreateWorldScan(world);
+                        _dbContext.WorldScans.Add(worldScan);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(world.Name);
+                        Console.WriteLine(e);
+                        continue;
+                    }
                 }
                 _dbContext.SaveChanges();
             }
