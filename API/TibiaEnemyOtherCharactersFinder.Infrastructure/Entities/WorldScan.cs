@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Entities
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
 {
     public class WorldScan
     {

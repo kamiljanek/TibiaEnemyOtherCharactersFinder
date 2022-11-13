@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Api.Entities
+﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
 {
     public class World
     {

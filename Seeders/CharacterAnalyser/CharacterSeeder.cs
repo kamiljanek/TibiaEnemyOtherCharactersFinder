@@ -1,4 +1,4 @@
-﻿namespace CharacterAnalyser
+﻿namespace CharacterAnalyserSeeder
 {
     public class CharacterSeeder
     {

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Providers;
 using TibiaEnemyOtherCharactersFinder.Api;
-using TibiaEnemyOtherCharactersFinder.Api.Entities;
-using TibiaEnemyOtherCharactersFinder.Api.Providers;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace CharacterAnalyser
+namespace CharacterAnalyserSeeder
 {
     public class Program
     {

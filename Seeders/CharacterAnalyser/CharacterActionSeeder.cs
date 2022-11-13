@@ -1,11 +1,11 @@
 ﻿using Castle.Core.Internal;
 using Dapper;
 using Shared.Database.Queries.Sql;
-using Shered.Enums;
-using TibiaEnemyOtherCharactersFinder.Api.Entities;
-using TibiaEnemyOtherCharactersFinder.Api.Providers;
+using Shared.Enums;
+using Shared.Providers;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace CharacterAnalyser
+namespace CharacterAnalyserSeeder
 {
     public class CharacterActionSeeder
     {

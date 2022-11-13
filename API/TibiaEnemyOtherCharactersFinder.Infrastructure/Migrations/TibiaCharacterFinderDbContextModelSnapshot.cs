@@ -2,20 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TibiaEnemyOtherCharactersFinder.Api.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 #nullable disable
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
 {
     [DbContext(typeof(TibiaCharacterFinderDbContext))]
-    [Migration("20221101100038_Init_postgres")]
-    partial class Init_postgres
+    partial class TibiaCharacterFinderDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
-using TibiaEnemyOtherCharactersFinder.Api.Entities;
-using TibiaEnemyOtherCharactersFinder.Api.Services;
+using TibiaEnemyOtherCharactersFinder.Application.Services;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 namespace WorldSeeder
 {

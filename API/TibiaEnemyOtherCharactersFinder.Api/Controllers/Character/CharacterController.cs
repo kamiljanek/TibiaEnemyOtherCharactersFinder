@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TibiaEnemyOtherCharactersFinder.Api.Queries.Character;
+using TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.Character;
 

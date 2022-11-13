@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TibiaEnemyOtherCharactersFinder.Api.Providers;
+using Shared.Providers;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Entities
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
 {
     //EntityFrameworkCore\Add-Migration <MIGRATION_NAME>
     public class TibiaCharacterFinderDbContext : DbContext

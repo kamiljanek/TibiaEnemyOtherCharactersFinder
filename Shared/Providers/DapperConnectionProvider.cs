@@ -1,9 +1,10 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using System;
 using System.Data;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Providers
+namespace Shared.Providers
 
 {
     public class DapperConnectionProvider : IDapperConnectionProvider

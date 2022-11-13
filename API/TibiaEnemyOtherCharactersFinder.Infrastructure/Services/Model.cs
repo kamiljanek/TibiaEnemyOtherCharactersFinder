@@ -1,6 +1,6 @@
-﻿using TibiaEnemyOtherCharactersFinder.Api.Entities;
+﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Services
+namespace TibiaEnemyOtherCharactersFinder.Application.Services
 {
     public class Model
     {

@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Api.Dtos
+﻿namespace TibiaEnemyOtherCharactersFinder.Application.Dtos
 {
     public class CharacterWithCorrelationsResult
     {

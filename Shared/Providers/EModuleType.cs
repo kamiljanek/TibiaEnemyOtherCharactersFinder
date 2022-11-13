@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Api.Providers
+﻿namespace Shared.Providers
 
 {
     public enum EModuleType

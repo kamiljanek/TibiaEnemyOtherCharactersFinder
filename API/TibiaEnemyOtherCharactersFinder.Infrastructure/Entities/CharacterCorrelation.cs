@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Entities
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
 {
     public class CharacterCorrelation
     {

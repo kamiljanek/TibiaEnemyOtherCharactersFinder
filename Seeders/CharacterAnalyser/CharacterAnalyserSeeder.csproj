@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\API\TibiaEnemyOtherCharactersFinder.Api\TibiaEnemyOtherCharactersFinder.Api.csproj" />
+    <ProjectReference Include="..\..\API\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\Shared.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿namespace Shered.Enums
+﻿namespace Shared.Enums
 {
     public enum EWorldType
     {

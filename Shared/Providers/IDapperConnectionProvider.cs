@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Providers
+namespace Shared.Providers
 
 {
     public interface IDapperConnectionProvider
