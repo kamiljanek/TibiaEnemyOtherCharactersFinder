@@ -16,17 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Character\**" />
-    <Compile Remove="Services\World\**" />
-    <Content Remove="Services\Character\**" />
-    <Content Remove="Services\World\**" />
-    <EmbeddedResource Remove="Services\Character\**" />
-    <EmbeddedResource Remove="Services\World\**" />
-    <None Remove="Services\Character\**" />
-    <None Remove="Services\World\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Dapper" Version="2.0.123">
       <TreatAsUsed>true</TreatAsUsed>
@@ -49,7 +38,9 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Shered\Shered.csproj" />
+		<ProjectReference Include="..\..\Shared\Shared.csproj" />
+		<ProjectReference Include="..\TibiaEnemyOtherCharactersFinder.Application\TibiaEnemyOtherCharactersFinder.Application.csproj" />
+		<ProjectReference Include="..\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
