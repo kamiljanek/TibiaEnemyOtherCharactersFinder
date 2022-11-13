@@ -49,7 +49,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Shered\Shered.csproj" />
+		<ProjectReference Include="..\..\Shared\Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

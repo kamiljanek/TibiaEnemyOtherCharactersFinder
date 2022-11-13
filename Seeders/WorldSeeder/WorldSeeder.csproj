@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\API\TibiaEnemyOtherCharactersFinder.Api\TibiaEnemyOtherCharactersFinder.Api.csproj" />
-    <ProjectReference Include="..\..\Shered\Shered.csproj" />
+    <ProjectReference Include="..\..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>
