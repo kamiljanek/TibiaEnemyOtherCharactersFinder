@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shered", "Shered\Shered.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{DCB2AD71-21DC-404B-9696-395813705E3D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seeders", "Seeders", "{0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{AD1CA861-E25C-4B7B-BD21-F7BBCBE77F1F}"
 EndProject
@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFinder.Infrastructure", "API\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj", "{B1A02783-D5EB-4F68-A15A-CA9D53819A05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterAnalyser", "Modules\CharacterAnalyser\CharacterAnalyser.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterAnalyserSeeder", "Modules\CharacterAnalyser\CharacterAnalyserSeeder.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
