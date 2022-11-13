@@ -1,4 +1,5 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Api.Models
+﻿namespace TibiaEnemyOtherCharactersFinder.Api.Services
+
 {
     public interface ISeeder
     {

@@ -16,6 +16,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Character\**" />
+    <Compile Remove="Services\World\**" />
+    <Content Remove="Services\Character\**" />
+    <Content Remove="Services\World\**" />
+    <EmbeddedResource Remove="Services\Character\**" />
+    <EmbeddedResource Remove="Services\World\**" />
+    <None Remove="Services\Character\**" />
+    <None Remove="Services\World\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Dapper" Version="2.0.123" />
@@ -39,11 +50,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Shered\Shered.csproj" />
 	</ItemGroup>
-	
-  <ItemGroup>
-    <Folder Include="Services\Character\" />
-    <Folder Include="Services\World\" />
-  </ItemGroup>
+
+	<ItemGroup>
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://appsemble.app/api.json" /></VisualStudio></ProjectExtensions>
 

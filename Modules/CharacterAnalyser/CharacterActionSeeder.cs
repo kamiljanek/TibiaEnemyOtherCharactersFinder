@@ -3,7 +3,6 @@ using Dapper;
 using Shared.Database.Queries.Sql;
 using Shered.Enums;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
-using TibiaEnemyOtherCharactersFinder.Api.Models;
 using TibiaEnemyOtherCharactersFinder.Api.Providers;
 
 namespace CharacterAnalyser
@@ -115,7 +114,7 @@ namespace CharacterAnalyser
                 var loginCharacter = CreateCharacterLogoutOrLogin(loginName, true, worldScan);
                 loginCharacters.Add(loginCharacter);
             }
-                _dbContext.CharacterActions.AddRange(loginCharacters);
+            _dbContext.CharacterActions.AddRange(loginCharacters);
         }
 
         private CharacterAction CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)

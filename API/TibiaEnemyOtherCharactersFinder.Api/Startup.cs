@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using TibiaEnemyOtherCharactersFinder.Api.Entities;
 using TibiaEnemyOtherCharactersFinder.Api.Providers;
-using TibiaEnemyOtherCharactersFinder.Api.Services;
 
 
 namespace TibiaEnemyOtherCharactersFinder.Api
@@ -27,8 +26,6 @@ namespace TibiaEnemyOtherCharactersFinder.Api
                .UseNpgsql(Configuration.GetConnectionString("PostgreSql"))
                 .UseSnakeCaseNamingConvention());
 
-            services.AddAutoMapper(GetType().Assembly);
-            services.AddScoped<IWorldService, WorldService>();
             services.AddScoped<IDapperConnectionProvider, DapperConnectionProvider>();
             services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
