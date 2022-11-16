@@ -3,17 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "Modules\WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "Seeders\WorldSeeder\WorldSeeder.csproj", "{62683399-B294-47AD-80BE-5B6F79551C32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "Modules\WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "Seeders\WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterLogoutOrLoginSeeder", "Modules\CharacterLogoutOrLoginSeeder\CharacterLogoutOrLoginSeeder.csproj", "{FF513A22-68A9-46F9-9028-0377777FA52F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shered", "Shered\Shered.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{DCB2AD71-21DC-404B-9696-395813705E3D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seeders", "Seeders", "{0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{AD1CA861-E25C-4B7B-BD21-F7BBCBE77F1F}"
 EndProject
@@ -25,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFinder.Infrastructure", "API\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj", "{B1A02783-D5EB-4F68-A15A-CA9D53819A05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharacterAnalyser", "Modules\CharacterAnalyser\CharacterAnalyser.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterAnalyserSeeder", "Seeders\CharacterAnalyser\CharacterAnalyserSeeder.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FF513A22-68A9-46F9-9028-0377777FA52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF513A22-68A9-46F9-9028-0377777FA52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF513A22-68A9-46F9-9028-0377777FA52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF513A22-68A9-46F9-9028-0377777FA52F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C67C3DA-4429-4865-9895-E69966D87A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9C67C3DA-4429-4865-9895-E69966D87A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C67C3DA-4429-4865-9895-E69966D87A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -76,7 +70,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{62683399-B294-47AD-80BE-5B6F79551C32} = {0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}
 		{C4C15676-0E76-4814-95D0-CF3B9DFCCE67} = {0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}
-		{FF513A22-68A9-46F9-9028-0377777FA52F} = {0C2A80AE-DEC4-4F8C-ABAF-3547546282A8}
 		{9C67C3DA-4429-4865-9895-E69966D87A32} = {AD1CA861-E25C-4B7B-BD21-F7BBCBE77F1F}
 		{A6E7F985-BC14-40A6-8049-A936EE2AEBA7} = {DCB2AD71-21DC-404B-9696-395813705E3D}
 		{99E16C7A-3BE7-413A-A54F-6D300B8A8880} = {DCB2AD71-21DC-404B-9696-395813705E3D}
