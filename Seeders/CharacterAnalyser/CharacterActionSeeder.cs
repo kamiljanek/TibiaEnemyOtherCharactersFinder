@@ -1,18 +1,19 @@
 ﻿using Castle.Core.Internal;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Shared.Database.Queries.Sql;
-using Shared.Enums;
 using Shared.Providers;
+using TibiaEnemyOtherCharactersFinder.Application.Services;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 namespace CharacterAnalyserSeeder
 {
-    public class CharacterActionSeeder
+    public class CharacterActionSeeder : Model
     {
         private readonly TibiaCharacterFinderDbContext _dbContext;
         private readonly IDapperConnectionProvider _connectionProvider;
 
-        public CharacterActionSeeder(TibiaCharacterFinderDbContext dbContext, IDapperConnectionProvider connectionProvider)
+        public CharacterActionSeeder(TibiaCharacterFinderDbContext dbContext, IDapperConnectionProvider connectionProvider) : base(dbContext)
         {
             _dbContext = dbContext;
             _connectionProvider = connectionProvider;
@@ -20,73 +21,77 @@ namespace CharacterAnalyserSeeder
 
         public void Seed()
         {
-            var logoutNames = new List<string>();
-            var loginNames = new List<string>();
-            var world = GetSpecificWorldIdIfAvailable(EWorldType.Premia);
+            var availableWorlds = GetAvailableWorldsIncludingScans();
 
-            if (world == 0)
+            foreach (var availableWorld in availableWorlds)
             {
-                return;
-            }
+                var twoWorldScans = availableWorld.WorldScans.Where(scan => !scan.IsDeleted).ToList();
 
-            var twoWorldScans = GetFirstTwoWorldScansFromSpecificWorld(world).ToList();
-
-            if (twoWorldScans.Count < 2)
-            {
-                return;
-            }
-
-            logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
-
-            if (!logoutNames.IsNullOrEmpty())
-            {
-                loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
-            }
-
-            if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
-            {
-                try
+                while (twoWorldScans.Count > 1)
                 {
-                    _dbContext.Database.BeginTransaction();
-                    SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
-                    SeedLoginCharacters(loginNames, twoWorldScans[1]);
-                    _dbContext.SaveChanges();
-                    _dbContext.Database.CommitTransaction();
 
-                    try
+                    var logoutNames = new List<string>();
+                    var loginNames = new List<string>();
+                    twoWorldScans = availableWorld.WorldScans.Where(scan => !scan.IsDeleted).Take(2).ToList();
+
+                    if (twoWorldScans.Count < 2)
                     {
-                        using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+                        continue;
+                    }
+
+                    logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
+
+                    if (!logoutNames.IsNullOrEmpty())
+                    {
+                        loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
+                    }
+
+                    if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
+                    {
+                        try
                         {
-                            connection.Execute(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+                            _dbContext.Database.BeginTransaction();
+                            SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
+                            SeedLoginCharacters(loginNames, twoWorldScans[1]);
+                            _dbContext.SaveChanges();
+                            _dbContext.Database.CommitTransaction();
+
+                            try
+                            {
+                                using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+                                {
+                                    connection.Execute(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+                                    connection.Execute(GenerateQueries.NpgsqlCreateCharacterCorrelation);
+                                }
+                                //using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+                                //{
+                                //}
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                                using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+                                {
+                                    connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
+                                }
+                            }
                         }
-                        using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+                        catch (Exception e)
                         {
-                            connection.Execute(GenerateQueries.NpgsqlCreateCharacterCorrelation);
+                            Console.WriteLine(e);
+                            _dbContext.Database.RollbackTransaction();
                         }
                     }
-                    catch (Exception e)
+
+                    using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
                     {
-                        Console.WriteLine(e);
-                        using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-                        {
-                            connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
-                        }
+                        connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
                     }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    _dbContext.Database.RollbackTransaction();
+
+                    SoftDeleteWorldScan(twoWorldScans[0]);
+                    Console.WriteLine(twoWorldScans[0].WorldScanId);
                 }
             }
-
-            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-            {
-                connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
-            }
-
-            SoftDeleteWorldScan(twoWorldScans[0]);
-            Console.WriteLine(twoWorldScans[0].WorldScanId);
         }
 
         private void SoftDeleteWorldScan(WorldScan worldScan)
@@ -132,8 +137,8 @@ namespace CharacterAnalyserSeeder
         {
             try
             {
-                return _dbContext.WorldScans.Where(w => w.WorldId == world && w.IsDeleted == false)
-                    .OrderBy(w => w.WorldScanId).Take(2);
+                return _dbContext.WorldScans.Where(w => w.WorldId == world && !w.IsDeleted)
+                    .OrderBy(w => w.WorldScanId).Take(2).AsNoTracking();
             }
             catch (Exception)
             {
@@ -146,11 +151,6 @@ namespace CharacterAnalyserSeeder
             var names = worldScan.CharactersOnline.Split("|").ToList();
             names.RemoveAll(string.IsNullOrWhiteSpace);
             return names;
-        }
-
-        private short GetSpecificWorldIdIfAvailable(EWorldType worldType)
-        {
-            return _dbContext.Worlds.FirstOrDefault(w => w.IsAvailable == true && w.Name == worldType.ToString()).WorldId;
         }
     }
 }

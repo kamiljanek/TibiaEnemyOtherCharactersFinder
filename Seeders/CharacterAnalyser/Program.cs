@@ -11,17 +11,16 @@ namespace CharacterAnalyserSeeder
     {
         static void Main(string[] args)
         {
-
             var services = new ServiceCollection();
-
             ConfigureServices(services);
-
             var serviceProvider = services.BuildServiceProvider();
-
             var seeder = serviceProvider.GetService<CharacterActionSeeder>();
+
             while (true)
             {
+                Console.WriteLine(DateTime.Now);
                 seeder.Seed();
+                Console.WriteLine(DateTime.Now);
             }
         }
         private static void ConfigureServices(IServiceCollection services)
