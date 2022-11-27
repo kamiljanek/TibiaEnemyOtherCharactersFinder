@@ -16,15 +16,7 @@ namespace WorldScanSeeder
             ServiceProvider = services.BuildServiceProvider();
 
             var seeder = ServiceProvider.GetService<WorldScanSeeder>();
-
-            try
-            {
-                await seeder.Seed();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            await seeder.Seed();
         }
 
         public static ServiceProvider ServiceProvider { get; private set; }
