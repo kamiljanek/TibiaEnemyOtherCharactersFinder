@@ -18,9 +18,7 @@ namespace CharacterAnalyserSeeder
 
             while (true)
             {
-                Console.WriteLine(DateTime.Now);
                 seeder.Seed();
-                Console.WriteLine(DateTime.Now);
             }
         }
         private static void ConfigureServices(IServiceCollection services)

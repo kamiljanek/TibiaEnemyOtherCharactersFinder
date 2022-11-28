@@ -63,9 +63,6 @@ namespace CharacterAnalyserSeeder
                                     connection.Execute(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
                                     connection.Execute(GenerateQueries.NpgsqlCreateCharacterCorrelation);
                                 }
-                                //using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-                                //{
-                                //}
                             }
                             catch (Exception e)
                             {
