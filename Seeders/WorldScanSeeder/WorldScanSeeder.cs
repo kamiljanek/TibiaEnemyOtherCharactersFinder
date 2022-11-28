@@ -1,4 +1,5 @@
-using System.Net.Http.Json;
+using Newtonsoft.Json;
+using System.IO.Compression;
 using TibiaEnemyOtherCharactersFinder.Application.Services;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
@@ -18,24 +19,23 @@ namespace WorldScanSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-                var worlds = GetAvailableWorlds();
-
-                foreach (var world in worlds)
+                var availableWorlds = GetAvailableWorlds();
+                foreach (var availableWorld in availableWorlds)
                 {
                     try
                     {
-                        var worldScan = await CreateWorldScan(world);
+                        var worldScan = await CreateWorldScan(availableWorld);
                         _dbContext.WorldScans.Add(worldScan);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(world.Name);
+                        Console.WriteLine($"{availableWorld.Name} - cannot deserialized object");
                         Console.WriteLine(e);
                         continue;
                     }
                 }
                 _dbContext.SaveChanges();
-                Console.WriteLine("Success" + DateTime.Now);
+                Console.WriteLine("Save success " + DateTime.Now);
             }
             else
             {
@@ -60,14 +60,44 @@ namespace WorldScanSeeder
 
         private async Task<string> FetchCharactersOnlineFromApi(string name)
         {
-            var response = await _httpClient.GetAsync($"https://api.tibiadata.com/v3/world/{name}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.tibiadata.com/v3/world/{name}");
 
-            var world = await response.Content.ReadFromJsonAsync<TibiaApiWorldResult>();
+            using var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await ReadContentAsString(response);
 
-            var onlinePlayers = world.worlds.world.online_players.Select(x => x.name).ToList();
+                var contentDeserialized = JsonConvert.DeserializeObject<TibiaApiWorldResult>(content);
 
-            return string.Join("|", onlinePlayers);
+                var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
 
+                Console.WriteLine($"{name} - successfull");
+
+                return string.Join("|", onlinePlayers);
+            }
+            Console.WriteLine($"{name} - code isn't success");
+
+            return string.Empty;
+        }
+        private async Task<string> ReadContentAsString(HttpResponseMessage response)
+        {
+            // Check whether response is compressed
+            if (response.Content.Headers.ContentEncoding.Any(x => x == "gzip"))
+            {
+                // Decompress manually
+                using (var s = await response.Content.ReadAsStreamAsync())
+                {
+                    using (var decompressed = new GZipStream(s, CompressionMode.Decompress))
+                    {
+                        using (var rdr = new StreamReader(decompressed))
+                        {
+                            return await rdr.ReadToEndAsync();
+                        }
+                    }
+                }
+            }
+            // Use standard implementation if not compressed
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }

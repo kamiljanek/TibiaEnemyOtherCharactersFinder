@@ -2,10 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Providers;
+using System;
 using TibiaEnemyOtherCharactersFinder.Api;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace WorldScanSeeder
+namespace DbTableCleaner
 {
     public class Program
     {
@@ -15,8 +16,9 @@ namespace WorldScanSeeder
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            var seeder = ServiceProvider.GetService<WorldScanSeeder>();
-            await seeder.Seed();
+            var seeder = ServiceProvider.GetService<TableCleaner>();
+            
+            seeder.CleanWorldScansTable();
         }
 
         public static ServiceProvider ServiceProvider { get; private set; }
@@ -26,11 +28,9 @@ namespace WorldScanSeeder
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
 
             services
-                .AddHttpClient()
-                .AddSingleton<WorldScanSeeder>()
-                .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>()
-                .AddSingleton<DbContextOptions<TibiaCharacterFinderDbContext>>()
-                .AddSingleton<TibiaCharacterFinderDbContext>();
+                .AddSingleton<TableCleaner>()
+                .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>();
+
             Startup.ConfigureOptions(services, configuration);
         }
     }

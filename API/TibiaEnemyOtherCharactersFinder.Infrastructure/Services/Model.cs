@@ -1,4 +1,5 @@
-﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Services
 {
@@ -13,7 +14,17 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Services
 
         protected List<World> GetAvailableWorlds()
         {
-            return _dbContext.Worlds.Where(w => w.IsAvailable == true).ToList();
+            return _dbContext.Worlds.Where(w => w.IsAvailable).ToList();
+        }
+        
+        protected List<World> GetAvailableWorldsAsNoTrucking()
+        {
+            return _dbContext.Worlds.Where(w => w.IsAvailable).AsNoTracking().ToList();
+        }
+        
+        protected List<World> GetAvailableWorldsIncludingScans()
+        {
+            return _dbContext.Worlds.Where(w => w.IsAvailable).Include(world => world.WorldScans.OrderBy(scan => scan.ScanCreateDateTime)).ToList();
         }
     }
 }
