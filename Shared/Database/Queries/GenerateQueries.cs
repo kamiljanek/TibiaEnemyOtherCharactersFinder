@@ -96,6 +96,9 @@ SELECT TOP 10 CorrelationId
 
         public const string NpgsqlClearCharacterActions = @"DELETE FROM character_actions;";
 
+        public const string NpgsqlClearWorldScans = @"DELETE FROM world_scans
+	WHERE is_deleted;";
+
         public const string NpgsqlCreateCharacterCorrelation = @"WITH cp AS (SELECT 
  f.character_id AS logout
 ,t.character_id AS login
