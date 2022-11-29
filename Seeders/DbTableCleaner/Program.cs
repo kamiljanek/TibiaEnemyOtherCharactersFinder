@@ -18,7 +18,7 @@ namespace DbTableCleaner
 
             var seeder = ServiceProvider.GetService<TableCleaner>();
             
-            seeder.CleanWorldScansTable();
+            await seeder.CleanWorldScansTable();
         }
 
         public static ServiceProvider ServiceProvider { get; private set; }
