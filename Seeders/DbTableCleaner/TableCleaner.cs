@@ -13,10 +13,10 @@ namespace DbTableCleaner
         {
             _connectionProvider = connectionProvider;
         }
-        public void CleanWorldScansTable()
+        public async Task CleanWorldScansTable()
         {
             using var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql);
-            connection.Execute(GenerateQueries.NpgsqlClearWorldScans);
+            await connection.ExecuteAsync(GenerateQueries.NpgsqlClearWorldScans);
         }
     }
 }
