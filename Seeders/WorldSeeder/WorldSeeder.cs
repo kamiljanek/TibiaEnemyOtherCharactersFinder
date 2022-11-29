@@ -23,16 +23,43 @@ namespace WorldSeeder
             {
                 try
                 {
-                    var worldNames = await GetWorldNamesFromTibiaApi();
-                    foreach (var worldName in worldNames)
-                    {
-                        if (!_dbContext.Worlds.Any(o => o.Name == worldName))
+                    var worldNamesFromApi = await GetWorldNamesFromTibiaApi();
+                    var worldsFromDb = await GetWorldsAsNoTrackingAsync();
+
+                    var newWorlds = worldNamesFromApi
+                        .Where(name => !worldsFromDb.Select(world => world.Name).Contains(name))
+                        .Select(name =>
                         {
-                            var world = CreateWorld(worldName);
-                            _dbContext.Worlds.Add(world);
-                        }
-                    }
-                    _dbContext.SaveChanges();
+                            return CreateWorld(name);
+                        })
+                        .ToList();
+
+                    _dbContext.Worlds.AddRange(newWorlds);
+
+                    await _dbContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(@"Cannot get worlds from ""api.tibiadata"" or from DB");
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        public async Task TurnOffIfWorldIsUnavailable()
+        {
+            if (_dbContext.Database.CanConnect())
+            {
+                try
+                {
+                    var availableWorldNamesFromApi = await GetWorldNamesFromTibiaApi();
+                    var worldsFromDb = await GetAvailableWorldsAsync();
+
+                    worldsFromDb
+                        .Where(world => !availableWorldNamesFromApi.Contains(world.Name))
+                        .Select(world => world.IsAvailable = false);
+
+                    await _dbContext.SaveChangesAsync();
                 }
                 catch (Exception e)
                 {
@@ -49,33 +76,6 @@ namespace WorldSeeder
             var result = await response.Content.ReadFromJsonAsync<TibiaApiWorldsResult>();
 
             return result.worlds.regular_worlds.Select(world => world.name).ToList();
-        }
-
-        public async Task TurnOffIfWorldIsUnavailable()
-        {
-            if (_dbContext.Database.CanConnect())
-            {
-                try
-                {
-                    var availableWorldNamesFromTibiaApi = await GetWorldNamesFromTibiaApi();
-                    var worldNamesFromDb = GetAvailableWorlds();
-
-                    foreach (var worldNameFromDb in worldNamesFromDb)
-                    {
-                        if (!availableWorldNamesFromTibiaApi.Contains(worldNameFromDb.Name))
-                        {
-                            var worldName = _dbContext.Worlds.First(i => i.Name == worldNameFromDb.Name);
-                            worldName.IsAvailable = false;
-                        }
-                    }
-                    _dbContext.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(@"Cannot get worlds from ""api.tibiadata""");
-                    Console.WriteLine(e);
-                }
-            }
         }
 
         private World CreateWorld(string worldName)
