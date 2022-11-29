@@ -12,19 +12,24 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Services
             _dbContext = dbContext;
         }
 
-        protected List<World> GetAvailableWorlds()
-        {
-            return _dbContext.Worlds.Where(w => w.IsAvailable).ToList();
-        }
+        public Task<List<World>> GetAvailableWorldsAsync() => 
+            Task.FromResult(_dbContext.Worlds.Where(w => w.IsAvailable).ToList());
         
-        protected List<World> GetAvailableWorldsAsNoTrucking()
-        {
-            return _dbContext.Worlds.Where(w => w.IsAvailable).AsNoTracking().ToList();
-        }
+        public Task<List<World>> GetWorldsAsNoTrackingAsync() => 
+            Task.FromResult(_dbContext.Worlds.AsNoTracking().ToList());
+
+        public Task<List<World>> GetAvailableWorldsAsNoTruckingAsync() => 
+            Task.FromResult(_dbContext.Worlds.Where(w => w.IsAvailable).AsNoTracking().ToList());
+
+        public Task<List<WorldScan>> GetWorldScansAsync(short worldId) => Task.FromResult(_dbContext.WorldScans
+                .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
+                .OrderBy(scan => scan.ScanCreateDateTime)
+                .ToList());
         
-        protected List<World> GetAvailableWorldsIncludingScans()
-        {
-            return _dbContext.Worlds.Where(w => w.IsAvailable).Include(world => world.WorldScans.OrderBy(scan => scan.ScanCreateDateTime)).ToList();
-        }
+        public Task<List<WorldScan>> GetFirlsTwoWorldScansAsync(short worldId) => Task.FromResult(_dbContext.WorldScans
+                .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
+                .OrderBy(scan => scan.ScanCreateDateTime)
+                .Take(2)
+                .ToList());
     }
 }

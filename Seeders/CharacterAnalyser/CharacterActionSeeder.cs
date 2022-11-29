@@ -19,82 +19,91 @@ namespace CharacterAnalyserSeeder
             _connectionProvider = connectionProvider;
         }
 
-        public void Seed()
+        public async Task Seed()
         {
-            var availableWorlds = GetAvailableWorldsIncludingScans();
+            var availableWorlds = await GetAvailableWorldsAsNoTruckingAsync();
 
             foreach (var availableWorld in availableWorlds)
             {
-                var twoWorldScans = availableWorld.WorldScans.Where(scan => !scan.IsDeleted).ToList();
+                var twoWorldScans = await GetFirlsTwoWorldScansAsync(availableWorld.WorldId);
 
-                while (twoWorldScans.Count > 1)
+                //var twoWorldScans = worldScans.Take(2).ToList();
+
+                if (twoWorldScans.Count < 2)
                 {
+                    continue;
+                }
+                var logoutNames = new List<string>();
+                var loginNames = new List<string>();
 
-                    var logoutNames = new List<string>();
-                    var loginNames = new List<string>();
-                    twoWorldScans = availableWorld.WorldScans.Where(scan => !scan.IsDeleted).Take(2).ToList();
+                logoutNames = GetLogoutNames(twoWorldScans);
 
-                    if (twoWorldScans.Count < 2)
+                if (!logoutNames.IsNullOrEmpty())
+                {
+                    loginNames = GetLoginNames(twoWorldScans);
+                }
+
+                if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
+                {
+                    try
                     {
-                        continue;
-                    }
-
-                    logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
-
-                    if (!logoutNames.IsNullOrEmpty())
-                    {
-                        loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
-                    }
-
-                    if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
-                    {
+                        await SeedCharactersAsync(logoutNames, loginNames, twoWorldScans);
                         try
                         {
-                            _dbContext.Database.BeginTransaction();
-                            SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
-                            SeedLoginCharacters(loginNames, twoWorldScans[1]);
-                            _dbContext.SaveChanges();
-                            _dbContext.Database.CommitTransaction();
-
-                            try
-                            {
-                                using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-                                {
-                                    connection.Execute(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
-                                    connection.Execute(GenerateQueries.NpgsqlCreateCharacterCorrelation);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                                using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-                                {
-                                    connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
-                                }
-                            }
+                            await SeedCharacterCorrelationsAsync();
                         }
                         catch (Exception e)
                         {
+                            await ClearCharacterActionsAsync();
                             Console.WriteLine(e);
-                            _dbContext.Database.RollbackTransaction();
                         }
                     }
-
-                    using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+                    catch (Exception e)
                     {
-                        connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
+                        Console.WriteLine(e);
+                        _dbContext.Database.RollbackTransaction();
                     }
-
-                    SoftDeleteWorldScan(twoWorldScans[0]);
-                    Console.WriteLine(twoWorldScans[0].WorldScanId);
                 }
+                await ClearCharacterActionsAsync();
+                SoftDeleteWorldScan(twoWorldScans[0]);
+                Console.WriteLine($"{twoWorldScans[0].WorldScanId} - world_id = {twoWorldScans[0].WorldId}");
             }
         }
+
+        private async Task ClearCharacterActionsAsync()
+        {
+            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+            {
+                await connection.ExecuteAsync(GenerateQueries.NpgsqlClearCharacterActions);
+            }
+        }
+
+        private async Task SeedCharacterCorrelationsAsync()
+        {
+            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+            {
+                await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+                await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelation);
+            }
+        }
+
+        private List<string> GetLoginNames(List<WorldScan> twoWorldScans) => GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
+
+        private List<string> GetLogoutNames(List<WorldScan> twoWorldScans) => GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
 
         private void SoftDeleteWorldScan(WorldScan worldScan)
         {
             worldScan.IsDeleted = true;
             _dbContext.SaveChanges();
+        }
+
+        private async Task SeedCharactersAsync(List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
+        {
+            _dbContext.Database.BeginTransaction();
+            SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
+            SeedLoginCharacters(loginNames, twoWorldScans[1]);
+            await _dbContext.SaveChangesAsync();
+            _dbContext.Database.CommitTransaction();
         }
 
         private void SeedLogoutCharacters(List<string> logoutNames, WorldScan worldScan)
