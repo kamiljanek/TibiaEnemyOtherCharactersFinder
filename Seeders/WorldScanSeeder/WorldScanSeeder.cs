@@ -19,12 +19,12 @@ namespace WorldScanSeeder
         {
             if (_dbContext.Database.CanConnect())
             {
-                var availableWorlds = GetAvailableWorlds();
+                var availableWorlds = await GetAvailableWorldsAsync();
                 foreach (var availableWorld in availableWorlds)
                 {
                     try
                     {
-                        var worldScan = await CreateWorldScan(availableWorld);
+                        var worldScan = await CreateWorldScanAsync(availableWorld);
                         _dbContext.WorldScans.Add(worldScan);
                     }
                     catch (Exception e)
@@ -43,7 +43,7 @@ namespace WorldScanSeeder
             }
         }
 
-        private async Task<WorldScan> CreateWorldScan(World world)
+        private async Task<WorldScan> CreateWorldScanAsync(World world)
         {
             var charactersOnline = await FetchCharactersOnlineFromApi(world.Name);
 
@@ -52,9 +52,7 @@ namespace WorldScanSeeder
                 CharactersOnline = charactersOnline,
                 WorldId = world.WorldId,
                 ScanCreateDateTime = DateTime.UtcNow,
-                World = world
             };
-
             return worldScan;
         }
 
@@ -79,6 +77,7 @@ namespace WorldScanSeeder
 
             return string.Empty;
         }
+
         private async Task<string> ReadContentAsString(HttpResponseMessage response)
         {
             // Check whether response is compressed

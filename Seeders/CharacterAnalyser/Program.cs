@@ -9,7 +9,7 @@ namespace CharacterAnalyserSeeder
 {
     public class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -18,7 +18,7 @@ namespace CharacterAnalyserSeeder
 
             while (true)
             {
-                seeder.Seed();
+                await seeder.Seed();
             }
         }
         private static void ConfigureServices(IServiceCollection services)
