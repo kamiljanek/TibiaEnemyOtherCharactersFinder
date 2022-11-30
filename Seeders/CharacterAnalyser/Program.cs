@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Providers;
+using System.Diagnostics;
 using TibiaEnemyOtherCharactersFinder.Api;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
@@ -15,7 +16,6 @@ namespace CharacterAnalyserSeeder
             ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();
             var seeder = serviceProvider.GetService<CharacterActionSeeder>();
-
             while (true)
             {
                 await seeder.Seed();

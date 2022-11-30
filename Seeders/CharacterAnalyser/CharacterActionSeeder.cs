@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Internal;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Shared.Database.Queries.Sql;
 using Shared.Providers;
 using TibiaEnemyOtherCharactersFinder.Application.Services;
@@ -25,9 +26,7 @@ namespace CharacterAnalyserSeeder
 
             foreach (var availableWorld in availableWorlds)
             {
-                var twoWorldScans = await GetFirlsTwoWorldScansAsync(availableWorld.WorldId);
-
-                //var twoWorldScans = worldScans.Take(2).ToList();
+                var twoWorldScans = GetFirstTwoWorldScans(availableWorld.WorldId);
 
                 if (twoWorldScans.Count < 2)
                 {
@@ -47,14 +46,15 @@ namespace CharacterAnalyserSeeder
                 {
                     try
                     {
-                        await SeedCharactersAsync(logoutNames, loginNames, twoWorldScans);
+                        SeedCharacterActions(logoutNames, loginNames, twoWorldScans);
                         try
                         {
                             await SeedCharacterCorrelationsAsync();
+                            SoftDeleteWorldScan(twoWorldScans[0]);
                         }
                         catch (Exception e)
                         {
-                            await ClearCharacterActionsAsync();
+                            ClearCharacterActions();
                             Console.WriteLine(e);
                         }
                     }
@@ -64,8 +64,12 @@ namespace CharacterAnalyserSeeder
                         _dbContext.Database.RollbackTransaction();
                     }
                 }
+                else
+                {
+                    SoftDeleteWorldScan(twoWorldScans[0]);
+
+                }
                 await ClearCharacterActionsAsync();
-                SoftDeleteWorldScan(twoWorldScans[0]);
                 Console.WriteLine($"{twoWorldScans[0].WorldScanId} - world_id = {twoWorldScans[0].WorldId}");
             }
         }
@@ -78,12 +82,38 @@ namespace CharacterAnalyserSeeder
             }
         }
 
+        private void ClearCharacterActions()
+        {
+            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+            {
+                connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
+            }
+        }
+
         private async Task SeedCharacterCorrelationsAsync()
         {
             using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
             {
                 await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+            }
+
+            NpgsqlConnection.ClearAllPools();
+
+            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+            {
                 await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelation);
+            }
+        }
+
+        private void SeedCharacterCorrelations()
+        {
+            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+            {
+                connection.Execute(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+            }
+            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
+            {
+                connection.Execute(GenerateQueries.NpgsqlCreateCharacterCorrelation);
             }
         }
 
@@ -97,16 +127,19 @@ namespace CharacterAnalyserSeeder
             _dbContext.SaveChanges();
         }
 
-        private async Task SeedCharactersAsync(List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
+        private async Task SeedCharacterActionsAsync(List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
         {
-            _dbContext.Database.BeginTransaction();
-            SeedLogoutCharacters(logoutNames, twoWorldScans[0]);
-            SeedLoginCharacters(loginNames, twoWorldScans[1]);
-            await _dbContext.SaveChangesAsync();
-            _dbContext.Database.CommitTransaction();
+            await SeedLogoutCharactersActionsAsync(logoutNames, twoWorldScans[0]); // UNDONE: zoptymalizowac metode na select
+            await SeedLoginCharactersActionsAsync(loginNames, twoWorldScans[1]); // UNDONE: zoptymalizowac metode na select
         }
 
-        private void SeedLogoutCharacters(List<string> logoutNames, WorldScan worldScan)
+        private void SeedCharacterActions(List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
+        {
+            SeedLogoutCharactersActions(logoutNames, twoWorldScans[0]); // UNDONE: zoptymalizowac metode na select
+            SeedLoginCharactersActions(loginNames, twoWorldScans[1]); // UNDONE: zoptymalizowac metode na select
+        }
+
+        private async Task SeedLogoutCharactersActionsAsync(List<string> logoutNames, WorldScan worldScan)
         {
             var logoutCharacters = new List<CharacterAction>();
             foreach (var logoutName in logoutNames)
@@ -115,9 +148,22 @@ namespace CharacterAnalyserSeeder
                 logoutCharacters.Add(logoutCharacter);
             }
             _dbContext.CharacterActions.AddRange(logoutCharacters);
+            await _dbContext.SaveChangesAsync();
         }
 
-        private void SeedLoginCharacters(List<string> loginNames, WorldScan worldScan)
+        private void SeedLogoutCharactersActions(List<string> logoutNames, WorldScan worldScan)
+        {
+            var logoutCharacters = new List<CharacterAction>();
+            foreach (var logoutName in logoutNames)
+            {
+                var logoutCharacter = CreateCharacterLogoutOrLogin(logoutName, false, worldScan);
+                logoutCharacters.Add(logoutCharacter);
+            }
+            _dbContext.CharacterActions.AddRange(logoutCharacters);
+            _dbContext.SaveChanges();
+        }
+
+        private async Task SeedLoginCharactersActionsAsync(List<string> loginNames, WorldScan worldScan)
         {
             var loginCharacters = new List<CharacterAction>();
             foreach (var loginName in loginNames)
@@ -126,6 +172,19 @@ namespace CharacterAnalyserSeeder
                 loginCharacters.Add(loginCharacter);
             }
             _dbContext.CharacterActions.AddRange(loginCharacters);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private void SeedLoginCharactersActions(List<string> loginNames, WorldScan worldScan)
+        {
+            var loginCharacters = new List<CharacterAction>();
+            foreach (var loginName in loginNames)
+            {
+                var loginCharacter = CreateCharacterLogoutOrLogin(loginName, true, worldScan);
+                loginCharacters.Add(loginCharacter);
+            }
+            _dbContext.CharacterActions.AddRange(loginCharacters);
+            _dbContext.SaveChanges();
         }
 
         private CharacterAction CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)
