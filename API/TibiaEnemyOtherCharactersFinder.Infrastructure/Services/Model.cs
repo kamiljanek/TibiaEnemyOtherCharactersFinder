@@ -20,6 +20,9 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Services
 
         public Task<List<World>> GetAvailableWorldsAsNoTruckingAsync() => 
             Task.FromResult(_dbContext.Worlds.Where(w => w.IsAvailable).AsNoTracking().ToList());
+        
+        public List<World> GetAvailableWorldsAsNoTrucking() => 
+            _dbContext.Worlds.Where(w => w.IsAvailable).AsNoTracking().ToList();
 
         public Task<List<WorldScan>> GetWorldScansAsync(short worldId) => Task.FromResult(_dbContext.WorldScans
                 .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
@@ -31,5 +34,11 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Services
                 .OrderBy(scan => scan.ScanCreateDateTime)
                 .Take(2)
                 .ToList());
+        
+        public List<WorldScan> GetFirlsTwoWorldScans(short worldId) => _dbContext.WorldScans
+                .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
+                .OrderBy(scan => scan.ScanCreateDateTime)
+                .Take(2)
+                .ToList();
     }
 }
