@@ -22,58 +22,55 @@ namespace CharacterAnalyserSeeder
 
         public async Task Seed()
         {
-            if (_dbContext.Database.CanConnect())
+            var availableWorlds = await GetAvailableWorldsAsNoTruckingAsync();
+
+            foreach (var availableWorld in availableWorlds)
             {
-                var availableWorlds = await GetAvailableWorldsAsNoTruckingAsync();
-                NpgsqlConnection.ClearAllPools();
+                var twoWorldScans = GetFirstTwoWorldScans(availableWorld.WorldId);
 
-                foreach (var availableWorld in availableWorlds)
+                if (twoWorldScans.Count < 2)
                 {
-                    var twoWorldScans = GetFirlsTwoWorldScans(availableWorld.WorldId);
+                    continue;
+                }
+                var logoutNames = new List<string>();
+                var loginNames = new List<string>();
 
-                    if (twoWorldScans.Count < 2)
+                logoutNames = GetLogoutNames(twoWorldScans);
+
+                if (!logoutNames.IsNullOrEmpty())
+                {
+                    loginNames = GetLoginNames(twoWorldScans);
+                }
+
+                if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
+                {
+                    try
                     {
-                        continue;
-                    }
-                    var logoutNames = new List<string>();
-                    var loginNames = new List<string>();
-
-                    logoutNames = GetLogoutNames(twoWorldScans);
-
-                    if (!logoutNames.IsNullOrEmpty())
-                    {
-                        loginNames = GetLoginNames(twoWorldScans);
-                    }
-
-                    if (!logoutNames.IsNullOrEmpty() && !loginNames.IsNullOrEmpty())
-                    {
+                        SeedCharacterActions(logoutNames, loginNames, twoWorldScans);
                         try
                         {
-                            SeedCharacterActions(logoutNames, loginNames, twoWorldScans);
-                            try
-                            {
-                                await SeedCharacterCorrelationsAsync();
-                                SoftDeleteWorldScan(twoWorldScans[0]);
-                            }
-                            catch (Exception e)
-                            {
-                                ClearCharacterActions();
-                                Console.WriteLine(e);
-                            }
+                            await SeedCharacterCorrelationsAsync();
+                            SoftDeleteWorldScan(twoWorldScans[0]);
                         }
                         catch (Exception e)
                         {
+                            ClearCharacterActions();
                             Console.WriteLine(e);
-                            _dbContext.Database.RollbackTransaction();
                         }
                     }
-                    await ClearCharacterActionsAsync();
-                    Console.WriteLine($"{twoWorldScans[0].WorldScanId} - world_id = {twoWorldScans[0].WorldId}");
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        _dbContext.Database.RollbackTransaction();
+                    }
                 }
-            }
-            else
-            {
-                Console.WriteLine("Cannot connect to DB");
+                else
+                {
+                    SoftDeleteWorldScan(twoWorldScans[0]);
+
+                }
+                await ClearCharacterActionsAsync();
+                Console.WriteLine($"{twoWorldScans[0].WorldScanId} - world_id = {twoWorldScans[0].WorldId}");
             }
         }
 

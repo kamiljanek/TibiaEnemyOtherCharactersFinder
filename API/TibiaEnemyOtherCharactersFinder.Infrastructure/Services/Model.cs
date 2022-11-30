@@ -29,13 +29,13 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Services
                 .OrderBy(scan => scan.ScanCreateDateTime)
                 .ToList());
         
-        public Task<List<WorldScan>> GetFirlsTwoWorldScansAsync(short worldId) => Task.FromResult(_dbContext.WorldScans
+        public Task<List<WorldScan>> GetFirstTwoWorldScansAsync(short worldId) => Task.FromResult(_dbContext.WorldScans
                 .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
                 .OrderBy(scan => scan.ScanCreateDateTime)
                 .Take(2)
                 .ToList());
         
-        public List<WorldScan> GetFirlsTwoWorldScans(short worldId) => _dbContext.WorldScans
+        public List<WorldScan> GetFirstTwoWorldScans(short worldId) => _dbContext.WorldScans
                 .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
                 .OrderBy(scan => scan.ScanCreateDateTime)
                 .Take(2)
