@@ -1,7 +1,6 @@
 ﻿using Castle.Core.Internal;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using Shared.Database.Queries.Sql;
 using Shared.Providers;
 using TibiaEnemyOtherCharactersFinder.Application.Services;
@@ -26,12 +25,20 @@ namespace CharacterAnalyserSeeder
 
             foreach (var availableWorld in availableWorlds)
             {
-                var twoWorldScans = GetFirstTwoWorldScans(availableWorld.WorldId);
+                var twoWorldScans = await GetFirstTwoWorldScansAsync(availableWorld.WorldId);
 
                 if (twoWorldScans.Count < 2)
                 {
                     continue;
                 }
+
+                var timeDifference = twoWorldScans[1].ScanCreateDateTime - twoWorldScans[0].ScanCreateDateTime;
+                if (timeDifference.TotalMinutes > 15)
+                {
+                    SoftDeleteWorldScan(twoWorldScans[0]);
+                    continue;
+                }
+
                 var logoutNames = new List<string>();
                 var loginNames = new List<string>();
 
@@ -46,7 +53,7 @@ namespace CharacterAnalyserSeeder
                 {
                     try
                     {
-                        SeedCharacterActions(logoutNames, loginNames, twoWorldScans);
+                        await SeedCharacterActionsAsync(logoutNames, loginNames, twoWorldScans);
                         try
                         {
                             await SeedCharacterCorrelationsAsync();
@@ -61,13 +68,11 @@ namespace CharacterAnalyserSeeder
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
-                        _dbContext.Database.RollbackTransaction();
                     }
                 }
                 else
                 {
                     SoftDeleteWorldScan(twoWorldScans[0]);
-
                 }
                 await ClearCharacterActionsAsync();
                 Console.WriteLine($"{twoWorldScans[0].WorldScanId} - world_id = {twoWorldScans[0].WorldId}");
@@ -94,14 +99,13 @@ namespace CharacterAnalyserSeeder
         {
             using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
             {
+                Console.WriteLine(@"before ""NpgsqlCreateCharacterIfNotExist""");
                 await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
-            }
-
-            NpgsqlConnection.ClearAllPools();
-
-            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-            {
-                await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelation);
+                Console.WriteLine(@"before ""NpgsqlUpdateCharacterCorrelationIfExist""");
+                await connection.ExecuteAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
+                Console.WriteLine(@"before ""NpgsqlCreateCharacterCorrelationIfNotExist""");
+                await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
+                Console.WriteLine(@"after ""NpgsqlCreateCharacterCorrelationIfNotExist""");
             }
         }
 

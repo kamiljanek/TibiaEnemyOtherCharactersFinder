@@ -34,6 +34,18 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Services
                 .OrderBy(scan => scan.ScanCreateDateTime)
                 .Take(2)
                 .ToList());
+
+        public Task<WorldScan> GetWorldScanAsync(short worldId, int elementPossitionInList) => _dbContext.WorldScans
+                .OrderBy(scan => scan.ScanCreateDateTime)
+                .Skip(elementPossitionInList)
+                .FirstOrDefaultAsync(scan => scan.WorldId == worldId && !scan.IsDeleted);
+        
+        public Task<List<WorldScan>> GetFirstTwoWorldScansAsNoTruckingAsync(short worldId) => Task.FromResult(_dbContext.WorldScans
+                .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
+                .OrderBy(scan => scan.ScanCreateDateTime)
+                .Take(2)
+                .AsNoTracking()
+                .ToList());
         
         public List<WorldScan> GetFirstTwoWorldScans(short worldId) => _dbContext.WorldScans
                 .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
