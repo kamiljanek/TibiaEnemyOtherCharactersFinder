@@ -34,6 +34,15 @@ namespace TibiaEnemyOtherCharactersFinder.Api
             services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             services.AddMediatR(typeof(Startup));
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("TibiaEnemyOtherCharacterFinderApi", builder =>
+                    {
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    });
+            });
+
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -65,6 +74,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors("TibiaEnemyOtherCharacterFinderApi");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
