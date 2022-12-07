@@ -35,7 +35,7 @@ namespace CharacterAnalyserSeeder
                 var timeDifference = twoWorldScans[1].ScanCreateDateTime - twoWorldScans[0].ScanCreateDateTime;
                 if (timeDifference.TotalMinutes > 15)
                 {
-                    SoftDeleteWorldScan(twoWorldScans[0]);
+                    await SoftDeleteWorldScanAsync(twoWorldScans[0]);
                     continue;
                 }
 
@@ -57,11 +57,11 @@ namespace CharacterAnalyserSeeder
                         try
                         {
                             await SeedCharacterCorrelationsAsync();
-                            SoftDeleteWorldScan(twoWorldScans[0]);
+                            await SoftDeleteWorldScanAsync(twoWorldScans[0]);
                         }
                         catch (Exception e)
                         {
-                            ClearCharacterActions();
+                            await ClearCharacterActionsAsync();
                             Console.WriteLine(e);
                         }
                     }
@@ -72,7 +72,7 @@ namespace CharacterAnalyserSeeder
                 }
                 else
                 {
-                    SoftDeleteWorldScan(twoWorldScans[0]);
+                    await SoftDeleteWorldScanAsync(twoWorldScans[0]);
                 }
                 await ClearCharacterActionsAsync();
                 Console.WriteLine($"{twoWorldScans[0].WorldScanId} - world_id = {twoWorldScans[0].WorldId}");
@@ -87,37 +87,13 @@ namespace CharacterAnalyserSeeder
             }
         }
 
-        private void ClearCharacterActions()
-        {
-            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-            {
-                connection.Execute(GenerateQueries.NpgsqlClearCharacterActions);
-            }
-        }
-
         private async Task SeedCharacterCorrelationsAsync()
         {
             using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
             {
-                Console.WriteLine(@"before ""NpgsqlCreateCharacterIfNotExist""");
-                await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
-                Console.WriteLine(@"before ""NpgsqlUpdateCharacterCorrelationIfExist""");
-                await connection.ExecuteAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
-                Console.WriteLine(@"before ""NpgsqlCreateCharacterCorrelationIfNotExist""");
-                await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
-                Console.WriteLine(@"after ""NpgsqlCreateCharacterCorrelationIfNotExist""");
-            }
-        }
-
-        private void SeedCharacterCorrelations()
-        {
-            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-            {
-                connection.Execute(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
-            }
-            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-            {
-                connection.Execute(GenerateQueries.NpgsqlCreateCharacterCorrelation);
+                var characterNumber = await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+                var updateNumber = await connection.ExecuteAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
+                var insertNumber = await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
             }
         }
 
@@ -125,10 +101,10 @@ namespace CharacterAnalyserSeeder
 
         private List<string> GetLogoutNames(List<WorldScan> twoWorldScans) => GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
 
-        private void SoftDeleteWorldScan(WorldScan worldScan)
+        private async Task SoftDeleteWorldScanAsync(WorldScan worldScan)
         {
             worldScan.IsDeleted = true;
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task SeedCharacterActionsAsync(List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
@@ -137,34 +113,16 @@ namespace CharacterAnalyserSeeder
             await SeedLoginCharactersActionsAsync(loginNames, twoWorldScans[1]); // UNDONE: zoptymalizowac metode na select
         }
 
-        private void SeedCharacterActions(List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
-        {
-            SeedLogoutCharactersActions(logoutNames, twoWorldScans[0]); // UNDONE: zoptymalizowac metode na select
-            SeedLoginCharactersActions(loginNames, twoWorldScans[1]); // UNDONE: zoptymalizowac metode na select
-        }
-
         private async Task SeedLogoutCharactersActionsAsync(List<string> logoutNames, WorldScan worldScan)
         {
             var logoutCharacters = new List<CharacterAction>();
             foreach (var logoutName in logoutNames)
             {
-                var logoutCharacter = CreateCharacterLogoutOrLogin(logoutName, false, worldScan);
-                logoutCharacters.Add(logoutCharacter);
+                var logoutCharacter = CreateCharacterLogoutOrLoginAsync(logoutName, false, worldScan);
+                logoutCharacters.Add(await logoutCharacter);
             }
             _dbContext.CharacterActions.AddRange(logoutCharacters);
             await _dbContext.SaveChangesAsync();
-        }
-
-        private void SeedLogoutCharactersActions(List<string> logoutNames, WorldScan worldScan)
-        {
-            var logoutCharacters = new List<CharacterAction>();
-            foreach (var logoutName in logoutNames)
-            {
-                var logoutCharacter = CreateCharacterLogoutOrLogin(logoutName, false, worldScan);
-                logoutCharacters.Add(logoutCharacter);
-            }
-            _dbContext.CharacterActions.AddRange(logoutCharacters);
-            _dbContext.SaveChanges();
         }
 
         private async Task SeedLoginCharactersActionsAsync(List<string> loginNames, WorldScan worldScan)
@@ -172,47 +130,23 @@ namespace CharacterAnalyserSeeder
             var loginCharacters = new List<CharacterAction>();
             foreach (var loginName in loginNames)
             {
-                var loginCharacter = CreateCharacterLogoutOrLogin(loginName, true, worldScan);
-                loginCharacters.Add(loginCharacter);
+                var loginCharacter = CreateCharacterLogoutOrLoginAsync(loginName, true, worldScan);
+                loginCharacters.Add(await loginCharacter);
             }
             _dbContext.CharacterActions.AddRange(loginCharacters);
             await _dbContext.SaveChangesAsync();
         }
 
-        private void SeedLoginCharactersActions(List<string> loginNames, WorldScan worldScan)
+        private async Task<CharacterAction> CreateCharacterLogoutOrLoginAsync(string characterName, bool isOnline, WorldScan worldScan)
         {
-            var loginCharacters = new List<CharacterAction>();
-            foreach (var loginName in loginNames)
-            {
-                var loginCharacter = CreateCharacterLogoutOrLogin(loginName, true, worldScan);
-                loginCharacters.Add(loginCharacter);
-            }
-            _dbContext.CharacterActions.AddRange(loginCharacters);
-            _dbContext.SaveChanges();
-        }
-
-        private CharacterAction CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)
-        {
-            return new CharacterAction()
+            var characterAction = Task.FromResult(new CharacterAction()
             {
                 CharacterName = characterName,
                 WorldScanId = worldScan.WorldScanId,
                 WorldId = worldScan.WorldId,
                 IsOnline = isOnline
-            };
-        }
-
-        private IQueryable<WorldScan> GetFirstTwoWorldScansFromSpecificWorld(short world)
-        {
-            try
-            {
-                return _dbContext.WorldScans.Where(w => w.WorldId == world && !w.IsDeleted)
-                    .OrderBy(w => w.WorldScanId).Take(2).AsNoTracking();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            });
+            return await characterAction;
         }
 
         private List<string> GetNames(WorldScan worldScan)
