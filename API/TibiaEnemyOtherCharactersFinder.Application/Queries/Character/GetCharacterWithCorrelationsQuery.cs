@@ -27,7 +27,7 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character
         {
             using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
             {
-                var parameters = new { CharacterName = request.Name };
+                var parameters = new { CharacterName = request.Name.ToLower() };
                 var result = await connection.QueryAsync<CharacterWithCorrelationsResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
                 return result.ToList();
             }
