@@ -153,6 +153,7 @@ namespace CharacterAnalyserSeeder
         {
             var names = worldScan.CharactersOnline.Split("|").ToList();
             names.RemoveAll(string.IsNullOrWhiteSpace);
+            names = names.ConvertAll(d => d.ToLower());
             return names;
         }
     }
