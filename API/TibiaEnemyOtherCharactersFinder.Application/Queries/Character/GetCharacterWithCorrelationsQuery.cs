@@ -25,12 +25,12 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character
 
         public async Task<List<CharacterWithCorrelationsResult>> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
         {
-            using (var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql))
-            {
-                var parameters = new { CharacterName = request.Name.ToLower() };
-                var result = await connection.QueryAsync<CharacterWithCorrelationsResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
-                return result.ToList();
-            }
+            var parameters = new { CharacterName = request.Name.ToLower() };
+           
+            using var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql);
+            var result = await connection.QueryAsync<CharacterWithCorrelationsResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
+           
+            return result.ToList();
         }
     }
 }
