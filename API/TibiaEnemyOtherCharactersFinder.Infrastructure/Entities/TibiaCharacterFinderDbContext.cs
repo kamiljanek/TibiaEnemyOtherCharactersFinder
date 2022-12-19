@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared.Providers;
+using TibiaEnemyOtherCharactersFinder.Application.Repository;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
 {
     //EntityFrameworkCore\Add-Migration <MIGRATION_NAME>
-    public class TibiaCharacterFinderDbContext : DbContext
+    public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbContext
     {
         private readonly IDapperConnectionProvider _connectionProvider;
 
