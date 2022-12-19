@@ -1,27 +1,7 @@
-WITH cor AS (
-SELECT
-       correlation_id AS CorrelationId
-      ,f.name AS LogoutName
-      ,t.name AS LoginName
-      ,number_of_matches AS NumberOfMatches
-  FROM character_correlations cc
-  INNER JOIN characters f on f.character_id = cc.logout_character_id
-  INNER JOIN characters t on t.character_id = cc.login_character_id
-  where (t.name LIKE @CharacterName OR f.name LIKE @CharacterName)
-  ORDER BY number_of_matches DESC LIMIT 10
-  )
+WITH character_id_CTE AS (SELECT character_id FROM characters WHERE name = @CharacterName)
 
-  SELECT CorrelationId
-        ,LoginName AS OtherCharacterName
-        ,NumberOfMatches
-  FROM cor
-  WHERE NOT LoginName LIKE @CharacterName
-  
-  UNION
-
-  SELECT CorrelationId
-        ,LogoutName AS OtherCharacterName
-        ,NumberOfMatches
-  FROM cor
-  WHERE NOT LogoutName LIKE @CharacterName
-  ORDER BY NumberOfMatches DESC
+SELECT DISTINCT c.name AS other_character_name, number_of_matches FROM character_correlations cc 
+JOIN characters c ON c.character_id = cc.login_character_id OR c.character_id = cc.logout_character_id 
+WHERE (logout_character_id = (SELECT character_id FROM character_id_CTE) OR login_character_id = (SELECT character_id FROM character_id_CTE)) 
+AND c.character_id <> (SELECT character_id FROM character_id_CTE)
+ORDER BY number_of_matches DESC LIMIT 10
