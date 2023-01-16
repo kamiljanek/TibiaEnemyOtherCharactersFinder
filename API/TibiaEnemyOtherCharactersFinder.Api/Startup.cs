@@ -1,90 +1,88 @@
 using Autofac;
 using MediatR;
-using Shared.Providers;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Api
+namespace TibiaEnemyOtherCharactersFinder.Api;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureContainer(ContainerBuilder builder)
+    {
+        builder.RegisterModule<AutofacModule>();
+    }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddInfrastructure(Configuration);
+
+        services.AddControllers().AddJsonOptions(options =>
         {
-            Configuration = configuration;
-        }
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        });
 
-        public IConfiguration Configuration { get; }
+        services.AddMediatR(typeof(Startup));
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureContainer(ContainerBuilder builder)
+        services.AddCors(options =>
         {
-            builder.RegisterModule<AutofacModule>();
-        }
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers();
-            services.AddInfrastructure(Configuration);
-            //services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
-            //.UseNpgsql(Configuration.GetConnectionString("PostgreSql"))
-            //.UseSnakeCaseNamingConvention());
-
-            services.AddScoped<IDapperConnectionProvider, DapperConnectionProvider>();
-            services.AddControllers().AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-            services.AddMediatR(typeof(Startup));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("TibiaEnemyOtherCharacterFinderApi", builder =>
-                    {
-                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                    });
-            });
-
-            services.AddSwaggerGen(s =>
-            {
-                s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            options.AddPolicy("TibiaEnemyOtherCharacterFinderApi", builder =>
                 {
-                    Version = "v1",
-                    Title = "Tibia Enemy Other Characters Finder API",
-                    Description = "API for retrieving other characters of our enemy"
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                s.IncludeXmlComments(xmlPath);
-            });
-            ConfigureOptions(services, Configuration);
-        }
+        });
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        services.AddSwaggerGen(s =>
         {
-            if (env.IsDevelopment())
+            s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
             {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                    {
-                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TibiaEnemyOtherCharactersFinder API v1");
-                        c.RoutePrefix = string.Empty;
-                    });
-            }
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseCors("TibiaEnemyOtherCharacterFinderApi");
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
+                Version = "v1",
+                Title = "Tibia Enemy Other Characters Finder API",
+                Description = "API for retrieving other characters of our enemy"
             });
-        }
-        public static void ConfigureOptions(IServiceCollection services, IConfiguration configuration)
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            s.IncludeXmlComments(xmlPath);
+        });
+        //ConfigureOptions(services, Configuration);
+        ConfigureAppOptions.Configure(services);
+    }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            services.Configure<ConnectionStringsSection>(options => configuration.GetSection("ConnectionStrings").Bind(options));
-            services.Configure<DapperConfigurationSection>(options => configuration.GetSection("Dapper").Bind(options));
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TibiaEnemyOtherCharactersFinder API v1");
+                    c.RoutePrefix = string.Empty;
+                });
         }
 
+        app.UseHttpsRedirection();
+        app.UseRouting();
+        app.UseCors("TibiaEnemyOtherCharacterFinderApi");
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

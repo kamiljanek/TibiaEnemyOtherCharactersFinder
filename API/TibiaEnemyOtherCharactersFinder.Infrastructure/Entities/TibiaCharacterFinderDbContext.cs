@@ -1,87 +1,87 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shared.Providers;
-using TibiaEnemyOtherCharactersFinder.Application.Repository;
+using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+
+public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbContext
 {
-    //EntityFrameworkCore\Add-Migration <MIGRATION_NAME>
-    public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbContext
+    private readonly IDapperConnectionProvider _connectionProvider;
+
+    public TibiaCharacterFinderDbContext(IDapperConnectionProvider connectionProvider)
     {
-        private readonly IDapperConnectionProvider _connectionProvider;
+        _connectionProvider = connectionProvider;
+    }
 
-        public TibiaCharacterFinderDbContext(DbContextOptions<TibiaCharacterFinderDbContext> options, IDapperConnectionProvider connectionProvider) : base(options)
+    public DbSet<World> Worlds { get; set; }
+    public DbSet<WorldScan> WorldScans { get; set; }
+    public DbSet<Character> Characters { get; set; }
+    public DbSet<CharacterCorrelation> CharacterCorrelations { get; set; }
+    public DbSet<CharacterAction> CharacterActions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.HasDefaultSchema("public");
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<World>(w =>
         {
-            _connectionProvider = connectionProvider;
-        }
+            w.Property(wo => wo.Name).IsRequired();
+            w.Property(wo => wo.Url).IsRequired();
+            w.Property(wo => wo.IsAvailable).IsRequired();
+            w.HasMany(wo => wo.WorldScans)
+                .WithOne(ws => ws.World)
+                .HasForeignKey(ws => ws.WorldId).OnDelete(DeleteBehavior.NoAction);
+            w.HasMany(wo => wo.Characters)
+                .WithOne(wo => wo.World)
+                .HasForeignKey(wo => wo.WorldId).OnDelete(DeleteBehavior.NoAction);
+            w.HasMany(wo => wo.CharacterLogoutOrLogins)
+                .WithOne(wo => wo.World)
+                .HasForeignKey(wo => wo.WorldId).OnDelete(DeleteBehavior.NoAction);
+        });
 
-        public DbSet<World> Worlds { get; set; }
-        public DbSet<WorldScan> WorldScans { get; set; }
-        public DbSet<Character> Characters { get; set; }
-        public DbSet<CharacterCorrelation> CharacterCorrelations { get; set; }
-        public DbSet<CharacterAction> CharacterActions { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        modelBuilder.Entity<WorldScan>(ws =>
         {
-            modelBuilder.HasDefaultSchema("public");
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<World>(w =>
-            {
-                w.Property(wo => wo.Name).IsRequired();
-                w.Property(wo => wo.Url).IsRequired();
-                w.Property(wo => wo.IsAvailable).IsRequired();
-                w.HasMany(wo => wo.WorldScans)
-                    .WithOne(ws => ws.World)
-                    .HasForeignKey(ws => ws.WorldId).OnDelete(DeleteBehavior.NoAction);
-                w.HasMany(wo => wo.Characters)
-                    .WithOne(wo => wo.World)
-                    .HasForeignKey(wo => wo.WorldId).OnDelete(DeleteBehavior.NoAction);
-                w.HasMany(wo => wo.CharacterLogoutOrLogins)
-                    .WithOne(wo => wo.World)
-                    .HasForeignKey(wo => wo.WorldId).OnDelete(DeleteBehavior.NoAction);
-            });
+            ws.Property(ws => ws.WorldScanId).IsRequired();
+            ws.Property(ws => ws.CharactersOnline).IsRequired();
+            ws.Property(ws => ws.WorldId).IsRequired();
+            ws.Property(ws => ws.ScanCreateDateTime).IsRequired();
+            ws.Property(ws => ws.IsDeleted).IsRequired().HasDefaultValue(false);
+        });
 
-            modelBuilder.Entity<WorldScan>(ws =>
-            {
-                ws.Property(ws => ws.WorldScanId).IsRequired();
-                ws.Property(ws => ws.CharactersOnline).IsRequired();
-                ws.Property(ws => ws.WorldId).IsRequired();
-                ws.Property(ws => ws.ScanCreateDateTime).IsRequired();
-                ws.Property(ws => ws.IsDeleted).IsRequired().HasDefaultValue(false);
-            });
-
-            modelBuilder.Entity<Character>(c =>
-            {
-                c.Property(ch => ch.CharacterId).IsRequired();
-                c.Property(ch => ch.Name).IsRequired();
-                c.HasMany(ch => ch.LogoutWorldCorrelations)
-                    .WithOne(ws => ws.LogoutCharacter)
-                    .HasForeignKey(ch => ch.LogoutCharacterId).OnDelete(DeleteBehavior.NoAction);
-                c.HasMany(ch => ch.LoginWorldCorrelations)
-                    .WithOne(ws => ws.LoginCharacter)
-                    .HasForeignKey(ch => ch.LoginCharacterId).OnDelete(DeleteBehavior.NoAction);
-            });
-
-            modelBuilder.Entity<CharacterAction>(c =>
-            {
-                c.Property(ch => ch.CharacterActionId).IsRequired();
-                c.Property(ch => ch.CharacterName).IsRequired();
-                c.Property(ch => ch.WorldScanId).IsRequired();
-                c.Property(ch => ch.IsOnline).IsRequired();
-                c.Property(ch => ch.WorldId).IsRequired();
-            });
-
-            modelBuilder.Entity<CharacterCorrelation>(o =>
-            {
-                o.HasKey(wc => wc.CorrelationId);
-                o.Property(wc => wc.LogoutCharacterId).IsRequired();
-                o.Property(wc => wc.LoginCharacterId).IsRequired();
-                o.Property(wc => wc.NumberOfMatches).IsRequired();
-            });
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        modelBuilder.Entity<Character>(c =>
         {
-            optionsBuilder.UseNpgsql(_connectionProvider.GetConnectionString(EModuleType.PostgreSql))
-                .UseSnakeCaseNamingConvention();
-        }
+            c.Property(ch => ch.CharacterId).IsRequired();
+            c.Property(ch => ch.Name).IsRequired();
+            c.HasMany(ch => ch.LogoutWorldCorrelations)
+                .WithOne(ws => ws.LogoutCharacter)
+                .HasForeignKey(ch => ch.LogoutCharacterId).OnDelete(DeleteBehavior.NoAction);
+            c.HasMany(ch => ch.LoginWorldCorrelations)
+                .WithOne(ws => ws.LoginCharacter)
+                .HasForeignKey(ch => ch.LoginCharacterId).OnDelete(DeleteBehavior.NoAction);
+        });
+
+        modelBuilder.Entity<CharacterAction>(c =>
+        {
+            c.Property(ch => ch.CharacterActionId).IsRequired();
+            c.Property(ch => ch.CharacterName).IsRequired();
+            c.Property(ch => ch.WorldScanId).IsRequired();
+            c.Property(ch => ch.IsOnline).IsRequired();
+            c.Property(ch => ch.WorldId).IsRequired();
+            c.Property(ch => ch.LogoutOrLoginDate).IsRequired();
+        });
+
+        modelBuilder.Entity<CharacterCorrelation>(o =>
+        {
+            o.HasKey(wc => wc.CorrelationId);
+            o.Property(wc => wc.LogoutCharacterId).IsRequired();
+            o.Property(wc => wc.LoginCharacterId).IsRequired();
+            o.Property(wc => wc.NumberOfMatches).IsRequired();
+            o.Property(wc => wc.CreateDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
+            o.Property(wc => wc.LastMatchDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
+        });
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseNpgsql(_connectionProvider.GetConnectionString(EDataBaseType.PostgreSql))
+            .UseSnakeCaseNamingConvention();
     }
 }

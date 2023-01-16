@@ -1,19 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
+public class CharacterCorrelation
 {
-    public class CharacterCorrelation
-    {
-        public int CorrelationId { get; set; }
-        public int LogoutCharacterId { get; set; }
-        public Character LogoutCharacter { get; set; }
-        public int LoginCharacterId { get; set; }
-        public Character LoginCharacter { get; set; }
-        public short NumberOfMatches { get; set; }
-    }
+    /// <summary>
+    /// Id of specific correlation between two characters
+    /// </summary>
+    public int CorrelationId { get; set; }
+
+    /// <summary>
+    /// Id of specific character that logout
+    /// </summary>
+    public int LogoutCharacterId { get; set; }
+
+    /// <summary>
+    /// Id of specific character that login
+    /// </summary>
+    public int LoginCharacterId { get; set; }
+
+    /// <summary>
+    /// Quantity occurrence of combination
+    /// </summary>
+    public short NumberOfMatches { get; set; }
+
+    /// <summary>
+    /// Date of first occurance
+    /// </summary>
+    public DateOnly CreateDate { get; set; }
+
+    /// <summary>
+    /// Date of last occurance
+    /// </summary>
+    public DateOnly LastMatchDate { get; set; }
+
+    // Associations
+    public Character LogoutCharacter { get; set; }
+    public Character LoginCharacter { get; set; }
 }
