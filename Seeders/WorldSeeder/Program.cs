@@ -1,37 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Shared.Providers;
-using TibiaEnemyOtherCharactersFinder.Api;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
-namespace WorldSeeder
+namespace WorldSeeder;
+
+public class Program
 {
-    public class Program
+    private static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
-        {
+        var services = new ServiceCollection();
+        var provider = ConfigureAppServices.Configure<IWorldSeeder, WorldSeeder>(services);
+        var seeder = provider.GetService<IWorldSeeder>();
 
-            var services = new ServiceCollection();
-
-            ConfigureServices(services);
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            var seeder = serviceProvider.GetService<WorldSeeder>();
-            await seeder.Seed();
-            await seeder.TurnOffIfWorldIsUnavailable();
-        }
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
-            services
-                .AddSingleton<WorldSeeder>()
-                .AddHttpClient()
-                .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>()
-                .AddSingleton<DbContextOptions<TibiaCharacterFinderDbContext>>()
-                .AddSingleton<TibiaCharacterFinderDbContext>();
-            Startup.ConfigureOptions(services, configuration);
-        }
+        await seeder.SetProperties();
+        await seeder.Seed();
+        await seeder.TurnOffIfWorldIsUnavailable();
     }
 }

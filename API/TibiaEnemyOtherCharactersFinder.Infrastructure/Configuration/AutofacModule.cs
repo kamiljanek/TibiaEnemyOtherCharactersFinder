@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using Autofac;
+﻿using Autofac;
+using System.Reflection;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration
 {
-    public class AutofacModule: Autofac.Module
+    public class AutofacModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

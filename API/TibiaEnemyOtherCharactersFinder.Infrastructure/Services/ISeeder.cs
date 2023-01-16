@@ -1,8 +1,6 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Application.Services
+﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
+public interface ISeeder
 {
-    public interface ISeeder
-    {
-        public void Seed();
-    }
+    public Task Seed();
 }

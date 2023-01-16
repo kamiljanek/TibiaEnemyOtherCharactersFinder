@@ -35,16 +35,22 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="System.Text.Json" Version="7.0.1" />
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Shared\Shared.csproj" />
 		<ProjectReference Include="..\TibiaEnemyOtherCharactersFinder.Application\TibiaEnemyOtherCharactersFinder.Application.csproj" />
 		<ProjectReference Include="..\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://appsemble.app/api.json" /></VisualStudio></ProjectExtensions>

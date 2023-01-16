@@ -1,15 +1,32 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities
+public class WorldScan
 {
-    public class WorldScan
-    {
-        public int WorldScanId { get; set; }
-        public string CharactersOnline { get; set; }
-        public short WorldId { get; set; }
-        public bool IsDeleted { get; set; }
-        public World World { get; set; }
-        public DateTime ScanCreateDateTime { get; set; }
-    }
+    /// <summary>
+    /// Id of World Scan
+    /// </summary>
+    public int WorldScanId { get; set; }
+
+    /// <summary>
+    /// List of online characters
+    /// </summary>
+    public string CharactersOnline { get; set; }
+
+    /// <summary>
+    /// Id of specific world
+    /// </summary>
+    public short WorldId { get; set; }
+
+    /// <summary>
+    /// Boolean (true if World Scan is deleted, otherwise false)
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
+    /// <summary>
+    /// Date and time when World Scan was created
+    /// </summary>
+    public DateTime ScanCreateDateTime { get; set; }
+
+    // Associations
+    public World World { get; set; }
 }
