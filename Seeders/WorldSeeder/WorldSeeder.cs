@@ -1,96 +1,91 @@
-using System.Net.Http.Json;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
-namespace WorldSeeder
+namespace WorldSeeder;
+
+public class WorldSeeder : IWorldSeeder
 {
-    public class WorldSeeder : Model
+    private const string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
+
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
+    private readonly IRepository _worldRepository;
+    private readonly ITibiaApi _tibiaApi;
+
+    private readonly List<string> _worldsNamesFromTibiaApi = new();
+    private readonly List<World> _worldsFromDb = new();
+
+    public WorldSeeder(ITibiaCharacterFinderDbContext dbContext, IRepository worldRepository, ITibiaApi tibiaApi)
     {
-        private const string _getWorldsUrl = "https://api.tibiadata.com/v3/worlds";
-        private const string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
-        private readonly TibiaCharacterFinderDbContext _dbContext;
-        private readonly HttpClient _httpClient;
+        _dbContext = dbContext;
+        _worldRepository = worldRepository;
+        _tibiaApi = tibiaApi;
+    }
 
-        public WorldSeeder(TibiaCharacterFinderDbContext dbContext, HttpClient httpClient) : base(dbContext)
-        {
-            _dbContext = dbContext;
-            _httpClient = httpClient;
-        }
+    public async Task SetProperties()
+    {
+        _worldsNamesFromTibiaApi.AddRange(await _tibiaApi.FetchWorldsNamesFromTibiaApi());
+        _worldsFromDb.AddRange(await _worldRepository.GetWorldsAsNoTrackingAsync());
+    }
 
-        public async Task Seed()
+    public async Task Seed()
+    {
+        if (_dbContext.Database.CanConnect())
         {
-            if (_dbContext.Database.CanConnect())
+            try
             {
-                try
-                {
-                    var worldNamesFromApi = await GetWorldNamesFromTibiaApi();
-                    var worldsFromDb = await GetWorldsAsNoTrackingAsync();
+                var newWorlds = _worldsNamesFromTibiaApi
+                    .Where(name => !_worldsFromDb.Select(world => world.Name).Contains(name))
+                    .Select(name =>
+                    {
+                        return CreateWorld(name);
+                    })
+                    .ToList();
 
-                    var newWorlds = worldNamesFromApi
-                        .Where(name => !worldsFromDb.Select(world => world.Name).Contains(name))
-                        .Select(name =>
-                        {
-                            return CreateWorld(name);
-                        })
-                        .ToList();
+                _dbContext.Worlds.AddRange(newWorlds);
 
-                    _dbContext.Worlds.AddRange(newWorlds);
-
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(@"Cannot get worlds from ""api.tibiadata"" or from DB");
-                    Console.WriteLine(e);
-                }
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(@"Cannot get worlds from ""api.tibiadata"" or from DB");
+                Console.WriteLine(e);
             }
         }
+    }
 
-        public async Task TurnOffIfWorldIsUnavailable()
+    public async Task TurnOffIfWorldIsUnavailable()
+    {
+        if (_dbContext.Database.CanConnect())
         {
-            if (_dbContext.Database.CanConnect())
+            try
             {
-                try
-                {
-                    var availableWorldNamesFromApi = await GetWorldNamesFromTibiaApi();
-                    var worldsFromDb = await GetAvailableWorldsAsync();
+                _worldsFromDb
+                    .Where(world => !_worldsNamesFromTibiaApi.Contains(world.Name))
+                    .Select(world => world.IsAvailable = false);
 
-                    worldsFromDb
-                        .Where(world => !availableWorldNamesFromApi.Contains(world.Name))
-                        .Select(world => world.IsAvailable = false);
-
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(@"Cannot get worlds from ""api.tibiadata""");
-                    Console.WriteLine(e);
-                }
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(@"Cannot get worlds from ""api.tibiadata""");
+                Console.WriteLine(e);
             }
         }
+    }
 
-        private async Task<List<string>> GetWorldNamesFromTibiaApi()
+    private World CreateWorld(string worldName)
+    {
+        return new World()
         {
-            var response = await _httpClient.GetAsync(_getWorldsUrl);
+            Name = worldName,
+            Url = BuildWorldUrl(worldName),
+            IsAvailable = true
+        };
+    }
 
-            var result = await response.Content.ReadFromJsonAsync<TibiaApiWorldsResult>();
-
-            return result.worlds.regular_worlds.Select(world => world.name).ToList();
-        }
-
-        private World CreateWorld(string worldName)
-        {
-            return new World()
-            {
-                Name = worldName,
-                Url = BuildWorldUrl(worldName),
-                IsAvailable = true
-            };
-        }
-
-        private string BuildWorldUrl(string worldName)
-        {
-            return $"{_mainUrl}&world={worldName}";
-        }
+    private string BuildWorldUrl(string worldName)
+    {
+        return $"{_mainUrl}&world={worldName}";
     }
 }

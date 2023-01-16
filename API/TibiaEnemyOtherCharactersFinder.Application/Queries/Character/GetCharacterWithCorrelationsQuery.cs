@@ -1,36 +1,36 @@
 ﻿using Dapper;
 using MediatR;
 using Shared.Database.Queries.Sql;
-using Shared.Providers;
+using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
 
-namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character
+namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
+
+public class GetCharacterWithCorrelationsQuery : IRequest<List<CharacterWithCorrelationsResult>>
 {
-    public class GetCharacterWithCorrelationsQuery : IRequest<List<CharacterWithCorrelationsResult>>
+    public string Name { get; }
+    public GetCharacterWithCorrelationsQuery(string name)
     {
-        public string Name { get; }
-        public GetCharacterWithCorrelationsQuery(string name)
-        {
-            Name = name;
-        }
+        Name = name;
     }
-    public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetCharacterWithCorrelationsQuery, List<CharacterWithCorrelationsResult>>
+}
+
+public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetCharacterWithCorrelationsQuery, List<CharacterWithCorrelationsResult>>
+{
+    private readonly IDapperConnectionProvider _connectionProvider;
+
+    public GetCharacterWithCorrelationsQueryHandler(IDapperConnectionProvider connectionProvider)
     {
-        private readonly IDapperConnectionProvider _connectionProvider;
+        _connectionProvider = connectionProvider;
+    }
 
-        public GetCharacterWithCorrelationsQueryHandler(IDapperConnectionProvider connectionProvider)
-        {
-            _connectionProvider = connectionProvider;
-        }
+    public async Task<List<CharacterWithCorrelationsResult>> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
+    {
+        var parameters = new { CharacterName = request.Name.ToLower() };
 
-        public async Task<List<CharacterWithCorrelationsResult>> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
-        {
-            var parameters = new { CharacterName = request.Name.ToLower() };
-           
-            using var connection = _connectionProvider.GetConnection(EModuleType.PostgreSql);
-            var result = await connection.QueryAsync<CharacterWithCorrelationsResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
-           
-            return result.ToList();
-        }
+        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
+        var result = await connection.QueryAsync<CharacterWithCorrelationsResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
+
+        return result.ToList();
     }
 }

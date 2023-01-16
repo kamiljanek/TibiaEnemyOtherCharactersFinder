@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldSeeder", "Seeders\Worl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldScanSeeder", "Seeders\WorldScanSeeder\WorldScanSeeder.csproj", "{C4C15676-0E76-4814-95D0-CF3B9DFCCE67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared\Shared.csproj", "{9C67C3DA-4429-4865-9895-E69966D87A32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{DCB2AD71-21DC-404B-9696-395813705E3D}"
 EndProject
@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TibiaEnemyOtherCharactersFinder.Infrastructure", "API\TibiaEnemyOtherCharactersFinder.Infrastructure\TibiaEnemyOtherCharactersFinder.Infrastructure.csproj", "{B1A02783-D5EB-4F68-A15A-CA9D53819A05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterAnalyserSeeder", "Seeders\CharacterAnalyser\CharacterAnalyserSeeder.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CharacterAnalyser", "Seeders\CharacterAnalyser\CharacterAnalyser.csproj", "{C6C05A9C-3668-4026-BD72-93741CBB4069}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbTableCleaner", "Seeders\DbTableCleaner\DbTableCleaner.csproj", "{97DF333E-420F-4CEC-A711-A3D78640966D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbCleaner", "Seeders\DbTableCleaner\DbCleaner.csproj", "{97DF333E-420F-4CEC-A711-A3D78640966D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
