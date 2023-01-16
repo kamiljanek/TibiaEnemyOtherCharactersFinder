@@ -1,37 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Shared.Providers;
-using System;
-using TibiaEnemyOtherCharactersFinder.Api;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
-namespace DbTableCleaner
+namespace DbTableCleaner;
+
+public class Program
 {
-    public class Program
+    private static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
-        {
-            var services = new ServiceCollection();
-            ConfigureServices(services);
-            ServiceProvider = services.BuildServiceProvider();
-
-            var seeder = ServiceProvider.GetService<TableCleaner>();
-            
-            await seeder.CleanWorldScansTable();
-        }
-
-        public static ServiceProvider ServiceProvider { get; private set; }
-
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
-
-            services
-                .AddSingleton<TableCleaner>()
-                .AddScoped<IDapperConnectionProvider, DapperConnectionProvider>();
-
-            Startup.ConfigureOptions(services, configuration);
-        }
+        var services = new ServiceCollection();
+        var provider = ConfigureAppServices.Configure<ICleaner, Cleaner>(services);
+        var seeder = provider.GetService<ICleaner>();
+        
+        await seeder.ClearDeletedWorldScans();
     }
 }
