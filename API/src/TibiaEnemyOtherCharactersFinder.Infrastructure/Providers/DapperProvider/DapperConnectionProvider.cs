@@ -5,7 +5,7 @@ using System.Data;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 
-namespace Shared.Providers;
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DapperProvider;
 
 public class DapperConnectionProvider : IDapperConnectionProvider
 {
@@ -33,20 +33,21 @@ public class DapperConnectionProvider : IDapperConnectionProvider
         }
     }
 
-    public string GetConnectionString(EDataBaseType module)
-    {
-        switch (module)
-        {
-            case EDataBaseType.SqlServer:
-                return _connectionStringsOptions.SqlServer;
+    //public string GetConnectionString(EDataBaseType module)
+    //{
+    //    switch (module)
+    //    {
+    //        case EDataBaseType.SqlServer:
+    //            return _connectionStringsOptions.SqlServer;
 
-            case EDataBaseType.PostgreSql:
-                return _connectionStringsOptions.PostgreSql;
+    //        case EDataBaseType.PostgreSql:
+    //            return _connectionStringsOptions.PostgreSql;
 
-            default:
-                throw new ArgumentOutOfRangeException(nameof(module), module, null);
-        }
-    }
+    //        default:
+    //            throw new ArgumentOutOfRangeException(nameof(module), module, null);
+    //    }
+    //}
+    // UNDONE: mozliwe ze do usuniecia
 
     private static IDbConnection GetConnection(string connectionString, int? commandTimeout)
     {

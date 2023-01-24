@@ -10,7 +10,7 @@ public class CharacterCorrelationSeeder : ISeeder
     private readonly IDapperConnectionProvider _connectionProvider;
 
     public CharacterCorrelationSeeder(IDapperConnectionProvider connectionProvider)
-	{
+    {
         _connectionProvider = connectionProvider;
     }
 
@@ -22,13 +22,13 @@ public class CharacterCorrelationSeeder : ISeeder
 
     private async Task UpdateCharacterCorrelationIfExist()
     {
-        using (var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql))
+        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
             await connection.ExecuteAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
     }
-    
+
     private async Task CreateCharacterCorrelationIfNotExist()
     {
-        using (var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql))
+        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
             await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
     }
 }

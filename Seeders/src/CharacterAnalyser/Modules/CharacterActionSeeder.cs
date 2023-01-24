@@ -3,48 +3,50 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
-public class CharacterActionSeeder : ISeeder
+public class CharacterActionSeeder : ISeeder<List<WorldScan>>
 {
-    private readonly IRepository _repository;
-    private readonly List<string> _logoutNames;
-    private readonly List<string> _loginNames;
-    private readonly List<WorldScan> _twoWorldScans;
+    private List<string> _loginNames;
+    private List<string> _logoutNames;
 
-    public CharacterActionSeeder(IRepository repository, List<string> logoutNames, List<string> loginNames, List<WorldScan> twoWorldScans)
+    private readonly IRepository _repository;
+
+    public CharacterActionSeeder(IRepository repository)
     {
         _repository = repository;
-        _logoutNames = logoutNames;
-        _loginNames = loginNames;
-        _twoWorldScans = twoWorldScans;
     }
 
-    public async Task Seed()
+    public async Task Seed(List<WorldScan> twoWorldScans)
     {
-        await SeedLogoutCharactersActionsAsync(_logoutNames, _twoWorldScans[0]);
-        await SeedLoginCharactersActionsAsync(_loginNames, _twoWorldScans[1]);
+        var characterActions = new List<CharacterAction>();
+
+        var logoutCharacters = CreateCharactersActionsAsync(_logoutNames, twoWorldScans[0], isOnline: false);
+        var loginCharacters = CreateCharactersActionsAsync(_loginNames, twoWorldScans[1], isOnline: true);
+
+        characterActions.AddRange(logoutCharacters);
+        characterActions.AddRange(loginCharacters);
+
+        await _repository.AddRangeAsync(characterActions);
     }
 
-    private async Task SeedLogoutCharactersActionsAsync(List<string> logoutNames, WorldScan worldScan)
-    {
-        var logoutCharacters = logoutNames.Select(name => CreateCharacterLogoutOrLogin(name, isOnline: false, worldScan)).ToList();
-        await _repository.AddCharactersActionsAsync(logoutCharacters);
-    }
+    public List<string> GetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
 
-    private async Task SeedLoginCharactersActionsAsync(List<string> loginNames, WorldScan worldScan)
-    {
-        var loginCharacters = loginNames.Select(name => CreateCharacterLogoutOrLogin(name, isOnline: true, worldScan)).ToList();
-        await _repository.AddCharactersActionsAsync(loginCharacters);
-    }
+    public List<string> GetLogoutNames(List<WorldScan> twoWorldScans) => _logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
 
-    private CharacterAction CreateCharacterLogoutOrLogin(string characterName, bool isOnline, WorldScan worldScan)
-    {
-        return new CharacterAction()
+    private static List<CharacterAction> CreateCharactersActionsAsync(List<string> names, WorldScan worldScan, bool isOnline) =>
+        names.Select(name => new CharacterAction()
         {
-            CharacterName = characterName,
+            CharacterName = name,
             WorldScanId = worldScan.WorldScanId,
             WorldId = worldScan.WorldId,
             IsOnline = isOnline,
             LogoutOrLoginDate = DateOnly.FromDateTime(worldScan.ScanCreateDateTime)
-        };
+        }).ToList();
+
+    private static List<string> GetNames(WorldScan worldScan)
+    {
+        var names = worldScan.CharactersOnline.Split("|").ToList();
+        names.RemoveAll(string.IsNullOrWhiteSpace);
+        // UNDONE: jak przemieli wszystkie WorldScany po tym deployu to można usunąć poniższą linijkę
+        return names.ConvertAll(d => d.ToLower());
     }
 }

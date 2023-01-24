@@ -14,7 +14,7 @@ public class Repository : IRepository
 
     public Task<List<World>> GetAvailableWorldsAsync() =>
         Task.FromResult(_dbContext.Worlds.Where(w => w.IsAvailable).ToList());
-
+    
     public Task<List<World>> GetWorldsAsNoTrackingAsync() =>
         Task.FromResult(_dbContext.Worlds.AsNoTracking().ToList());
 
@@ -25,11 +25,18 @@ public class Repository : IRepository
             .Take(2)
             .ToList());
 
-    public Task<HashSet<short>> GetDistinctWorldIdsFromWorldScansAsync() =>
+    public Task<List<short>> GetDistinctWorldIdsFromWorldScansAsync() =>
        Task.FromResult(_dbContext.WorldScans
+           .Where(scan => !scan.IsDeleted)
            .Select(scan => scan.WorldId)
            .Distinct()
-           .ToHashSet());
+           .ToList());
+    
+    public Task<List<short>> GetAvailableWorldIdsFromWorldScansAsync() =>
+       Task.FromResult(_dbContext.WorldScans
+           .Where(scan => !scan.IsDeleted)
+           .Select(scan => scan.WorldId)
+           .ToList());
 
     public async Task SoftDeleteWorldScanAsync(WorldScan worldScan)
     {
@@ -52,6 +59,13 @@ public class Repository : IRepository
     public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity
     {
         _dbContext.Set<T>().AddRange(entities);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateWorldAsync(World newWorld)
+    {   
+        var currentWorld = await _dbContext.Set<World>().FirstOrDefaultAsync(e => e.WorldId == newWorld.WorldId);
+        _dbContext.Entry(currentWorld).CurrentValues.SetValues(newWorld);
         await _dbContext.SaveChangesAsync();
     }
 }

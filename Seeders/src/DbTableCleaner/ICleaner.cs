@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+﻿namespace DbCleaner;
 
 public interface ICleaner
 {

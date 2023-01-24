@@ -7,6 +7,7 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 public interface ITibiaCharacterFinderDbContext
 {
     DatabaseFacade Database { get; }
+    EntityEntry<TEntry> Entry<TEntry>(TEntry entry) where TEntry : class;
 
     DbSet<CharacterAction> CharacterActions { get; set; }
     DbSet<CharacterCorrelation> CharacterCorrelations { get; set; }
