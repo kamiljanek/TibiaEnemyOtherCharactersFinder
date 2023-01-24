@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+using WorldSeeder.Configuration;
 
 namespace WorldSeeder;
 
@@ -9,8 +10,14 @@ public class Program
     private static async Task Main(string[] args)
     {
         var services = new ServiceCollection();
-        var provider = ConfigureAppServices.Configure<IWorldSeeder, WorldSeeder>(services);
-        var seeder = provider.GetService<IWorldSeeder>();
+        services
+            .AddWorldSeeder()
+            .AddServices()
+            .AddTibiaDbContext();
+
+        var serviceProvider = services.BuildContainer();
+
+        var seeder = serviceProvider.GetService<IWorldSeeder>();
 
         await seeder.SetProperties();
         await seeder.Seed();

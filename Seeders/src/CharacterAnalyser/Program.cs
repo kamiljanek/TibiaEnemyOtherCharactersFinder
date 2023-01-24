@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CharacterAnalyser.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser;
 
@@ -9,14 +9,24 @@ public class Program
     private static async Task Main(string[] args)
     {
         var services = new ServiceCollection();
-        var provider = ConfigureAppServices.Configure<ICharacterAnalyser, CharacterAnalyser>(services);
-        var seeder = provider.GetService<ICharacterAnalyser>();
 
-        await seeder.SetProperties();
+        services
+            .AddCharacterAnalyser()
+            .AddServices()
+            .AddTibiaDbContext()
+            .AddDapper();
 
-        while (true)
+        var serviceProvider = services.BuildContainer();
+
+        var seeder = serviceProvider.GetService<ICharacterAnalyser>();
+
+        while (await seeder.HasDataToAnalyse())
         {
-            await seeder.Seed();
+            foreach (var worldId in seeder.UniqueWorldIds)
+            {
+                var worldScans = await seeder.GetWorldScansToAnalyseAsync(worldId);
+                await seeder.Seed(worldScans);
+            }
         }
     }
 }

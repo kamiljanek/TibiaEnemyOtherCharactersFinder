@@ -35,7 +35,7 @@ public class TibiaApi : ITibiaApi
         return new List<string>();
     }
 
-    public async Task<string> FetchCharactersOnlineFromApi(string name)
+    public async Task<string> FetchCharactersOnlineFromTibiaApi(string name)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{_worldEndpoint}{name}");
 

@@ -1,10 +1,10 @@
 ﻿namespace CharacterAnalyser.ActionRules.Rules;
 
-public class CharacterNameListCannotBeEmpty : IRule
+public class CharacterNameListCannotBeEmptyRule : IRule
 {
     private readonly List<string> _names;
 
-    public CharacterNameListCannotBeEmpty(List<string> names)
+    public CharacterNameListCannotBeEmptyRule(List<string> names)
 	{
         _names = names;
     }

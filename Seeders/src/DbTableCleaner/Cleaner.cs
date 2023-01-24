@@ -2,9 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
-namespace DbTableCleaner;
+namespace DbCleaner;
 
 public class Cleaner : ICleaner
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+using WorldScanSeeder.Configuration;
 
 namespace WorldScanSeeder;
 
@@ -9,9 +9,19 @@ public class Program
     private static async Task Main(string[] args)
     {
         var services = new ServiceCollection();
-        var provider = ConfigureAppServices.Configure<ISeeder, WorldScanSeeder>(services);
-        var seeder = provider.GetService<ISeeder>();
+        services
+            .AddWorldScanSeeder()
+            .AddServices()
+            .AddTibiaDbContext();
 
-        await seeder.Seed();
+        var serviceProvider = services.BuildContainer();
+
+        var seeder = serviceProvider.GetService<IWorldScanSeeder>();
+
+        await seeder.SetProperties();
+        foreach (var availableWorld in seeder.AvailableWorlds)
+        {
+            await seeder.Seed(availableWorld);
+        }
     }
 }

@@ -19,7 +19,7 @@ public class CharacterController : CharacterBaseController
     /// <param name="characterName"></param>
     /// <returns></returns>
     [HttpGet("{characterName}")]
-    public async Task<IActionResult> GetCharacter([FromRoute] string characterName)
+    public async Task<IActionResult> GetOtherCharacters([FromRoute] string characterName)
     {
         var result = await _mediator.Send(new GetCharacterWithCorrelationsQuery(characterName));
         return Ok(result);
