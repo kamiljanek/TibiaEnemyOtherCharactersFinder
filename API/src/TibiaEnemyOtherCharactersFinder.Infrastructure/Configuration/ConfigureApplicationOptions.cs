@@ -6,22 +6,18 @@ using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
-public static class ConfigureAppOptions
+public static class ConfigureApplicationOptions
 {
-    private const string _settingFileName = "appsettings.Development.json";
-    private const string _settingDapperSection = "Dapper";
-    private const string _settingConnectionStringsSection = "ConnectionStrings";
-
     public static void Configure(IServiceCollection services)
     {
-        services.Configure<ConnectionStringsSection>(options => GetSettingsSection(_settingConnectionStringsSection).Bind(options));
-        services.Configure<DapperConfigurationSection>(options => GetSettingsSection(_settingDapperSection).Bind(options));
+        services.Configure<ConnectionStringsSection>(options => GetSettingsSection(ApplicationSettingsSections.ConnectionStringsSection).Bind(options));
+        services.Configure<DapperConfigurationSection>(options => GetSettingsSection(ApplicationSettingsSections.DapperSection).Bind(options));
     }
 
     public static void ConfigureOptions(this ContainerBuilder builder)
     {
-        var configDapper = GetSettingsSection(_settingDapperSection);
-        var configConnectionStrings = GetSettingsSection(_settingConnectionStringsSection);
+        var configDapper = GetSettingsSection(ApplicationSettingsSections.DapperSection);
+        var configConnectionStrings = GetSettingsSection(ApplicationSettingsSections.ConnectionStringsSection);
 
         builder.Register(c => new NamedConfigureFromConfigurationOptions<DapperConfigurationSection>(Options.DefaultName, configDapper, _ => { }))
                .As<IConfigureOptions<DapperConfigurationSection>>()
@@ -34,7 +30,7 @@ public static class ConfigureAppOptions
 
     private static IConfigurationSection GetSettingsSection(string settingsSection)
     {
-        var configuration = new ConfigurationBuilder().AddJsonFile(_settingFileName, optional: false, reloadOnChange: true).Build();
+        var configuration = new ConfigurationBuilder().AddJsonFile(ApplicationSettingsSections.FileName, optional: false, reloadOnChange: true).Build();
         var result = configuration.GetSection(settingsSection);
 
         return result;

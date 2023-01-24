@@ -4,57 +4,58 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace WorldScanSeeder;
 
-public class WorldScanSeeder : ISeeder
+public class WorldScanSeeder : IWorldScanSeeder
 {
-    private readonly ITibiaCharacterFinderDbContext _dbContext;
-    private readonly IRepository _worldRepository;
+    private readonly IRepository _repository;
     private readonly ITibiaApi _tibiaApi;
 
-    public WorldScanSeeder(ITibiaCharacterFinderDbContext dbContext, IRepository worldRepository, ITibiaApi tibiaApi)
+    private List<World> _availableWorlds;
+
+    public List<World> AvailableWorlds => _availableWorlds;
+
+    public WorldScanSeeder(IRepository repository, ITibiaApi tibiaApi)
     {
-        _dbContext = dbContext;
-        _worldRepository = worldRepository;
+        _repository = repository;
         _tibiaApi = tibiaApi;
     }
 
-    public async Task Seed()
+    public async Task SetProperties()
     {
-        if (_dbContext.Database.CanConnect())
+        try
         {
-            var availableWorlds = await _worldRepository.GetAvailableWorldsAsync();
-            foreach (var availableWorld in availableWorlds)
-            {
-                try
-                {
-                    var worldScan = await CreateWorldScanAsync(availableWorld);
-                    _dbContext.WorldScans.Add(worldScan);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"{availableWorld.Name} - cannot deserialized object");
-                    Console.WriteLine(e);
-                    continue;
-                }
-            }
-            await _dbContext.SaveChangesAsync();
-            Console.WriteLine("Save success " + DateTime.Now);
+            _availableWorlds = await _repository.GetAvailableWorldsAsync();
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine("Cannot connect to DB");
+            Console.WriteLine($"Cannot Get Available Worlds");
+            Console.WriteLine(e);
         }
+    }
+
+    public async Task Seed(World availableWorld)
+    {
+        try
+        {
+            var worldScan = await CreateWorldScanAsync(availableWorld);
+            await _repository.AddAsync(worldScan);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"{availableWorld.Name} - cannot deserialized object");
+            Console.WriteLine(e);
+        }
+        Console.WriteLine("Save success " + DateTime.Now);
     }
 
     private async Task<WorldScan> CreateWorldScanAsync(World world)
     {
-        var charactersOnline = await _tibiaApi.FetchCharactersOnlineFromApi(world.Name);
+        var charactersOnline = await _tibiaApi.FetchCharactersOnlineFromTibiaApi(world.Name);
 
-        var worldScan = new WorldScan
+        return new WorldScan
         {
-            CharactersOnline = charactersOnline,
+            CharactersOnline = charactersOnline.ToLower(),
             WorldId = world.WorldId,
             ScanCreateDateTime = DateTime.UtcNow,
         };
-        return worldScan;
     }
 }

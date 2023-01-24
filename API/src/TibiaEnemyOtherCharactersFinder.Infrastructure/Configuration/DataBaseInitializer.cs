@@ -11,6 +11,8 @@ public class DataBaseInitializer : IInitializer
 
     public DataBaseInitializer(ILogger<DataBaseInitializer> logger, TibiaCharacterFinderDbContext dbContext)
     {
+        // UNDONE: możliwe ze TibiaCharacterFinderDbContext można będzie zamienic na ITibiaCharacterFinderDbContext
+
         _logger = logger;
         _dbContext = dbContext;
     }
@@ -19,8 +21,8 @@ public class DataBaseInitializer : IInitializer
 
     public async Task Initialize()
     {
-        _logger.LogInformation("Database technology initializer - started");
+        _logger.LogInformation("Database tibia initializer - started");
         await _dbContext.Database.MigrateAsync();
-        _logger.LogInformation("Database technology initializer - finished");
+        _logger.LogInformation("Database tibia initializer - finished");
     }
 }

@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TibiaEnemyOtherCharactersFinder.Application.Dapper;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbContext
 {
-    private readonly IDapperConnectionProvider _connectionProvider;
-
-    public TibiaCharacterFinderDbContext(IDapperConnectionProvider connectionProvider)
+    public TibiaCharacterFinderDbContext(DbContextOptions<TibiaCharacterFinderDbContext> options) : base(options)
     {
-        _connectionProvider = connectionProvider;
     }
 
     public DbSet<World> Worlds { get; set; }
@@ -22,6 +21,9 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
     {
         modelBuilder.HasDefaultSchema("public");
         base.OnModelCreating(modelBuilder);
+        // UNDONE: może odkomentować
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
         modelBuilder.Entity<World>(w =>
         {
             w.Property(wo => wo.Name).IsRequired();
@@ -79,9 +81,20 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
             o.Property(wc => wc.LastMatchDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
         });
     }
+
+    // UNDONE: mozliwe ze do usuniecia
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_connectionProvider.GetConnectionString(EDataBaseType.PostgreSql))
-            .UseSnakeCaseNamingConvention();
+        //if (!optionsBuilder.IsConfigured)
+        //{
+        //    IConfigurationRoot configuration = new ConfigurationBuilder()
+        //        //.SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile(ApplicationSettingsSections.FileName)
+        //        .Build();
+
+        //    var connectionString = configuration.GetConnectionString(ApplicationSettingsSections.ConnectionStringsSection);
+        //    optionsBuilder.UseNpgsql(connectionString)
+        //        .UseSnakeCaseNamingConvention();
+        //}
     }
 }

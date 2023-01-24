@@ -4,20 +4,23 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 public interface IRepository
 {
-    public Task<List<World>> GetAvailableWorldsAsync();
+    Task<List<World>> GetAvailableWorldsAsync();
 
-    public Task<List<World>> GetWorldsAsNoTrackingAsync();
+    Task<List<World>> GetWorldsAsNoTrackingAsync();
 
-    public Task<List<WorldScan>> GetFirstTwoWorldScansAsync(short worldId);
+    Task<List<WorldScan>> GetFirstTwoWorldScansAsync(short worldId);
 
-    public Task<HashSet<short>> GetDistinctWorldIdsFromWorldScansAsync();
+    Task<List<short>> GetDistinctWorldIdsFromWorldScansAsync();
 
-    public Task SoftDeleteWorldScanAsync(WorldScan worldScan);
+    Task<List<short>> GetAvailableWorldIdsFromWorldScansAsync();
 
-    public Task AddCharactersActionsAsync(List<CharacterAction> characterActions);
+    Task SoftDeleteWorldScanAsync(WorldScan worldScan);
 
-    public Task AddAsync<T>(T entity) where T : class, IEntity;
+    Task AddCharactersActionsAsync(List<CharacterAction> characterActions);
 
-    public Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity;
+    Task AddAsync<T>(T entity) where T : class, IEntity;
 
+    Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity;
+
+    Task UpdateWorldAsync(World entity);
 }

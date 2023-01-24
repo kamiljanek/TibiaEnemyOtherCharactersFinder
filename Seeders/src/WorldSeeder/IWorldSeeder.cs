@@ -1,4 +1,6 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+
+namespace WorldSeeder;
 
 public interface IWorldSeeder : ISeeder
 {

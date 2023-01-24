@@ -13,9 +13,10 @@ public class CharacterSeeder : ISeeder
     {
         _connectionProvider = connectionProvider;
     }
+
     public async Task Seed()
     {
-        using (var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql))
+        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
             await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
     }
 }
