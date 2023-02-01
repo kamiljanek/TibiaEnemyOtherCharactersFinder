@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharacterController;
 
@@ -47,11 +48,12 @@ public class CharacterControllerTests : IClassFixture<TibiaApiFactory>
     [Fact]
     public void DataInDatabaseShouldBeCorrectUsingEFCore()
     {
+        using var scope = _factory.Services.CreateScope();
         // Arrange
-        //var dbContext = _factory.CreateTibiaDbContext();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
 
         // Act
-        var worlds = _factory.DbContext.Worlds.Where(w => w.IsAvailable).ToList();
+        var worlds = dbContext.Worlds.Where(w => w.IsAvailable).ToList();
 
         // Assert
         worlds.Should().NotBeEmpty();
