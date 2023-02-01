@@ -85,16 +85,16 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
     // UNDONE: mozliwe ze do usuniecia
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //if (!optionsBuilder.IsConfigured)
-        //{
-        //    IConfigurationRoot configuration = new ConfigurationBuilder()
-        //        //.SetBasePath(Directory.GetCurrentDirectory())
-        //        .AddJsonFile(ApplicationSettingsSections.FileName)
-        //        .Build();
+        if (!optionsBuilder.IsConfigured)
+        {
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                //.SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(ApplicationSettingsSections.FileName)
+                .Build();
 
-        //    var connectionString = configuration.GetConnectionString(ApplicationSettingsSections.ConnectionStringsSection);
-        //    optionsBuilder.UseNpgsql(connectionString)
-        //        .UseSnakeCaseNamingConvention();
-        //}
+            var connectionString = configuration.GetConnectionString(ApplicationSettingsSections.ConnectionStringsSection);
+        optionsBuilder.UseNpgsql(connectionString)
+            .UseSnakeCaseNamingConvention();
+        }
     }
 }
