@@ -65,22 +65,19 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
         {
             var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<TibiaCharacterFinderDbContext>));
             if (descriptor != null) services.Remove(descriptor);
-            services.RemoveAll(typeof(DbContextOptions<TibiaCharacterFinderDbContext>));
+            //services.RemoveAll(typeof(DbContextOptions<TibiaCharacterFinderDbContext>));
             //services.RemoveAll(typeof(ITibiaCharacterFinderDbContext));
-            services.RemoveAll(typeof(TibiaCharacterFinderDbContext));
+            //services.RemoveAll(typeof(TibiaCharacterFinderDbContext));
             services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.ConnectionString }));
             //services.AddSingleton<DbContextOptions<TibiaCharacterFinderDbContext>>();
             //services.AddSingleton<TibiaCharacterFinderDbContext>(_ =>
             //{
-            var optionsBuilder = new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>();
-            optionsBuilder.UseNpgsql(_dbContainer.ConnectionString);
-            services.AddSingleton(new TibiaCharacterFinderDbContext(optionsBuilder.Options));
+            //var optionsBuilder = new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>();
+            //optionsBuilder.UseNpgsql(_dbContainer.ConnectionString).UseSnakeCaseNamingConvention();
+            //services.AddSingleton(new TibiaCharacterFinderDbContext(optionsBuilder.Options));
             //});
-            var serviceProvider = services.BuildServiceProvider();
-            using var scope = serviceProvider.CreateScope();
-            var scopedServices = scope.ServiceProvider;
-            DbContext = scopedServices.GetRequiredService<TibiaCharacterFinderDbContext>();
-            services.AddDbContextPool<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.ConnectionString));
+            services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.ConnectionString).UseSnakeCaseNamingConvention());
+            //DbContext = scopedServices.GetRequiredService<TibiaCharacterFinderDbContext>();
         });
 
         //builder.ConfigureTestServices(services =>
@@ -108,8 +105,4 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
         await _dbContainer.DisposeAsync();
     }
 
-    public TibiaCharacterFinderDbContext CreateTibiaDbContext()
-    {
-        return Services.GetService<TibiaCharacterFinderDbContext>()!;
-    }
 }
