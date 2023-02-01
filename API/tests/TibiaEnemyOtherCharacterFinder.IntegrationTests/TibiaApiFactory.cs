@@ -15,10 +15,8 @@ namespace TibiaEnemyOtherCharacterFinder.IntegrationTests;
 
 public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
 {
-    public TibiaCharacterFinderDbContext DbContext { get; set; }
-
     private readonly PostgreSqlTestcontainer _dbContainer =
-        new TestcontainersBuilder<PostgreSqlTestcontainer>()
+        new ContainerBuilder<PostgreSqlTestcontainer>()
              .WithDatabase(new PostgreSqlTestcontainerConfiguration
              {
                  Database = "postgres",

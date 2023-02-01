@@ -42,7 +42,7 @@ public class CharacterControllerTests : IClassFixture<TibiaApiFactory>
         // Assert
 
         result.Should().NotBeEmpty();
-        result.First(c => c.OtherCharacterName == "someName").NumberOfMatches.Should().Be(5);
+        result.FirstOrDefault(c => c.OtherCharacterName == "someName").NumberOfMatches.Should().Be(5);
     }
 
     [Fact]
