@@ -4,7 +4,7 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace WorldScanSeeder;
 
-public class WorldScanSeeder : IWorldScanSeeder
+public class ScanSeeder : IScanSeeder
 {
     private readonly IRepository _repository;
     private readonly ITibiaApi _tibiaApi;
@@ -13,7 +13,7 @@ public class WorldScanSeeder : IWorldScanSeeder
 
     public List<World> AvailableWorlds => _availableWorlds;
 
-    public WorldScanSeeder(IRepository repository, ITibiaApi tibiaApi)
+    public ScanSeeder(IRepository repository, ITibiaApi tibiaApi)
     {
         _repository = repository;
         _tibiaApi = tibiaApi;
@@ -27,7 +27,7 @@ public class WorldScanSeeder : IWorldScanSeeder
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Cannot Get Available Worlds");
+            Console.WriteLine("Cannot Get Available Worlds");
             Console.WriteLine(e);
         }
     }

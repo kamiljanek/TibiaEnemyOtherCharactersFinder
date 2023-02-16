@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using TibiaEnemyOtherCharactersFinder.Api;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+
 #pragma warning disable CS0618
 
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests;
@@ -20,7 +21,7 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             {
                 Database = "postgres",
                 Username = "username",
-                Password = "password",
+                Password = "password"
             })
             .WithImage("postgres:14.6")
             .Build();
@@ -44,13 +45,12 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     {
         builder.ConfigureTestServices(services =>
         {
-            var descriptor = services.SingleOrDefault(d =>
-                d.ServiceType == typeof(DbContextOptions<TibiaCharacterFinderDbContext>));
-            if (descriptor != null) services.Remove(descriptor);
-            services.AddSingleton(Options.Create(new ConnectionStringsSection
-                { PostgreSql = _dbContainer.ConnectionString }));
-            services.AddDbContext<TibiaCharacterFinderDbContext>(options =>
-                options.UseNpgsql(_dbContainer.ConnectionString).UseSnakeCaseNamingConvention());
+            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<TibiaCharacterFinderDbContext>));
+            if (descriptor != null) 
+                services.Remove(descriptor);
+            
+            services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.ConnectionString }));
+            services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.ConnectionString).UseSnakeCaseNamingConvention());
         });
     }
 
@@ -63,8 +63,8 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     {
         return new List<World>()
         {
-            new() { WorldId = 1, Name = "Premia", Url = "urlPremia"},
-            new() { WorldId = 2, Name = "Vunira", Url = "urlVunira"}
+            new() { WorldId = 111, Name = "Premia", Url = "urlPremia" },
+            new() { WorldId = 112, Name = "Vunira", Url = "urlVunira" }
         };
     }
     
@@ -72,13 +72,13 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     {
         return new List<Character>()
         {
-            new() { CharacterId = 1, Name = "abargo maewa", WorldId = 1 },
-            new() { CharacterId = 2, Name = "amy winehousse", WorldId = 1 },
-            new() { CharacterId = 3, Name = "duzzerah", WorldId = 1 },
+            new() { CharacterId = 111, Name = "abargo maewa", WorldId = 111 },
+            new() { CharacterId = 112, Name = "amy winehousse", WorldId = 111 },
+            new() { CharacterId = 113, Name = "duzzerah", WorldId = 111 },
     
-            new() { CharacterId = 4, Name = "ziomal rafiego", WorldId = 2},
-            new() { CharacterId = 5, Name = "zanteey", WorldId = 2 },
-            new() { CharacterId = 6, Name = "artenian", WorldId = 2 },
+            new() { CharacterId = 114, Name = "ziomal rafiego", WorldId = 112},
+            new() { CharacterId = 115, Name = "zanteey", WorldId = 112 },
+            new() { CharacterId = 116, Name = "artenian", WorldId = 112 },
         };
     }
     
@@ -86,13 +86,13 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     {
         return new List<CharacterCorrelation>()
         {
-            new() { LoginCharacterId = 1, LogoutCharacterId = 2, NumberOfMatches = 8 },
-            new() { LoginCharacterId = 3, LogoutCharacterId = 1, NumberOfMatches = 4 },
-            new() { LoginCharacterId = 3, LogoutCharacterId = 2, NumberOfMatches = 2 },
+            new() { LoginCharacterId = 111, LogoutCharacterId = 112, NumberOfMatches = 8 },
+            new() { LoginCharacterId = 113, LogoutCharacterId = 111, NumberOfMatches = 4 },
+            new() { LoginCharacterId = 113, LogoutCharacterId = 112, NumberOfMatches = 2 },
     
-            new() { LoginCharacterId = 4, LogoutCharacterId = 6, NumberOfMatches = 10 },
-            new() { LoginCharacterId = 6, LogoutCharacterId = 5, NumberOfMatches = 21 },
-            new() { LoginCharacterId = 5, LogoutCharacterId = 6, NumberOfMatches = 1 },
+            new() { LoginCharacterId = 114, LogoutCharacterId = 116, NumberOfMatches = 10 },
+            new() { LoginCharacterId = 116, LogoutCharacterId = 115, NumberOfMatches = 21 },
+            new() { LoginCharacterId = 115, LogoutCharacterId = 116, NumberOfMatches = 1 },
         };
     }
 }

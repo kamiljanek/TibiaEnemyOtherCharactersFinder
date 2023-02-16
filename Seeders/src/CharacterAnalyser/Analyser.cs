@@ -6,7 +6,7 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser;
 
-public class CharacterAnalyser : ActionRule, ICharacterAnalyser
+public class Analyser : ActionRule, IAnalyser
 {
     private List<short> _uniqueWorldIds = new();
 
@@ -18,7 +18,7 @@ public class CharacterAnalyser : ActionRule, ICharacterAnalyser
 
     public List<short> UniqueWorldIds => _uniqueWorldIds;
 
-    public CharacterAnalyser(IRepository repository,
+    public Analyser(IRepository repository,
                              CharacterActionSeeder characterActionSeeder,
                              CharacterAnalyserCleaner characterAnalyserCleaner,
                              CharacterSeeder characterSeeder,
