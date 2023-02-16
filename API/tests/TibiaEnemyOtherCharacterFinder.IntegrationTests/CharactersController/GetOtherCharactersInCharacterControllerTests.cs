@@ -3,21 +3,22 @@ using FluentAssertions;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
-namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharacterController;
+namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;
 
-public class CharacterControllerTests : IClassFixture<TibiaApiFactory>
+public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaApiFactory>
 {
     private const string _controllerBase = "api/character";
-    private const string _defaultName = "duzzerah";
+    private const string _defaultName = "_defaultName";
+    private const string _nameInDatabase = "duzzerah";
     private readonly TibiaApiFactory _factory;
 
-    public CharacterControllerTests(TibiaApiFactory factory)
+    public GetOtherCharactersInCharacterControllerTests(TibiaApiFactory factory)
     {
         _factory = factory;
     }
 
     [Fact]
-    public async Task GetOtherCharactersEndpoint_WithRouteParameters_ReturnsOkResult()
+    public async Task GetOtherCharactersEndpoint_WithRouteParameters_ReturnsStatusOk()
     {
         // Arrange
         var client = _factory.CreateClient();
@@ -30,7 +31,23 @@ public class CharacterControllerTests : IClassFixture<TibiaApiFactory>
     }
 
     [Fact]
-    public async Task GetOtherCharactersEndpoint_WithRouteParameters_ReturnsCorrectData()
+    public async Task GetOtherCharactersEndpoint_WithRouteParametersThatFoundInDatabase_ReturnsCorrectData()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync($"{_controllerBase}/{_nameInDatabase}");
+        var result = await response.Content.ReadFromJsonAsync<List<CharacterWithCorrelationsResult>>();
+
+        // Assert
+        result.Should().NotBeEmpty();
+        result!.Count.Should().Be(2);
+        result.First(c => c.OtherCharacterName == "abargo maewa").NumberOfMatches.Should().Be(4);
+    }
+    
+    [Fact]
+    public async Task GetOtherCharactersEndpoint_WithRouteParametersThatNotFoundInDatabase_ReturnsEmptyList()
     {
         // Arrange
         var client = _factory.CreateClient();
@@ -40,9 +57,8 @@ public class CharacterControllerTests : IClassFixture<TibiaApiFactory>
         var result = await response.Content.ReadFromJsonAsync<List<CharacterWithCorrelationsResult>>();
 
         // Assert
-        result.Should().NotBeEmpty();
-        result!.Count.Should().Be(2);
-        result.First(c => c.OtherCharacterName == "abargo maewa").NumberOfMatches.Should().Be(4);
+        result.Should().BeEmpty();
+        result.Should().BeEmpty();
     }
 
     [Fact]

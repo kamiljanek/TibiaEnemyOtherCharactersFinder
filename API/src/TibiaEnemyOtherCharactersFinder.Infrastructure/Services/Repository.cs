@@ -30,12 +30,14 @@ public class Repository : IRepository
            .Where(scan => !scan.IsDeleted)
            .Select(scan => scan.WorldId)
            .Distinct()
+           .OrderBy(id => id)
            .ToList());
     
     public Task<List<short>> GetAvailableWorldIdsFromWorldScansAsync() =>
        Task.FromResult(_dbContext.WorldScans
            .Where(scan => !scan.IsDeleted)
            .Select(scan => scan.WorldId)
+           .OrderBy(id => id)
            .ToList());
 
     public async Task SoftDeleteWorldScanAsync(WorldScan worldScan)

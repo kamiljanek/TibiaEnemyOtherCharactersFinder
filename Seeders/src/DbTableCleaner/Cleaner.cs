@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 
@@ -14,7 +13,7 @@ public class Cleaner : ICleaner
         _connectionProvider = connectionProvider;
     }
 
-    public async Task ClearDeletedWorldScans()
+    public async Task ClearSoftDeletedWorldScans()
     {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
         await connection.ExecuteAsync(GenerateQueries.NpgsqlClearDeletedWorldScans);

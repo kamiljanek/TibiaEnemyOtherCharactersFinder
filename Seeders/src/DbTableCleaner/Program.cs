@@ -18,6 +18,6 @@ public class Program
 
         var seeder = serviceProvider.GetService<ICleaner>();
 
-        await seeder.ClearDeletedWorldScans();
+        await seeder.ClearSoftDeletedWorldScans();
     }
 }
