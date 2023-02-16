@@ -3,7 +3,7 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace WorldScanSeeder;
 
-public interface IWorldScanSeeder : ISeeder<World>
+public interface IScanSeeder : ISeeder<World>
 {
     List<World> AvailableWorlds { get; }
     Task SetProperties();

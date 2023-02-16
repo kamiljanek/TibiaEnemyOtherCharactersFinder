@@ -2,5 +2,5 @@
 
 public interface ICleaner
 {
-    public Task ClearDeletedWorldScans();
+    public Task ClearSoftDeletedWorldScans();
 }

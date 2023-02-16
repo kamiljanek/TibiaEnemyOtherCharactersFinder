@@ -18,7 +18,7 @@ public class Program
 
         var serviceProvider = services.BuildContainer();
 
-        var seeder = serviceProvider.GetService<ICharacterAnalyser>();
+        var seeder = serviceProvider.GetService<IAnalyser>();
 
         while (await seeder.HasDataToAnalyse())
         {

@@ -16,7 +16,7 @@ public class Program
 
         var serviceProvider = services.BuildContainer();
 
-        var seeder = serviceProvider.GetService<IWorldScanSeeder>();
+        var seeder = serviceProvider.GetService<IScanSeeder>();
 
         await seeder.SetProperties();
         foreach (var availableWorld in seeder.AvailableWorlds)

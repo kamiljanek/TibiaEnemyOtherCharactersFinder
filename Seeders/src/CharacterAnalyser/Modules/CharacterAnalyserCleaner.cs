@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 
