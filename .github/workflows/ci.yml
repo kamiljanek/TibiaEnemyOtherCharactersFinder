@@ -8,16 +8,24 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-20.04
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3.3.0
+        
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v3.0.3
         with:
           dotnet-version: 7.0.x
-      - name: Restore dependencies
+          
+      - name: Restore NuGet Packages
         run: dotnet restore
-      - name: Build
+
+      - name: Run Build
         run: dotnet build --no-restore
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
+
+      - name: Run Tests
+        run: dotnet test --no-build
+        # run: dotnet test --no-build --verbosity normal
