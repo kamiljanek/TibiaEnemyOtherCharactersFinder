@@ -23,13 +23,24 @@ jobs:
         run: dotnet build --no-restore
         
       - name: Publish
-        run: dotnet publish -c Release -o ${{ env.DOTNET_ROOT }}
+        run: dotnet publish ./API/src -c Release -o ${{ env.DOTNET_ROOT }}/API
         
-      - name: Build and publish Docker Images to GitHub Container registry
-        uses: VaultVulp/gp-docker-action@1.6.0
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with: 
+          name: api-artifact
+          path: ${{ env.DOTNET_ROOT }}/API
+        
+    
         
   deploy-main:
     runs-on: ubuntu-20.04
     needs: build
     steps: 
-      - 
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: api-artifact
+          #path: 
+      - name: Build and publish Docker Images to GitHub Container registry
+        uses: VaultVulp/gp-docker-action@1.6.0
