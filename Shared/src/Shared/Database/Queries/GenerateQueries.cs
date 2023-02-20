@@ -12,9 +12,9 @@ namespace Shared.Database.Queries.Sql
 {
     public static class GenerateQueries
     {
-        public const string ClearCharacterLogoutOrLogins = @"DELETE FROM CharacterLogoutOrLogins;";
+        public const string MssqlClearCharacterLogoutOrLogins = @"DELETE FROM CharacterLogoutOrLogins;";
 
-        public const string CreateCharacterCorrelation = @"
+        public const string MssqlCreateCharacterCorrelation = @"
 WITH CartesianProduct AS 
 (
 SELECT 
@@ -54,7 +54,7 @@ FROM
 	 1
 	 );";
 
-        public const string CreateCharacterIfNotExist = @"INSERT INTO Characters (Name, WorldId)
+        public const string MssqlCreateCharacterIfNotExist = @"INSERT INTO Characters (Name, WorldId)
 SELECT DISTINCT CharacterName, WorldId
 FROM CharacterLogoutOrLogins clol
 WHERE NOT EXISTS (
@@ -66,7 +66,7 @@ WHERE NOT EXISTS (
         /// Required parameters: 
         ///    @CharacterName
         /// </summary>
-        public const string GetOtherPossibleCharacters = @"WITH cor AS (
+        public const string MssqlGetOtherPossibleCharacters = @"WITH cor AS (
 SELECT TOP 10 CorrelationId
       ,f.Name AS LogoutName
       ,t.Name AS LoginName
@@ -127,6 +127,20 @@ SELECT DISTINCT ca.character_name, ca.world_id
 FROM character_actions ca
 LEFT JOIN characters c ON ca.character_name = c.name
 WHERE c.name IS NULL;";
+
+        public const string NpgsqlDeleteCharacterCorrelationIfCorrelationExistInOneScan = @"WITH 	cte_on AS (SELECT c.character_id FROM character_actions ca LEFT JOIN characters c ON ca.character_name = c.name WHERE is_online),
+      
+        cte_off AS (SELECT c.character_id FROM character_actions ca LEFT JOIN characters c ON ca.character_name = c.name WHERE NOT is_online),
+        
+        cte_del AS (SELECT on1.character_id AS login, on2.character_id AS logout
+                    FROM cte_on on1, cte_on on2
+                    WHERE on1.character_id <> on2.character_id
+                    UNION
+                    SELECT off1.character_id, off2.character_id
+                    FROM cte_off off1, cte_off off2
+                    WHERE off1.character_id <> off2.character_id)
+
+DELETE FROM character_correlations cc WHERE (cc.login_character_id, cc.logout_character_id) IN (SELECT login, logout FROM cte_del)";
 
         /// <summary>
         /// Required parameters: 
