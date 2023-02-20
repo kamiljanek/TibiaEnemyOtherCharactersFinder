@@ -15,6 +15,7 @@ public class Analyser : ActionRule, IAnalyser
     private readonly CharacterAnalyserCleaner _characterAnalyserCleaner;
     private readonly CharacterSeeder _characterSeeder;
     private readonly CharacterCorrelationSeeder _characterCorrelationSeeder;
+    private readonly CharacterCorrelationDeleter _characterCorrelationDeleter;
 
     public List<short> UniqueWorldIds => _uniqueWorldIds;
 
@@ -22,13 +23,15 @@ public class Analyser : ActionRule, IAnalyser
                              CharacterActionSeeder characterActionSeeder,
                              CharacterAnalyserCleaner characterAnalyserCleaner,
                              CharacterSeeder characterSeeder,
-                             CharacterCorrelationSeeder characterCorrelationSeeder)
+                             CharacterCorrelationSeeder characterCorrelationSeeder,
+                             CharacterCorrelationDeleter characterCorrelationDeleter)
     {
         _repository = repository;
         _characterActionSeeder = characterActionSeeder;
         _characterAnalyserCleaner = characterAnalyserCleaner;
         _characterSeeder = characterSeeder;
         _characterCorrelationSeeder = characterCorrelationSeeder;
+        _characterCorrelationDeleter = characterCorrelationDeleter;
     }
 
     public async Task<bool> HasDataToAnalyse()
@@ -70,6 +73,7 @@ public class Analyser : ActionRule, IAnalyser
             await _characterActionSeeder.Seed(twoWorldScans);
             await _characterSeeder.Seed();
             await _characterCorrelationSeeder.Seed();
+            await _characterCorrelationDeleter.Delete();
 
             await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0]);
         }
