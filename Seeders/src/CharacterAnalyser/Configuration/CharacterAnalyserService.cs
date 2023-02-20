@@ -11,6 +11,7 @@ public static class CharacterAnalyserService
         services.AddScoped<CharacterActionSeeder>();
         services.AddScoped<CharacterAnalyserCleaner>();
         services.AddScoped<CharacterCorrelationSeeder>();
+        services.AddScoped<CharacterCorrelationDeleter>();
         services.AddScoped<CharacterSeeder>();
 
         return services;
