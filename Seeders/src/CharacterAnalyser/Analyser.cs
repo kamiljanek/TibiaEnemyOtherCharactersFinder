@@ -73,9 +73,10 @@ public class Analyser : ActionRule, IAnalyser
             await _characterActionSeeder.Seed(twoWorldScans);
             await _characterSeeder.Seed();
             await _characterCorrelationSeeder.Seed();
-            await _characterCorrelationDeleter.Delete();
 
             await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0]);
+            
+            await _characterCorrelationDeleter.Delete();
         }
         catch (Exception e)
         {

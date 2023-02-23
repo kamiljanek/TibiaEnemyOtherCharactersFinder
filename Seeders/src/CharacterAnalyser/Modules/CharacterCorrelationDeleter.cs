@@ -16,6 +16,7 @@ public class CharacterCorrelationDeleter
     public async Task Delete()
     {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
-             await connection.ExecuteAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInOneScan);
+             await connection.ExecuteAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInFirstScan);
+             await connection.ExecuteAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan);
     }
 }
