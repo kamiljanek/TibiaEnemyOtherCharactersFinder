@@ -35,19 +35,22 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
             w.HasMany(wo => wo.CharacterLogoutOrLogins)
                 .WithOne(wo => wo.World)
                 .HasForeignKey(wo => wo.WorldId).OnDelete(DeleteBehavior.NoAction);
+
         });
 
-        modelBuilder.Entity<WorldScan>(ws =>
+        modelBuilder.Entity<WorldScan>(w =>
         {
-            ws.Property(ws => ws.WorldScanId).IsRequired();
-            ws.Property(ws => ws.CharactersOnline).IsRequired();
-            ws.Property(ws => ws.WorldId).IsRequired();
-            ws.Property(ws => ws.ScanCreateDateTime).IsRequired();
-            ws.Property(ws => ws.IsDeleted).IsRequired().HasDefaultValue(false);
+            w.Property(ws => ws.WorldScanId).IsRequired();
+            w.Property(ws => ws.CharactersOnline).IsRequired();
+            w.Property(ws => ws.WorldId).IsRequired();
+            w.Property(ws => ws.ScanCreateDateTime).IsRequired();
+            w.Property(ws => ws.IsDeleted).IsRequired().HasDefaultValue(false);
         });
 
         modelBuilder.Entity<Character>(c =>
         {
+            c.HasIndex(ch => ch.Name);
+            c.HasIndex(ch => ch.CharacterId);
             c.Property(ch => ch.CharacterId).IsRequired();
             c.Property(ch => ch.Name).IsRequired();
             c.HasMany(ch => ch.LogoutWorldCorrelations)
@@ -60,22 +63,26 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
 
         modelBuilder.Entity<CharacterAction>(c =>
         {
-            c.Property(ch => ch.CharacterActionId).IsRequired();
-            c.Property(ch => ch.CharacterName).IsRequired();
-            c.Property(ch => ch.WorldScanId).IsRequired();
-            c.Property(ch => ch.IsOnline).IsRequired();
-            c.Property(ch => ch.WorldId).IsRequired();
-            c.Property(ch => ch.LogoutOrLoginDate).IsRequired();
+            c.HasIndex(ca => ca.CharacterName);
+            c.Property(ca => ca.CharacterActionId).IsRequired();
+            c.Property(ca => ca.CharacterName).IsRequired();
+            c.Property(ca => ca.WorldScanId).IsRequired();
+            c.Property(ca => ca.IsOnline).IsRequired();
+            c.Property(ca => ca.WorldId).IsRequired();
+            c.Property(ca => ca.LogoutOrLoginDate).IsRequired();
         });
 
         modelBuilder.Entity<CharacterCorrelation>(o =>
         {
-            o.HasKey(wc => wc.CorrelationId);
-            o.Property(wc => wc.LogoutCharacterId).IsRequired();
-            o.Property(wc => wc.LoginCharacterId).IsRequired();
-            o.Property(wc => wc.NumberOfMatches).IsRequired();
-            o.Property(wc => wc.CreateDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
-            o.Property(wc => wc.LastMatchDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
+            o.HasIndex(cc => cc.LogoutCharacterId);
+            o.HasIndex(cc => cc.LoginCharacterId);
+            o.HasKey(cc => cc.CorrelationId);
+            o.Property(cc => cc.CorrelationId).IsRequired();
+            o.Property(cc => cc.LogoutCharacterId).IsRequired();
+            o.Property(cc => cc.LoginCharacterId).IsRequired();
+            o.Property(cc => cc.NumberOfMatches).IsRequired();
+            o.Property(cc => cc.CreateDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
+            o.Property(cc => cc.LastMatchDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
         });
     }
 
