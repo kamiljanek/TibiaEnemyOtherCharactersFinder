@@ -16,19 +16,8 @@ public class CharacterCorrelationSeeder : ISeeder
 
     public async Task Seed()
     {
-        await UpdateCharacterCorrelationIfExist();
-        await CreateCharacterCorrelationIfNotExist();
-    }
-
-    private async Task UpdateCharacterCorrelationIfExist()
-    {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
             await connection.ExecuteAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
-    }
-
-    private async Task CreateCharacterCorrelationIfNotExist()
-    {
-        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
             await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
     }
 }
