@@ -1,22 +1,22 @@
 ﻿using Dapper;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
 public class CharacterCorrelationDeleter
 {
-    private readonly IDapperConnectionProvider _connectionProvider;
+    private readonly IRepository _repository;
 
-    public CharacterCorrelationDeleter(IDapperConnectionProvider connectionProvider)
+    public CharacterCorrelationDeleter(IRepository repository)
     {
-        _connectionProvider = connectionProvider;
+        _repository = repository;
     }
 
     public async Task Delete()
     {
-        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
-             await connection.ExecuteAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInFirstScan);
-             await connection.ExecuteAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan);
+        await _repository.RemoveCharacterCorrelations(isOnline: true);
+        await _repository.RemoveCharacterCorrelations(isOnline: false);
     }
 }
