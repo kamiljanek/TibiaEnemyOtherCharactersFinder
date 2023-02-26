@@ -11,6 +11,6 @@ public class Program
         Host.CreateDefaultBuilder(args)
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-    // UNDONE:  dodac serilog
+    // UNDONE:  dodac serilog z możliwością logowania generowanych zapytań SQL
     //.UseSerilog();
 }

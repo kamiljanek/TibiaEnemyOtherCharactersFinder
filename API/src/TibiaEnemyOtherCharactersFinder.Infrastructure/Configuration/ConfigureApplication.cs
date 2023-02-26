@@ -7,7 +7,6 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 public static class ConfigureApplication
 {
-    // UNDONE: zmienić nazwę klasy
     private static bool _wasAddDapperMethodCalled;
 
     public static IServiceProvider BuildContainer(this IServiceCollection services)
@@ -43,8 +42,6 @@ public static class ConfigureApplication
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        // UNDONE: mozliwe ze AddOptions można wywalić
-        //services.AddOptions();
         services.AddHttpClient();
 
         return services;

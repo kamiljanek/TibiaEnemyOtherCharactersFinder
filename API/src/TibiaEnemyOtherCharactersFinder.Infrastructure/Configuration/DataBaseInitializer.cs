@@ -7,12 +7,10 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 public class DataBaseInitializer : IInitializer
 {
     private readonly ILogger<DataBaseInitializer> _logger;
-    private readonly TibiaCharacterFinderDbContext _dbContext;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
 
-    public DataBaseInitializer(ILogger<DataBaseInitializer> logger, TibiaCharacterFinderDbContext dbContext)
+    public DataBaseInitializer(ILogger<DataBaseInitializer> logger, ITibiaCharacterFinderDbContext dbContext)
     {
-        // UNDONE: możliwe ze TibiaCharacterFinderDbContext można będzie zamienic na ITibiaCharacterFinderDbContext
-
         _logger = logger;
         _dbContext = dbContext;
     }

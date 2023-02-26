@@ -85,20 +85,4 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
             o.Property(cc => cc.LastMatchDate).IsRequired().HasDefaultValue(new DateOnly(2022, 12, 06));
         });
     }
-
-    // UNDONE: mozliwe ze do usuniecia
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // if (!optionsBuilder.IsConfigured)
-        // {
-        //     IConfigurationRoot configuration = new ConfigurationBuilder()
-        //         //.SetBasePath(Directory.GetCurrentDirectory())
-        //         .AddJsonFile(ApplicationSettingsSections.FileName)
-        //         .Build();
-        //
-        //     var connectionString = configuration.GetConnectionString(ApplicationSettingsSections.ConnectionStringsSection);
-        // optionsBuilder.UseNpgsql(connectionString)
-        //     .UseSnakeCaseNamingConvention();
-        // }
-    }
 }

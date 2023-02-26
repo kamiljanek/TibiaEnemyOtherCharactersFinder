@@ -12,15 +12,16 @@ public interface IRepository
 
     Task<List<short>> GetDistinctWorldIdsFromWorldScansAsync();
 
-    Task<List<short>> GetAvailableWorldIdsFromWorldScansAsync();
+    Task<int> NumberOfAvailableWorldScansAsync();
 
-    Task SoftDeleteWorldScanAsync(WorldScan worldScan);
-
-    Task AddCharactersActionsAsync(List<CharacterAction> characterActions);
+    Task SoftDeleteWorldScanAsync(int worldScan);
 
     Task AddAsync<T>(T entity) where T : class, IEntity;
 
     Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity;
 
     Task UpdateWorldAsync(World entity);
+
+    Task RemoveCharacterCorrelations(bool isOnline);
+
 }

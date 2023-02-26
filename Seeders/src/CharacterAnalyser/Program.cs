@@ -1,4 +1,5 @@
-﻿using CharacterAnalyser.Configuration;
+﻿using System.Diagnostics;
+using CharacterAnalyser.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
@@ -19,7 +20,8 @@ public class Program
         var serviceProvider = services.BuildContainer();
 
         var seeder = serviceProvider.GetService<IAnalyser>();
-
+        
+        Stopwatch sw = Stopwatch.StartNew();
         while (await seeder.HasDataToAnalyse())
         {
             foreach (var worldId in seeder.UniqueWorldIds)
@@ -28,5 +30,7 @@ public class Program
                 await seeder.Seed(worldScans);
             }
         }
+        sw.Stop();
+        Console.WriteLine(sw.ElapsedMilliseconds/1000);
     }
 }

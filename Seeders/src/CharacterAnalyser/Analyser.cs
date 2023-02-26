@@ -36,10 +36,10 @@ public class Analyser : ActionRule, IAnalyser
 
     public async Task<bool> HasDataToAnalyse()
     {
-        var availableWorldIds = await _repository.GetAvailableWorldIdsFromWorldScansAsync();
+        var availableWorldIds = await _repository.NumberOfAvailableWorldScansAsync();
         _uniqueWorldIds = await _repository.GetDistinctWorldIdsFromWorldScansAsync();
 
-        return availableWorldIds.Count > _uniqueWorldIds.Count;
+        return availableWorldIds > _uniqueWorldIds.Count;
     }
 
     public async Task<List<WorldScan>> GetWorldScansToAnalyseAsync(short worldId)
@@ -56,7 +56,7 @@ public class Analyser : ActionRule, IAnalyser
             IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionSeeder.GetLogoutNames(twoWorldScans))) ||
             IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionSeeder.GetLoginNames(twoWorldScans))))
         {
-            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0]);
+            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
             return;
         }
 
@@ -74,7 +74,7 @@ public class Analyser : ActionRule, IAnalyser
             await _characterSeeder.Seed();
             await _characterCorrelationSeeder.Seed();
 
-            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0]);
+            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
             
             await _characterCorrelationDeleter.Delete();
         }
