@@ -17,15 +17,11 @@ public class CharacterActionSeeder : ISeeder<List<WorldScan>>
 
     public async Task Seed(List<WorldScan> twoWorldScans)
     {
-        var characterActions = new List<CharacterAction>();
-
         var logoutCharacters = CreateCharactersActionsAsync(_logoutNames, twoWorldScans[0], isOnline: false);
         var loginCharacters = CreateCharactersActionsAsync(_loginNames, twoWorldScans[1], isOnline: true);
 
-        characterActions.AddRange(logoutCharacters);
-        characterActions.AddRange(loginCharacters);
-
-        await _repository.AddRangeAsync(characterActions);
+        await _repository.AddRangeAsync(logoutCharacters);
+        await _repository.AddRangeAsync(loginCharacters);
     }
 
     public List<string> GetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();

@@ -11,9 +11,11 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContextPool<TibiaCharacterFinderDbContext>(opt => opt
-               .UseNpgsql(configuration.GetConnectionString(nameof(ConnectionStringsSection.PostgreSql)))
-               //.UseNpgsql(configuration.GetConnectionString("PostgreSql"))
-               // UNDONE: mozliwe ze linijka powyzej jest do wywalenia
+               .UseNpgsql(
+                   configuration.GetConnectionString(nameof(ConnectionStringsSection.PostgreSql)), 
+                   o => o.MinBatchSize(1)
+                       .MaxBatchSize(30)
+                       .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                .UseSnakeCaseNamingConvention());
 
             return services;

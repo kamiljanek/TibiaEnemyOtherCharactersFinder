@@ -13,7 +13,7 @@ public class CharacterCorrelationSeeder : ISeeder
     {
         _connectionProvider = connectionProvider;
     }
-
+    
     public async Task Seed()
     {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
