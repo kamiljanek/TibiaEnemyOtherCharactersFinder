@@ -57,13 +57,14 @@ public class Analyser : ActionRule, IAnalyser
             IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionSeeder.GetLoginNames(twoWorldScans))))
         {
             await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
+            Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - not analysed");
             return;
         }
 
         await _characterAnalyserCleaner.ClearCharacterActionsAsync();
         await AnalizeCharactersAndSeed(twoWorldScans);
 
-        Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId})");
+        Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()}");
     }
 
     private async Task AnalizeCharactersAndSeed(List<WorldScan> twoWorldScans)

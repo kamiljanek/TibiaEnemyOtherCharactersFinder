@@ -1,21 +1,19 @@
-﻿using Dapper;
-using Shared.Database.Queries.Sql;
-using TibiaEnemyOtherCharactersFinder.Application.Dapper;
+﻿using Shared.Database.Queries.Sql;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
 public class CharacterAnalyserCleaner
 {
-    private readonly IDapperConnectionProvider _connectionProvider;
+    private readonly IRepository _repository;
 
-    public CharacterAnalyserCleaner(IDapperConnectionProvider connectionProvider)
+    public CharacterAnalyserCleaner(IRepository repository)
     {
-        _connectionProvider = connectionProvider;
+        _repository = repository;
     }
 
     public async Task ClearCharacterActionsAsync()
     {
-        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
-        await connection.ExecuteAsync(GenerateQueries.NpgsqlClearCharacterActions);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlClearCharacterActions);
     }
 }
