@@ -1,22 +1,20 @@
-﻿using Dapper;
-using Shared.Database.Queries.Sql;
-using TibiaEnemyOtherCharactersFinder.Application.Dapper;
+﻿using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
 public class CharacterSeeder : ISeeder
 {
-    private readonly IDapperConnectionProvider _connectionProvider;
+    private readonly IRepository _repository;
 
-    public CharacterSeeder(IDapperConnectionProvider connectionProvider)
+    public CharacterSeeder(IRepository repository)
     {
-        _connectionProvider = connectionProvider;
+        _repository = repository;
     }
 
     public async Task Seed()
     {
-        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
-            await connection.ExecuteAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+        // await _repository.CreateCharacterIfNotExist();
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
     }
 }

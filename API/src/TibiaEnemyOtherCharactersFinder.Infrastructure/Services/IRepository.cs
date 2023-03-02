@@ -24,4 +24,9 @@ public interface IRepository
 
     Task RemoveCharacterCorrelations(bool isOnline);
 
+    Task UpdateCharacterCorrelations();
+
+    Task ExecuteRawSqlAsync(string rawSql);
+
+    Task CreateCharacterIfNotExist();
 }
