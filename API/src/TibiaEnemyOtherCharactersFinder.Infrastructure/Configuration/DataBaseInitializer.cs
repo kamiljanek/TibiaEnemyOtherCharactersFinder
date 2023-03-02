@@ -20,7 +20,6 @@ public class DataBaseInitializer : IInitializer
     public async Task Initialize()
     {
         _logger.LogInformation("Database tibia initializer - started");
-        _dbContext.Database.SetCommandTimeout(120);
         await _dbContext.Database.MigrateAsync();
         _logger.LogInformation("Database tibia initializer - finished");
     }
