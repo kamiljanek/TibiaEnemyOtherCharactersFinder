@@ -21,15 +21,23 @@ public class Program
 
         var seeder = serviceProvider.GetService<IAnalyser>();
         
-        Stopwatch sw = Stopwatch.StartNew();
+        var sw = Stopwatch.StartNew();
         while (await seeder.HasDataToAnalyse())
         {
             foreach (var worldId in seeder.UniqueWorldIds)
             {
-                var worldScans = await seeder.GetWorldScansToAnalyseAsync(worldId);
-                await seeder.Seed(worldScans);
+                try
+                {
+                    var worldScans = await seeder.GetWorldScansToAnalyseAsync(worldId);
+                    await seeder.Seed(worldScans);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }
+
         sw.Stop();
         Console.WriteLine(sw.ElapsedMilliseconds/1000);
     }

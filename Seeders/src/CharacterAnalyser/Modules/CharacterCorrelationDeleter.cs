@@ -1,7 +1,4 @@
-﻿using Dapper;
-using Shared.Database.Queries.Sql;
-using TibiaEnemyOtherCharactersFinder.Application.Dapper;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
@@ -16,7 +13,7 @@ public class CharacterCorrelationDeleter
 
     public async Task Delete()
     {
-        await _repository.RemoveCharacterCorrelations(isOnline: true);
-        await _repository.RemoveCharacterCorrelations(isOnline: false);
+        await _repository.RemoveCharacterCorrelations(true);
+        await _repository.RemoveCharacterCorrelations(false);
     }
 }
