@@ -1,4 +1,5 @@
-﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+﻿using Shared.Database.Queries.Sql;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
@@ -13,7 +14,7 @@ public class CharacterCorrelationDeleter
 
     public async Task Delete()
     {
-        await _repository.RemoveCharacterCorrelations(true);
-        await _repository.RemoveCharacterCorrelations(false);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInFirstScan);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan);
     }
 }
