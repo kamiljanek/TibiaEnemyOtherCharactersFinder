@@ -22,11 +22,9 @@ public interface IRepository
 
     Task UpdateWorldAsync(World entity);
 
-    Task RemoveCharacterCorrelations(bool isOnline);
-
     Task UpdateCharacterCorrelations();
 
     Task ExecuteRawSqlAsync(string rawSql);
 
-    Task CreateCharacterIfNotExist();
+    Task CreateCharacterCorrelationsIfNotExist();
 }
