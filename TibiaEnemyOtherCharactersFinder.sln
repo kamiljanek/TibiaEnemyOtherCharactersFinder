@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TibiaEnemyOtherCharacterFin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seeders.IntegrationTests", "Seeders\tests\Seeders.IntegrationTests\Seeders.IntegrationTests.csproj", "{510E58C6-56AC-4911-97BF-58CA6C2970A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seeders.Benchmark", "Seeders\tests\Seeders.Benchmark\Seeders.Benchmark.csproj", "{D1692424-904A-4F63-8B5D-509C2FA5EF58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{510E58C6-56AC-4911-97BF-58CA6C2970A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{510E58C6-56AC-4911-97BF-58CA6C2970A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{510E58C6-56AC-4911-97BF-58CA6C2970A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1692424-904A-4F63-8B5D-509C2FA5EF58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1692424-904A-4F63-8B5D-509C2FA5EF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1692424-904A-4F63-8B5D-509C2FA5EF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1692424-904A-4F63-8B5D-509C2FA5EF58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{666A568D-C181-4162-9BD8-4A0C5DD573D3} = {537524FD-C088-4356-B023-39304CCB1F27}
 		{A2F7AEEB-11F1-405F-B3C2-A8DA63BF9594} = {537524FD-C088-4356-B023-39304CCB1F27}
 		{510E58C6-56AC-4911-97BF-58CA6C2970A9} = {A39C1CF4-08DC-4073-A598-05311C9AF34C}
+		{D1692424-904A-4F63-8B5D-509C2FA5EF58} = {A39C1CF4-08DC-4073-A598-05311C9AF34C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FC00B179-AF59-4167-8549-F28CE809505E}

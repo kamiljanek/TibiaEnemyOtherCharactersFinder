@@ -16,6 +16,10 @@ public class CharacterCorrelationSeeder : ISeeder
     {
         await _repository.UpdateCharacterCorrelations();
         // await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
+        Console.WriteLine($" - {DateTime.Now.ToLongTimeString()} - updated CharactersCorrelations");
+
+        await _repository.CreateCharacterCorrelationsIfNotExist();
+        // await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
+        Console.WriteLine($" - {DateTime.Now.ToLongTimeString()} - created new CharactersCorrelations");
     }
 }
