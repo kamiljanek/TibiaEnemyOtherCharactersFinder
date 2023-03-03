@@ -29,7 +29,7 @@ public class Repository : IRepository
             .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
             .OrderBy(scan => scan.ScanCreateDateTime)
             .Take(2)
-            .AsTracking()
+            .AsNoTracking()
             .ToList());
     }
 
@@ -77,39 +77,6 @@ public class Repository : IRepository
         
         // UNDONE: do zmiany
     }
-
-    public async Task RemoveCharacterCorrelations(bool isOnline)
-    {
-        var charactersIds = CharactersIds(isOnline);
-        
-        await _dbContext.CharacterCorrelations
-            .Where(c => charactersIds.Contains(c.LoginCharacterId) && charactersIds.Contains(c.LogoutCharacterId))
-            .DeleteAsync(x => x.BatchSize = 30);
-            // .ExecuteDeleteAsync();
-    }
-    
-    public async Task ExecuteRawSqlAsync(string rawSql)
-    {   
-        await _dbContext.Database.ExecuteSqlRawAsync(rawSql);
-    }
-    
-    private IQueryable<int> CharactersIds(bool isOnline)
-    {
-        return _dbContext.Characters
-            .Where(c =>
-                _dbContext.CharacterActions
-                    .Where(ca => ca.IsOnline == isOnline)
-                    .Select(ca => ca.CharacterName)
-                    .Distinct().Contains(c.Name))
-            .Select(ca => ca.CharacterId);
-    }
-    
-    private IQueryable<string> CharactersNames()
-    {
-        return _dbContext.CharacterActions
-                    .Select(ca => ca.CharacterName)
-                    .Distinct();
-    }
     
     public async Task UpdateCharacterCorrelations()
     {
@@ -132,67 +99,65 @@ public class Repository : IRepository
                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
                .SetProperty(c => c.LastMatchDate, lastMatchDate));
     }
-    
-    public async Task CreateCharacterIfNotExist()
-    {
-        var worldId = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).WorldId;
-
-        await _dbContext.Characters
-            .BulkInsertAsync(CharactersNames().Select(name => new Character{Name = name, WorldId = worldId}), 
-                options =>
-                {
-                    options.InsertIfNotExists = true;
-                    options.ColumnPrimaryKeyExpression = c => c.Name;
-                });
+  
+    public async Task ExecuteRawSqlAsync(string rawSql)
+    {   
+        await _dbContext.Database.ExecuteSqlRawAsync(rawSql);
     }
     
-    
-    
-    public async Task MergeCharacterCorrelations()
+    public async Task CreateCharacterCorrelationsIfNotExist()
     {
         var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
         var loginCharactersIds = CharactersIds(true);
         var logoutCharactersIds = CharactersIds(false);
+        
+        var correlationsDataToCreate = loginCharactersIds
+            .SelectMany(login => logoutCharactersIds,
+                (login, logout) => new { LoginCharacterId = login, LogoutCharacterId = logout });
+        
+        var existingCharacterCorrelationsPart1 =
+            _dbContext.Characters
+                .Where(c => loginCharactersIds.Contains(c.CharacterId))
+                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+        
+        var existingCharacterCorrelationsPart2 =
+            _dbContext.Characters
+                .Where(c => logoutCharactersIds.Contains(c.CharacterId))
+                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+  
+        var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
+     
+        var newCorrelations = correlationsDataToInsert
+            .Select(cc => new CharacterCorrelation
+            {
+                LoginCharacterId = cc.LoginCharacterId,
+                LogoutCharacterId = cc.LogoutCharacterId,
+                NumberOfMatches = 1,
+                CreateDate = lastMatchDate,
+                LastMatchDate = lastMatchDate
+            }).ToList();
 
-        var characterCorrelationsIdsPart1 =  _dbContext.CharacterCorrelations
-            .Where(c => loginCharactersIds.Contains(c.LoginCharacterId) && logoutCharactersIds.Contains(c.LogoutCharacterId))
-            .Select(cc => cc.CorrelationId);
-        
-        var characterCorrelationsIdsPart2 =  _dbContext.CharacterCorrelations
-            .Where(c => logoutCharactersIds.Contains(c.LoginCharacterId) && loginCharactersIds.Contains(c.LogoutCharacterId))
-            .Select(cc => cc.CorrelationId);
-        
+        _dbContext.CharacterCorrelations.AddRange(newCorrelations);
+        await _dbContext.BulkSaveChangesAsync(x => x.BatchSize = 30);
     }
     
-    public async Task CreateCharacterCorrelations()
+    public async Task RemoveCharacterCorrelations(bool isOnline)
     {
-        var createMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
-        var loginCharactersIds = _dbContext.Characters
+        var charactersIds = CharactersIds(isOnline).ToArray();
+        
+        await _dbContext.CharacterCorrelations
+            .Where(c => charactersIds.Contains(c.LoginCharacterId) && charactersIds.Contains(c.LogoutCharacterId))
+            .ExecuteDeleteAsync();
+    }
+    
+    private IQueryable<int> CharactersIds(bool isOnline)
+    {
+        return _dbContext.Characters
             .Where(c =>
                 _dbContext.CharacterActions
-                    .Where(ca => ca.IsOnline)
+                    .Where(ca => ca.IsOnline == isOnline)
                     .Select(ca => ca.CharacterName)
                     .Distinct().Contains(c.Name))
             .Select(ca => ca.CharacterId);
-        
-        var logoutCharactersIds = _dbContext.Characters
-            .Where(c =>
-                _dbContext.CharacterActions
-                    .Where(ca => !ca.IsOnline)
-                    .Select(ca => ca.CharacterName)
-                    .Distinct().Contains(c.Name))
-            .Select(ca => ca.CharacterId);
-        
-        
-        var cartesianProduct = loginCharactersIds
-            .SelectMany(login => logoutCharactersIds, (login, logout) => new { LoginCharacterId = login, LogoutCharacterId = logout });
-    
-    
-       var characterCorrelations =  _dbContext.CharacterCorrelations
-            .Where(c => (loginCharactersIds.Contains(c.LoginCharacterId) && logoutCharactersIds.Contains(c.LogoutCharacterId)) || 
-                        (logoutCharactersIds.Contains(c.LoginCharacterId) && loginCharactersIds.Contains(c.LogoutCharacterId)))
-            .Select(cc => cc.CorrelationId);
-       // UNDONE: 
-    
     }
 }
