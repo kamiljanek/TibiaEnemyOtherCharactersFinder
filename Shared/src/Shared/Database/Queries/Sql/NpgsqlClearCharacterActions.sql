@@ -1,1 +1,1 @@
-TRUNCATE TABLE character_actions;
+DELETE FROM character_actions;
