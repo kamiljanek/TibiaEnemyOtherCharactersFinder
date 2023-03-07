@@ -30,7 +30,7 @@ public class ClearSoftDeletedWorldScansOnCleanerTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
         
         // Act
-        await cleaner.ClearSoftDeletedWorldScans();
+        await cleaner.ClearTables();
         var worldScans = dbContext.WorldScans.AsNoTracking().ToList();
 
         // Assert

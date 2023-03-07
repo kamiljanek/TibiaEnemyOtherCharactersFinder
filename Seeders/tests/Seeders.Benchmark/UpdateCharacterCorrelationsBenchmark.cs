@@ -17,7 +17,7 @@ public class UpdateCharacterCorrelationsBenchmark
     private readonly TibiaCharacterFinderDbContext _dbContext = new (new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
             .UseNpgsql(ConnectionString).UseSnakeCaseNamingConvention().Options);
     
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public async Task UpdateCharacterCorrelationsEfCore()
     {
         var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
@@ -40,10 +40,30 @@ public class UpdateCharacterCorrelationsBenchmark
                 .SetProperty(c => c.LastMatchDate, lastMatchDate));
     }
     
-    [Benchmark(Baseline = true)]
-    public async Task UpdateCharacterCorrelationsSql()
+    [Benchmark]
+    public async Task UpdateCharacterCorrelationsEfCoreNew()
     {
-        await _dbContext.Database.ExecuteSqlRawAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var loginCharactersIds = CharactersIds(true);
+        var logoutCharactersIds = CharactersIds(false);
+        
+        var existingCharacterCorrelationsIdsPart1 =
+            _dbContext.Characters
+                .Where(c => loginCharactersIds.Contains(c.CharacterId))
+                .SelectMany(wc => wc.LoginWorldCorrelations
+                    .Where(a => logoutCharactersIds.Contains(a.LogoutCharacterId))).Select(cc => cc.CorrelationId);
+        
+        var existingCharacterCorrelationsIdsPart2 =
+            _dbContext.Characters
+                .Where(c => logoutCharactersIds.Contains(c.CharacterId))
+                .SelectMany(wc => wc.LoginWorldCorrelations
+                    .Where(a => loginCharactersIds.Contains(a.LogoutCharacterId))).Select(cc => cc.CorrelationId);
+        
+        await _dbContext.CharacterCorrelations
+            .Where(cc => existingCharacterCorrelationsIdsPart1.Concat(existingCharacterCorrelationsIdsPart2).Contains(cc.CorrelationId))
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
+                .SetProperty(c => c.LastMatchDate, lastMatchDate));
     }
     
     private IQueryable<int> CharactersIds(bool isOnline)

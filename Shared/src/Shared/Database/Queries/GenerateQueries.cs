@@ -94,7 +94,7 @@ SELECT TOP 10 CorrelationId
   ORDER BY NumberOfMatches DESC
 ";
 
-        public const string NpgsqlClearCharacterActions = @"TRUNCATE TABLE character_actions;";
+        public const string NpgsqlClearCharacterActions = @"DELETE FROM character_actions;";
 
         public const string NpgsqlClearDeletedWorldScans = @"DELETE FROM world_scans
 	WHERE is_deleted;";

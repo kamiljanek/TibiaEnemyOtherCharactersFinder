@@ -18,6 +18,7 @@ public class Program
 
         var seeder = serviceProvider.GetService<ICleaner>();
 
-        await seeder.ClearSoftDeletedWorldScans();
+        await seeder.ClearTables();
+        await seeder.VacuumTables();
     }
 }

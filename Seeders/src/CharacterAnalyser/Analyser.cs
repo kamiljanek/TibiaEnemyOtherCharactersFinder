@@ -62,10 +62,11 @@ public class Analyser : ActionRule, IAnalyser
         }
 
         Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - start");
+
         await _characterAnalyserCleaner.ClearCharacterActionsAsync();
         Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - cleared CharacterActions");
-        await AnalizeCharactersAndSeed(twoWorldScans);
 
+        await AnalizeCharactersAndSeed(twoWorldScans);
         Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()}");
     }
 
