@@ -5,4 +5,4 @@ using Seeders.Benchmark;
 
 Console.WriteLine("Hello, World!");
 
-BenchmarkRunner.Run<CreateCharacterCorrelationsIfNotExistBenchmark>();
+BenchmarkRunner.Run<CharacterActionSeederBenchmark>();

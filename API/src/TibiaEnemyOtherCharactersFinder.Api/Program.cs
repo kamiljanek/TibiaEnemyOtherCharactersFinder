@@ -1,16 +1,21 @@
 using Autofac.Extensions.DependencyInjection;
+using Serilog;
 
 namespace TibiaEnemyOtherCharactersFinder.Api;
 
 public class Program
 {
     public static Task Main(string[] args)
-     => CreateHostBuilder(args).Build().RunAsync();
+    {
+        return CreateHostBuilder(args).Build().RunAsync();
+    }
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+            .UseSerilog();
+    }
     // UNDONE:  dodac serilog z możliwością logowania generowanych zapytań SQL
-    //.UseSerilog();
 }

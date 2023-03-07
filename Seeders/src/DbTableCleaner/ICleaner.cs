@@ -2,5 +2,6 @@
 
 public interface ICleaner
 {
-    public Task ClearSoftDeletedWorldScans();
+    Task ClearTables();
+    Task VacuumTables();
 }

@@ -20,29 +20,30 @@ public class CharacterActionSeeder : ISeeder<List<WorldScan>>
         var logoutCharacters = CreateCharactersActionsAsync(_logoutNames, twoWorldScans[0], isOnline: false);
         var loginCharacters = CreateCharactersActionsAsync(_loginNames, twoWorldScans[1], isOnline: true);
 
-        await _repository.AddRangeAsync(logoutCharacters);
-        await _repository.AddRangeAsync(loginCharacters);
+        var characterActionsToAdd = logoutCharacters.Concat(loginCharacters);
+        await _repository.AddRangeAsync(characterActionsToAdd);
     }
 
     public List<string> GetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
 
     public List<string> GetLogoutNames(List<WorldScan> twoWorldScans) => _logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
 
-    private static List<CharacterAction> CreateCharactersActionsAsync(List<string> names, WorldScan worldScan, bool isOnline) =>
-        names.Select(name => new CharacterAction()
+    private static List<CharacterAction> CreateCharactersActionsAsync(IEnumerable<string> names, WorldScan worldScan, bool isOnline)
+    {
+        var logoutOrLoginDate = DateOnly.FromDateTime(worldScan.ScanCreateDateTime);
+        
+        return names.Select(name => new CharacterAction()
         {
             CharacterName = name,
             WorldScanId = worldScan.WorldScanId,
             WorldId = worldScan.WorldId,
             IsOnline = isOnline,
-            LogoutOrLoginDate = DateOnly.FromDateTime(worldScan.ScanCreateDateTime)
+            LogoutOrLoginDate = logoutOrLoginDate
         }).ToList();
+    }
 
     private static List<string> GetNames(WorldScan worldScan)
     {
-        var names = worldScan.CharactersOnline.Split("|").ToList();
-        names.RemoveAll(string.IsNullOrWhiteSpace);
-        // UNDONE: jak przemieli wszystkie WorldScany po tym deployu to można usunąć poniższą linijkę
-        return names.ConvertAll(d => d.ToLower());
+        return worldScan.CharactersOnline.Split("|", StringSplitOptions.RemoveEmptyEntries).ToList();
     }
 }

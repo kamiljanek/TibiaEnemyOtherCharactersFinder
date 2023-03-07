@@ -10,7 +10,7 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContextPool<TibiaCharacterFinderDbContext>(opt => opt
+            services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
                .UseNpgsql(
                    configuration.GetConnectionString(nameof(ConnectionStringsSection.PostgreSql)), 
                    o => o.MinBatchSize(1)
