@@ -49,19 +49,20 @@ public class AnalyserFullTests : IAsyncLifetime
         scans.Count(s => !s.IsDeleted).Should().Be(2);
         scans.Count(s => s.IsDeleted).Should().Be(10);
         
-        actions.Count.Should().Be(3); //count after analyse all scans
-        actions.Count(a => !a.IsOnline).Should().Be(1);
-        actions.Count(a => a.IsOnline).Should().Be(2);
+        actions.Count.Should().Be(4); //count after analyse all scans
+        actions.Count(a => !a.IsOnline).Should().Be(3);
+        actions.Count(a => a.IsOnline).Should().Be(1);
         actions.All(s => s.WorldId == 32).Should().Be(true);
 
         characters.Count.Should().Be(17);
         characters.Select(c => c.Name).Distinct().Count().Should().Be(characters.Count);
-        characters.Count(c => c.WorldId == 31).Should().Be(11);
-        characters.Count(c => c.WorldId == 32).Should().Be(6);
+        characters.Count(c => c.WorldId == 31).Should().Be(6);
+        characters.Count(c => c.WorldId == 32).Should().Be(11);
+        characters.Count(c => c.FoundInScan).Should().Be(4);
 
-        correlations.Count.Should().Be(28);// worldID(31) = 23-2(duplicate) | worldID(32) = 8-1(correlation exist in one scan)
+        correlations.Count.Should().Be(27);// worldID(32) = 23-2(duplicate)-1(ccc|ddd foundInScan) | worldID(31) = 8-1(correlation exist in one scan)
         correlations.Select(c => (c.LogoutCharacterId, c.LoginCharacterId)).Distinct().Count().Should().Be(correlations.Count);
-        correlations.Count(c => c.NumberOfMatches == 1).Should().Be(26);
+        correlations.Count(c => c.NumberOfMatches == 1).Should().Be(25);
         correlations.Count(c => c.NumberOfMatches == 2).Should().Be(2);
         
         //check distinct values but switches columns
@@ -102,22 +103,22 @@ public class AnalyserFullTests : IAsyncLifetime
     {
         return new List<WorldScan>
         {
-            new() { WorldScanId = 3182, IsDeleted = true, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|hhh|lll" },
-            new() { WorldScanId = 3217, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|ccc|fff|ggg|iii" },// cfi - djkl
-            new() { WorldScanId = 3302, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,28,36, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|ddd|ggg|jjj|kkk|lll" },// bgjk - ch
-            new() { WorldScanId = 3387, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,33,52, DateTimeKind.Utc), CharactersOnline = "aaa|ccc|ddd|hhh|lll" },// dhl - e
-            new() { WorldScanId = 3472, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,39,06, DateTimeKind.Utc), CharactersOnline = "aaa|ccc|eee" },
+            new() { WorldScanId = 3182, IsDeleted = true, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|hhh|lll" },
+            new() { WorldScanId = 3217, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|ccc|fff|ggg|iii" },// cfi - djkl
+            new() { WorldScanId = 3302, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,28,36, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|ddd|ggg|jjj|kkk|lll" },// bgjk - ch
+            new() { WorldScanId = 3387, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,33,52, DateTimeKind.Utc), CharactersOnline = "aaa|ccc|ddd|hhh|lll" },// dhl - e
+            new() { WorldScanId = 3472, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,39,06, DateTimeKind.Utc), CharactersOnline = "aaa|ccc|eee" },
             
-            new() { WorldScanId = 3727, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,55,02, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|ccc|ddd|fff|ggg" },
+            new() { WorldScanId = 3727, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,55,02, DateTimeKind.Utc), CharactersOnline = "aaa|bbb|ccc|ddd|fff|ggg" },
             
             
-            new() { WorldScanId = 3183, IsDeleted = true, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "111" },
-            new() { WorldScanId = 3218, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "111|333|555|666|999" },// 569 - 47
-            new() { WorldScanId = 3303, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,28,36, DateTimeKind.Utc), CharactersOnline = "111|333|444|777" },
-            new() { WorldScanId = 3388, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,33,52, DateTimeKind.Utc), CharactersOnline = "111|333" },// 3 - 45
-            new() { WorldScanId = 3473, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,20,39,06, DateTimeKind.Utc), CharactersOnline = "111|555|444|" },
+            new() { WorldScanId = 3183, IsDeleted = true, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "111" },
+            new() { WorldScanId = 3218, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "111|333|555|666|999" },// 569 - 47
+            new() { WorldScanId = 3303, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,28,36, DateTimeKind.Utc), CharactersOnline = "111|333|444|777" },
+            new() { WorldScanId = 3388, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,33,52, DateTimeKind.Utc), CharactersOnline = "111|333" },// 3 - 45
+            new() { WorldScanId = 3473, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,20,39,06, DateTimeKind.Utc), CharactersOnline = "111|555|444|" },
                                                   
-            new() { WorldScanId = 3813, IsDeleted = false, WorldId = 32, ScanCreateDateTime = new DateTime(2022,11,30,21,00,18, DateTimeKind.Utc), CharactersOnline = "111|222|444|555" }
+            new() { WorldScanId = 3813, IsDeleted = false, WorldId = 31, ScanCreateDateTime = new DateTime(2022,11,30,21,00,18, DateTimeKind.Utc), CharactersOnline = "111|222|444|555" }
         };
     }
 }

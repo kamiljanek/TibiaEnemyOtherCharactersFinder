@@ -14,7 +14,6 @@ public class CharacterCorrelationDeleter
 
     public async Task Delete()
     {
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInFirstScan);
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInScan);
     }
 }

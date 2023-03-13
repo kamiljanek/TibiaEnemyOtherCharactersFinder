@@ -1,16 +1,18 @@
-﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿using Shared.Database.Queries.Sql;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
-public class CharacterActionSeeder : ISeeder<List<WorldScan>>
+public class CharacterManager : ISeeder<List<WorldScan>>
 {
-    private List<string> _loginNames;
-    private List<string> _logoutNames;
+    private IReadOnlyList<string> _loginNames;
+    private IReadOnlyList<string> _logoutNames;
+    private IReadOnlyList<string> _firstScanNames;
 
     private readonly IRepository _repository;
 
-    public CharacterActionSeeder(IRepository repository)
+    public CharacterManager(IRepository repository)
     {
         _repository = repository;
     }
@@ -22,11 +24,19 @@ public class CharacterActionSeeder : ISeeder<List<WorldScan>>
 
         var characterActionsToAdd = logoutCharacters.Concat(loginCharacters);
         await _repository.AddRangeAsync(characterActionsToAdd);
+
+        await _repository.SetCharacterFoundInScan(_firstScanNames, foundInScan: true);
     }
 
-    public List<string> GetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToList();
+    public IReadOnlyList<string> GetAndSetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToArray();
 
-    public List<string> GetLogoutNames(List<WorldScan> twoWorldScans) => _logoutNames = GetNames(twoWorldScans[0]).Except(GetNames(twoWorldScans[1])).ToList();
+    public IReadOnlyList<string> GetAndSetLogoutNames(List<WorldScan> twoWorldScans)
+    {
+        _firstScanNames = GetNames(twoWorldScans[0]);
+        var secondScanNames = GetNames(twoWorldScans[1]);
+        return _logoutNames = _firstScanNames.Except(secondScanNames).ToArray();
+
+    }
 
     private static List<CharacterAction> CreateCharactersActionsAsync(IEnumerable<string> names, WorldScan worldScan, bool isOnline)
     {

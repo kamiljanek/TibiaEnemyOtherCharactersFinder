@@ -17,8 +17,13 @@ public class Character : IEntity
     /// </summary>
     public short WorldId { get; set; }
 
+    /// <summary>
+    /// Boolean wether found name in scan or not
+    /// </summary>
+    public bool FoundInScan { get; set; }
+
     // Associations
     public World World { get; set; }
-    public List<CharacterCorrelation> LogoutWorldCorrelations { get; set; }
-    public List<CharacterCorrelation> LoginWorldCorrelations { get; set; }
+    public List<CharacterCorrelation> LogoutCharacterCorrelations { get; set; }
+    public List<CharacterCorrelation> LoginCharacterCorrelations { get; set; }
 }

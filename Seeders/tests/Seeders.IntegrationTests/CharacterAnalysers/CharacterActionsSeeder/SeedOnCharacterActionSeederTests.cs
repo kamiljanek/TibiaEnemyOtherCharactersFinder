@@ -23,19 +23,23 @@ public class SeedOnCharacterActionSeederTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var seeder = scope.ServiceProvider.GetRequiredService<CharacterActionSeeder>();
+        var seeder = scope.ServiceProvider.GetRequiredService<CharacterManager>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
+
         var worldScans = await repository.GetFirstTwoWorldScansAsync(worldId: 11);
-        seeder.GetLoginNames(worldScans);
-        seeder.GetLogoutNames(worldScans);
+        seeder.GetAndSetLoginNames(worldScans);
+        seeder.GetAndSetLogoutNames(worldScans);
         
         // Act
         await seeder.Seed(worldScans);
-        var characterActions = dbContext.CharacterActions.ToList();
+        var characterActions = dbContext.CharacterActions;
+        var characters = dbContext.Characters;
 
         // Assert
-        characterActions.Count.Should().Be(10);
+        characterActions.Count().Should().Be(10);
+        characters.Count().Should().Be(4);
+        characters.Count(c => c.FoundInScan).Should().Be(3);
     }
     
     public Task InitializeAsync() => Task.CompletedTask;
