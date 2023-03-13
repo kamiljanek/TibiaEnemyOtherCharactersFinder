@@ -12,7 +12,7 @@ public class Program
         services
             .AddDbCleaner()
             .AddServices()
-            .AddDapper();
+            .AddTibiaDbContext();
 
         var serviceProvider = services.BuildContainer();
 

@@ -53,10 +53,11 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
             c.HasIndex(ch => ch.CharacterId);
             c.Property(ch => ch.CharacterId).IsRequired();
             c.Property(ch => ch.Name).IsRequired();
-            c.HasMany(ch => ch.LogoutWorldCorrelations)
+            c.Property(ch => ch.FoundInScan).IsRequired().HasDefaultValue(false);
+            c.HasMany(ch => ch.LogoutCharacterCorrelations)
                 .WithOne(ws => ws.LogoutCharacter)
                 .HasForeignKey(ch => ch.LogoutCharacterId).OnDelete(DeleteBehavior.NoAction);
-            c.HasMany(ch => ch.LoginWorldCorrelations)
+            c.HasMany(ch => ch.LoginCharacterCorrelations)
                 .WithOne(ws => ws.LoginCharacter)
                 .HasForeignKey(ch => ch.LoginCharacterId).OnDelete(DeleteBehavior.NoAction);
         });

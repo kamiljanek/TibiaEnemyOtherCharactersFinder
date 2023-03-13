@@ -36,7 +36,7 @@ public class DeleteOnCharacterCorrelationDeleterTests : IAsyncLifetime
         
         // Assert
         characterCorrelationsBeforeDelete.Count.Should().Be(22);
-        characterCorrelationsAfterDelete.Count.Should().Be(16);
+        characterCorrelationsAfterDelete.Count.Should().Be(17);
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -71,14 +71,14 @@ public class DeleteOnCharacterCorrelationDeleterTests : IAsyncLifetime
     {
         return new List<Character>
         {
-            new() {CharacterId = 120, WorldId = 11, Name = "aphov"},
-            new() {CharacterId = 121, WorldId = 11, Name = "asiier"},
+            new() {CharacterId = 120, WorldId = 11, Name = "aphov", FoundInScan = true},
+            new() {CharacterId = 121, WorldId = 11, Name = "asiier", FoundInScan = true},
             new() {CharacterId = 122, WorldId = 11, Name = "belzebubba"},
             new() {CharacterId = 123, WorldId = 11, Name = "braws"},
             new() {CharacterId = 124, WorldId = 11, Name = "armystrong"},
-            new() {CharacterId = 125, WorldId = 11, Name = "brytiaggo"},
+            new() {CharacterId = 125, WorldId = 11, Name = "brytiaggo", FoundInScan = true},
             new() {CharacterId = 126, WorldId = 11, Name = "ergren"},
-            new() {CharacterId = 127, WorldId = 11, Name = "corvinusik"},
+            new() {CharacterId = 127, WorldId = 11, Name = "corvinusik", FoundInScan = true},
         };
     }
     

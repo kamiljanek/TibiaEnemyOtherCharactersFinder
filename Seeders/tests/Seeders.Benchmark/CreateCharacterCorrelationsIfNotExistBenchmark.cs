@@ -31,12 +31,12 @@ public class CreateCharacterCorrelationsIfNotExistBenchmark
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
   
         var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
      
@@ -68,12 +68,12 @@ public class CreateCharacterCorrelationsIfNotExistBenchmark
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
   
         var newCorrelations = correlationsDataToCreate
             .Where(cc => !existingCharacterCorrelationsPart1.Concat(existingCharacterCorrelationsPart2)

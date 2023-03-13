@@ -2,9 +2,9 @@
 
 public class CharacterNameListCannotBeEmptyRule : IRule
 {
-    private readonly List<string> _names;
+    private readonly IReadOnlyList<string> _names;
 
-    public CharacterNameListCannotBeEmptyRule(List<string> names)
+    public CharacterNameListCannotBeEmptyRule(IReadOnlyList<string> names)
 	{
         _names = names;
     }

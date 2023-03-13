@@ -22,7 +22,7 @@ public class ClearCharacterActionsInCharacterAnalyserCleanerTests : IAsyncLifeti
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var cleaner = scope.ServiceProvider.GetRequiredService<CharacterAnalyserCleaner>();
+        var cleaner = scope.ServiceProvider.GetRequiredService<CharacterActionsCleaner>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         
         var characterActions =  new List<CharacterAction>
@@ -35,7 +35,7 @@ public class ClearCharacterActionsInCharacterAnalyserCleanerTests : IAsyncLifeti
         dbContext.CharacterActions.AddRange(characterActions);
         
         // Act
-        await cleaner.ClearCharacterActionsAsync();
+        await cleaner.ClearAsync();
         var result = dbContext.CharacterActions.ToList();
 
         // Assert
