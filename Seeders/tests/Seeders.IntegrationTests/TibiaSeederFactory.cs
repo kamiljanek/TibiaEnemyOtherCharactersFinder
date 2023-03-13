@@ -80,8 +80,8 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
                 services.Remove(descriptor);
             
             services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.ConnectionString }));
-            services.AddSingleton<CharacterActionSeeder>();
-            services.AddSingleton<CharacterAnalyserCleaner>();
+            services.AddSingleton<CharacterManager>();
+            services.AddSingleton<CharacterActionsCleaner>();
             services.AddSingleton<Analyser>();
             services.AddSingleton<CharacterSeeder>();
             services.AddSingleton<CharacterCorrelationSeeder>();

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
-using Z.EntityFramework.Plus;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
@@ -78,6 +77,14 @@ public class Repository : IRepository
         // UNDONE: do zmiany
     }
     
+    public async Task SetCharacterFoundInScan(IReadOnlyList<string> charactersNames, bool foundInScan)
+    {
+        await _dbContext.Characters
+           .Where(ch => charactersNames.Contains(ch.Name))
+           .ExecuteUpdateAsync(update => update
+               .SetProperty(c => c.FoundInScan, c => foundInScan));
+    }
+
     public async Task UpdateCharacterCorrelations()
     {
         var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
@@ -87,24 +94,27 @@ public class Repository : IRepository
         var characterCorrelationsIdsPart1 =  _dbContext.CharacterCorrelations
             .Where(c => loginCharactersIds.Contains(c.LoginCharacterId) && logoutCharactersIds.Contains(c.LogoutCharacterId))
             .Select(cc => cc.CorrelationId);
-        
+
         var characterCorrelationsIdsPart2 =  _dbContext.CharacterCorrelations
             .Where(c => logoutCharactersIds.Contains(c.LoginCharacterId) && loginCharactersIds.Contains(c.LogoutCharacterId))
             .Select(cc => cc.CorrelationId);
-        
-        
+
+
         await _dbContext.CharacterCorrelations
            .Where(cc => characterCorrelationsIdsPart1.Concat(characterCorrelationsIdsPart2).Contains(cc.CorrelationId))
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
                .SetProperty(c => c.LastMatchDate, lastMatchDate));
     }
-  
-    public async Task ExecuteRawSqlAsync(string rawSql)
+
+    /// <param name="rawSql">Sql command to execute</param>
+    /// <param name="timeOut">Value in seconds</param>
+    public async Task ExecuteRawSqlAsync(string rawSql, int timeOut)
     {   
+        _dbContext.Database.SetCommandTimeout(TimeSpan.FromSeconds(timeOut));
         await _dbContext.Database.ExecuteSqlRawAsync(rawSql);
     }
-    
+
     public async Task CreateCharacterCorrelationsIfNotExist()
     {
         var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
@@ -118,12 +128,12 @@ public class Repository : IRepository
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
   
         var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
      
@@ -139,15 +149,6 @@ public class Repository : IRepository
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
         await _dbContext.BulkSaveChangesAsync(x => x.BatchSize = 30);
-    }
-    
-    public async Task RemoveCharacterCorrelations(bool isOnline)
-    {
-        var charactersIds = CharactersIds(isOnline).ToArray();
-        
-        await _dbContext.CharacterCorrelations
-            .Where(c => charactersIds.Contains(c.LoginCharacterId) && charactersIds.Contains(c.LogoutCharacterId))
-            .ExecuteDeleteAsync();
     }
     
     private IQueryable<int> CharactersIds(bool isOnline)

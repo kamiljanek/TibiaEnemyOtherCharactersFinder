@@ -119,12 +119,12 @@ public class UpdateOrCreateCharacterCorrelationsBenchmark
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new { wc.LoginCharacterId, wc.LogoutCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new { wc.LoginCharacterId, wc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
   
         var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
      

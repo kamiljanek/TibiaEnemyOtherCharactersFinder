@@ -137,6 +137,18 @@ WHERE logout_character_id IN
         (SELECT character_id
          FROM online_characters)";
 
+        public const string NpgsqlDeleteCharacterCorrelationIfCorrelationExistInScan = @"WITH online_characters AS
+         (SELECT character_id FROM characters c WHERE found_in_scan = true)
+
+DELETE FROM character_correlations
+WHERE logout_character_id IN
+      (SELECT character_id
+       FROM online_characters)
+
+  AND login_character_id IN
+      (SELECT character_id
+       FROM online_characters)";
+
         public const string NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan = @"WITH offline_characters AS (SELECT character_id FROM ""characters"" c INNER JOIN character_actions ca ON c.""name"" = ca.character_name WHERE is_online = false)
 DELETE FROM character_correlations
 WHERE logout_character_id IN
@@ -186,6 +198,8 @@ WHERE
   (cc.logout_character_id = cp.logout AND cc.login_character_id = cp.login)
   OR 
   (cc.logout_character_id = cp.login AND cc.login_character_id = cp.logout);";
+
+        public const string NpgsqlUpdateCharactersSetFoundInScanFalse = @"UPDATE characters SET found_in_scan = FALSE WHERE found_in_scan = TRUE";
 
     }
 

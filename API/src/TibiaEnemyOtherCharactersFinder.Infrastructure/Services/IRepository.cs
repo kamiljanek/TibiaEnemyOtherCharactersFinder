@@ -24,7 +24,9 @@ public interface IRepository
 
     Task UpdateCharacterCorrelations();
 
-    Task ExecuteRawSqlAsync(string rawSql);
+    Task ExecuteRawSqlAsync(string rawSql, int timeOut = 30);
 
     Task CreateCharacterCorrelationsIfNotExist();
+
+    Task SetCharacterFoundInScan(IReadOnlyList<string> charactersNames, bool foundInScan);
 }

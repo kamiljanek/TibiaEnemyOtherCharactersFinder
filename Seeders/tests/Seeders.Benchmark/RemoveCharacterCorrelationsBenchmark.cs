@@ -1,9 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Microsoft.EntityFrameworkCore;
-using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
-using Z.EntityFramework.Plus;
 
 namespace Seeders.Benchmark;
 
@@ -12,6 +10,30 @@ namespace Seeders.Benchmark;
 [RankColumn]
 public class RemoveCharacterCorrelationsBenchmark
 {
+    private const string _removeWithCte = @"WITH online_characters AS 
+                                        (SELECT character_id FROM characters c WHERE found_in_scan = true)
+
+                                        DELETE FROM character_correlations
+                                            WHERE logout_character_id IN
+                                        (SELECT character_id
+                                            FROM online_characters)
+
+                                        AND login_character_id IN
+                                        (SELECT character_id
+                                            FROM online_characters)";
+
+    private const string _removeWithoutCte = @"WITH online_characters AS 
+                                        (SELECT character_id FROM characters c WHERE found_in_scan = true)
+
+                                        DELETE FROM character_correlations
+                                            WHERE logout_character_id IN
+                                        (SELECT character_id
+                                            FROM characters WHERE found_in_scan = true)
+
+                                        AND login_character_id IN
+                                        (SELECT character_id
+                                            FROM characters WHERE found_in_scan = true)";
+
     private const string ConnectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
 
     private readonly TibiaCharacterFinderDbContext _dbContext = new (new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
@@ -20,50 +42,28 @@ public class RemoveCharacterCorrelationsBenchmark
     [Benchmark(Baseline = true)]
     public async Task RemoveCharacterCorrelationsEfCore()
     {
-        var charactersIdsOnline = CharactersIds(true).ToArray();
-        var charactersIdsOffline = CharactersIds(false).ToArray();
-
         await _dbContext.CharacterCorrelations
-            .Where(c => charactersIdsOnline.Contains(c.LoginCharacterId) && charactersIdsOnline.Contains(c.LogoutCharacterId))
-            .ExecuteDeleteAsync();
-        
-        await _dbContext.CharacterCorrelations
-            .Where(c => charactersIdsOffline.Contains(c.LoginCharacterId) && charactersIdsOffline.Contains(c.LogoutCharacterId))
+            .Where(c => CharactersIdsInScan().Contains(c.LoginCharacterId) && CharactersIdsInScan().Contains(c.LogoutCharacterId))
             .ExecuteDeleteAsync();
     }
     
     [Benchmark]
-    public async Task RemoveCharacterCorrelationsEfCoreUnsegregate()
+    public async Task RemoveCharacterCorrelationsSqlWithEtc()
     {
-        var charactersIdsOnline = CharactersIds(true).ToArray();
-
-        await _dbContext.CharacterCorrelations
-            .Where(c => charactersIdsOnline.Contains(c.LoginCharacterId) && charactersIdsOnline.Contains(c.LogoutCharacterId))
-            .ExecuteDeleteAsync();
-        
-        var charactersIdsOffline = CharactersIds(false).ToArray();
-        
-        await _dbContext.CharacterCorrelations
-            .Where(c => charactersIdsOffline.Contains(c.LoginCharacterId) && charactersIdsOffline.Contains(c.LogoutCharacterId))
-            .ExecuteDeleteAsync();
+        await _dbContext.Database.ExecuteSqlRawAsync(_removeWithCte);
     }
-    
+
     [Benchmark]
-    public async Task RemoveCharacterCorrelationsSql()
+    public async Task RemoveCharacterCorrelationsSqlWithoutEtc()
     {
-        await _dbContext.Database.ExecuteSqlRawAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInFirstScan);
-        await _dbContext.Database.ExecuteSqlRawAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan);
+        await _dbContext.Database.ExecuteSqlRawAsync(_removeWithoutCte);
     }
 
- private IQueryable<int> CharactersIds(bool isOnline)
+    private IQueryable<int> CharactersIdsInScan()
     {
         return _dbContext.Characters
-            .Where(c =>
-                _dbContext.CharacterActions
-                    .Where(ca => ca.IsOnline == isOnline)
-                    .Select(ca => ca.CharacterName)
-                    .Distinct().Contains(c.Name))
-            .Select(ca => ca.CharacterId);
+            .Where(c => c.FoundInScan)
+            .Select(c => c.CharacterId);
     }
 }
     

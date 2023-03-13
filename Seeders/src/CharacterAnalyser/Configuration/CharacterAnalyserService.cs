@@ -8,8 +8,8 @@ public static class CharacterAnalyserService
     public static IServiceCollection AddCharacterAnalyser(this IServiceCollection services)
     {
         services.AddScoped<IAnalyser, Analyser>();
-        services.AddScoped<CharacterActionSeeder>();
-        services.AddScoped<CharacterAnalyserCleaner>();
+        services.AddScoped<CharacterManager>();
+        services.AddScoped<CharacterActionsCleaner>();
         services.AddScoped<CharacterCorrelationSeeder>();
         services.AddScoped<CharacterCorrelationDeleter>();
         services.AddScoped<CharacterSeeder>();

@@ -11,8 +11,8 @@ public class Analyser : ActionRule, IAnalyser
     private List<short> _uniqueWorldIds = new();
 
     private readonly IRepository _repository;
-    private readonly CharacterActionSeeder _characterActionSeeder;
-    private readonly CharacterAnalyserCleaner _characterAnalyserCleaner;
+    private readonly CharacterManager _characterManager;
+    private readonly CharacterActionsCleaner _characterActionsCleaner;
     private readonly CharacterSeeder _characterSeeder;
     private readonly CharacterCorrelationSeeder _characterCorrelationSeeder;
     private readonly CharacterCorrelationDeleter _characterCorrelationDeleter;
@@ -20,15 +20,15 @@ public class Analyser : ActionRule, IAnalyser
     public List<short> UniqueWorldIds => _uniqueWorldIds;
 
     public Analyser(IRepository repository,
-                             CharacterActionSeeder characterActionSeeder,
-                             CharacterAnalyserCleaner characterAnalyserCleaner,
+                             CharacterManager characterManager,
+                             CharacterActionsCleaner characterActionsCleaner,
                              CharacterSeeder characterSeeder,
                              CharacterCorrelationSeeder characterCorrelationSeeder,
                              CharacterCorrelationDeleter characterCorrelationDeleter)
     {
         _repository = repository;
-        _characterActionSeeder = characterActionSeeder;
-        _characterAnalyserCleaner = characterAnalyserCleaner;
+        _characterManager = characterManager;
+        _characterActionsCleaner = characterActionsCleaner;
         _characterSeeder = characterSeeder;
         _characterCorrelationSeeder = characterCorrelationSeeder;
         _characterCorrelationDeleter = characterCorrelationDeleter;
@@ -49,32 +49,32 @@ public class Analyser : ActionRule, IAnalyser
 
     public async Task Seed(List<WorldScan> twoWorldScans)
     {
+        Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - start");
+
         if (IsBroken(new NumberOfWorldScansSpecificAmountRule(twoWorldScans)))
             return;
 
         if (IsBroken(new TimeBetweenWorldScansCannotBeLongerThanMaxDurationRule(twoWorldScans)) ||
-            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionSeeder.GetLogoutNames(twoWorldScans))) ||
-            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionSeeder.GetLoginNames(twoWorldScans))))
+            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterManager.GetAndSetLogoutNames(twoWorldScans))) ||
+            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterManager.GetAndSetLoginNames(twoWorldScans))))
         {
             await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
             Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - not analysed");
             return;
         }
 
-        Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - start");
-
-        await _characterAnalyserCleaner.ClearCharacterActionsAsync();
+        await _characterActionsCleaner.ClearAsync();
+        await _characterActionsCleaner.ResetFoundInScanInCharactersAsync();
         Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - cleared CharacterActions");
 
-        await AnalizeCharactersAndSeed(twoWorldScans);
-        Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()}");
+        await SeedAndAnalyseCharacters(twoWorldScans);
     }
 
-    private async Task AnalizeCharactersAndSeed(List<WorldScan> twoWorldScans)
+    private async Task SeedAndAnalyseCharacters(List<WorldScan> twoWorldScans)
     {
         try
         {
-            await _characterActionSeeder.Seed(twoWorldScans);
+            await _characterManager.Seed(twoWorldScans);
             Console.WriteLine($"{twoWorldScans[0].WorldScanId} (world_id = {twoWorldScans[0].WorldId}) - {DateTime.Now.ToLongTimeString()} - seeded CharacterActions");
 
             await _characterSeeder.Seed();

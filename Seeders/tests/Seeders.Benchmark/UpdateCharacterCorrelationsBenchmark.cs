@@ -50,13 +50,13 @@ public class UpdateCharacterCorrelationsBenchmark
         var existingCharacterCorrelationsIdsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations
+                .SelectMany(wc => wc.LoginCharacterCorrelations
                     .Where(a => logoutCharactersIds.Contains(a.LogoutCharacterId))).Select(cc => cc.CorrelationId);
         
         var existingCharacterCorrelationsIdsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginWorldCorrelations
+                .SelectMany(wc => wc.LoginCharacterCorrelations
                     .Where(a => loginCharactersIds.Contains(a.LogoutCharacterId))).Select(cc => cc.CorrelationId);
         
         await _dbContext.CharacterCorrelations
