@@ -158,6 +158,8 @@ WHERE logout_character_id IN
         (SELECT character_id
          FROM offline_characters)";
 
+        public const string NpgsqlGetActiveWorlds = @"SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name";
+
         /// <summary>
         /// Required parameters: 
         ///    @CharacterName

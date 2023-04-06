@@ -1,5 +1,4 @@
-﻿using Shared.Database.Queries.Sql;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
@@ -19,6 +18,7 @@ public class CharacterManager : ISeeder<List<WorldScan>>
 
     public async Task Seed(List<WorldScan> twoWorldScans)
     {
+
         var logoutCharacters = CreateCharactersActionsAsync(_logoutNames, twoWorldScans[0], isOnline: false);
         var loginCharacters = CreateCharactersActionsAsync(_loginNames, twoWorldScans[1], isOnline: true);
 

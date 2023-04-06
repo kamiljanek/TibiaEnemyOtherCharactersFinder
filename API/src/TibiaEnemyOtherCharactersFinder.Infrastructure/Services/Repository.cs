@@ -64,8 +64,7 @@ public class Repository : IRepository
     public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity
     {
         _dbContext.Set<T>().AddRange(entities);
-        
-        await _dbContext.BulkSaveChangesAsync(x => x.BatchSize = 30);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateWorldAsync(World newWorld)
@@ -73,8 +72,6 @@ public class Repository : IRepository
         var currentWorld = await _dbContext.Set<World>().FirstOrDefaultAsync(e => e.WorldId == newWorld.WorldId);
         _dbContext.Entry(currentWorld).CurrentValues.SetValues(newWorld);
         await _dbContext.SaveChangesAsync();
-        
-        // UNDONE: do zmiany
     }
     
     public async Task SetCharacterFoundInScan(IReadOnlyList<string> charactersNames, bool foundInScan)
@@ -83,6 +80,14 @@ public class Repository : IRepository
            .Where(ch => charactersNames.Contains(ch.Name))
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.FoundInScan, c => foundInScan));
+    }
+
+    public async Task ResetCharacterFoundInScan()
+    {
+        await _dbContext.Characters
+           .Where(ch => ch.FoundInScan)
+           .ExecuteUpdateAsync(update => update
+               .SetProperty(c => c.FoundInScan, c => false));
     }
 
     public async Task UpdateCharacterCorrelations()
@@ -99,20 +104,36 @@ public class Repository : IRepository
             .Where(c => logoutCharactersIds.Contains(c.LoginCharacterId) && loginCharactersIds.Contains(c.LogoutCharacterId))
             .Select(cc => cc.CorrelationId);
 
-
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         await _dbContext.CharacterCorrelations
            .Where(cc => characterCorrelationsIdsPart1.Concat(characterCorrelationsIdsPart2).Contains(cc.CorrelationId))
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
                .SetProperty(c => c.LastMatchDate, lastMatchDate));
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
     }
 
     /// <param name="rawSql">Sql command to execute</param>
-    /// <param name="timeOut">Value in seconds</param>
-    public async Task ExecuteRawSqlAsync(string rawSql, int timeOut)
-    {   
-        _dbContext.Database.SetCommandTimeout(TimeSpan.FromSeconds(timeOut));
+    /// <param name="timeOut">Optional value in seconds</param>
+    public async Task ExecuteRawSqlAsync(string rawSql, int? timeOut)
+    {
+        if (timeOut is not null)
+        {
+            _dbContext.Database.SetCommandTimeout(TimeSpan.FromSeconds((double)timeOut));
+        }
+
         await _dbContext.Database.ExecuteSqlRawAsync(rawSql);
+    }
+
+    /// <param name="numberOfDays">Removes records older than the number of days</param>
+    /// <param name="matchingNumber">Removes records that have less "NumberOfMatches" than input</param>
+    public async Task DeleteIrrelevantCharacterCorrelations(int numberOfDays, int matchingNumber)
+    {
+        var thresholdDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-numberOfDays));
+
+        _dbContext.CharacterCorrelations.RemoveRange(_dbContext.CharacterCorrelations
+            .Where(c => c.NumberOfMatches < matchingNumber && c.LastMatchDate < thresholdDate));
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task CreateCharacterCorrelationsIfNotExist()
@@ -136,7 +157,7 @@ public class Repository : IRepository
                 .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
   
         var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
-     
+
         var newCorrelations = correlationsDataToInsert
             .Select(cc => new CharacterCorrelation
             {
@@ -146,9 +167,29 @@ public class Repository : IRepository
                 CreateDate = lastMatchDate,
                 LastMatchDate = lastMatchDate
             }).ToList();
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
-        await _dbContext.BulkSaveChangesAsync(x => x.BatchSize = 30);
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+        await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+
+    }
+
+    public async Task DeleteCharacterCorrelationIfCorrelationExistInScan()
+    {
+        var charactersToRemove = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
+
+        var correlationsToRemove = _dbContext.CharacterCorrelations
+        .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId));
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+        _dbContext.CharacterCorrelations.RemoveRange(correlationsToRemove);
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+        await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
     }
     
     private IQueryable<int> CharactersIds(bool isOnline)

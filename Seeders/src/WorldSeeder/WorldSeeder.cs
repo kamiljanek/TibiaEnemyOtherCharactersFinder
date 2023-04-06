@@ -9,28 +9,26 @@ public class WorldSeeder : IWorldSeeder
     private const string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
 
     private readonly IRepository _repository;
-    private readonly ITibiaApi _tibiaApi;
+    private readonly ITibiaDataProvider _tibiaDataProvider;
 
-    private List<string> _worldsNamesFromTibiaApi;
+    private List<string> _worldsNamesFromTibiaDataProvider;
     private List<World> _worldsFromDb;
 
-    public WorldSeeder(IRepository repository, ITibiaApi tibiaApi)
+    public WorldSeeder(IRepository repository, ITibiaDataProvider tibiaDataProvider)
     {
         _repository = repository;
-        _tibiaApi = tibiaApi;
+        _tibiaDataProvider = tibiaDataProvider;
     }
 
     public async Task SetProperties()
     {
-        _worldsNamesFromTibiaApi = await _tibiaApi.FetchWorldsNamesFromTibiaApi();
+        _worldsNamesFromTibiaDataProvider = await _tibiaDataProvider.FetchWorldsNamesFromTibiaApi();
         _worldsFromDb = await _repository.GetWorldsAsNoTrackingAsync();
     }
 
     public async Task Seed()
     {
-        try
-        {
-            var newWorlds = _worldsNamesFromTibiaApi
+            var newWorlds = _worldsNamesFromTibiaDataProvider
                 .Where(name => !_worldsFromDb.Select(world => world.Name).Contains(name))
                 .Select(name =>
                 {
@@ -39,32 +37,18 @@ public class WorldSeeder : IWorldSeeder
                 .ToList();
 
             await _repository.AddRangeAsync(newWorlds);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(@"Cannot get worlds from ""api.tibiadata"" or from DB");
-            Console.WriteLine(e);
-        }
     }
 
     public async Task TurnOffIfWorldIsUnavailable()
     {
-        try
-        {
             var newWorlds = _worldsFromDb
-                .Where(world => !_worldsNamesFromTibiaApi.Contains(world.Name))
+                .Where(world => !_worldsNamesFromTibiaDataProvider.Contains(world.Name))
             .Select(world => { world.IsAvailable = false; return world; }).ToList();
 
             foreach (var world in newWorlds)
             {
                 await _repository.UpdateWorldAsync(world);
             }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(@"Cannot get worlds from ""api.tibiadata""");
-            Console.WriteLine(e);
-        }
     }
 
     private World CreateWorld(string worldName)
@@ -73,7 +57,7 @@ public class WorldSeeder : IWorldSeeder
         {
             Name = worldName,
             Url = BuildWorldUrl(worldName),
-            IsAvailable = true
+            IsAvailable = false
         };
     }
 

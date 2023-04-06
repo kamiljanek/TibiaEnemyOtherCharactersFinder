@@ -31,6 +31,7 @@ public class ClearSoftDeletedWorldScansOnCleanerTests : IAsyncLifetime
         
         // Act
         await cleaner.ClearTables();
+        await cleaner.VacuumTables();
         var worldScans = dbContext.WorldScans.AsNoTracking().ToList();
 
         // Assert

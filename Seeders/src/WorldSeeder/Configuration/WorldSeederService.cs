@@ -7,6 +7,8 @@ public static class WorldSeederService
     public static IServiceCollection AddWorldSeeder(this IServiceCollection services)
     {
         services.AddScoped<IWorldSeeder, WorldSeeder>();
+        services.AddScoped<IWorldService, WorldService>();
+        services.AddScoped<WorldSeederDecorator>();
 
         return services;
     }

@@ -13,9 +13,16 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
             services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
                .UseNpgsql(
                    configuration.GetConnectionString(nameof(ConnectionStringsSection.PostgreSql)), 
-                   o => o.MinBatchSize(1)
-                       .MaxBatchSize(30)
-                       .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                   options =>
+                   {
+                       options
+                           .MinBatchSize(1)
+                           .MaxBatchSize(30)
+                           .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                           .CommandTimeout(configuration
+                               .GetSection($"{EfCoreConfigurationSection.SectionName}:{EfCoreConfigurationSection.CommandTimeout}")
+                               .Get<int>());
+                   })
                .UseSnakeCaseNamingConvention());
 
             return services;

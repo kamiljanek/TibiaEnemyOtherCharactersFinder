@@ -1,9 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Microsoft.EntityFrameworkCore;
-using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
-using Z.EntityFramework.Plus;
+// ReSharper disable RedundantAnonymousTypePropertyName
 
 namespace Seeders.Benchmark;
 
@@ -12,15 +11,15 @@ namespace Seeders.Benchmark;
 [RankColumn]
 public class CreateCharacterCorrelationsIfNotExistBenchmark
 {
-    private const string ConnectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
+    private const string _connectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
 
     private readonly TibiaCharacterFinderDbContext _dbContext = new (new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
-            .UseNpgsql(ConnectionString).UseSnakeCaseNamingConvention().Options);
+            .UseNpgsql(_connectionString).UseSnakeCaseNamingConvention().Options);
     
     [Benchmark(Baseline = true)]
     public async Task CreateCharacterCorrelationsIfNotExistEfCoreOld()
     {
-        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstAsync()).LogoutOrLoginDate;
         var loginCharactersIds = CharactersIds(true);
         var logoutCharactersIds = CharactersIds(false);
         
@@ -31,12 +30,12 @@ public class CreateCharacterCorrelationsIfNotExistBenchmark
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+                .SelectMany(c => c.LoginCharacterCorrelations.Select(cc => new {LoginCharacterId = cc.LoginCharacterId, LogoutCharacterId = cc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(c => c.LoginCharacterCorrelations.Select(cc => new {LoginCharacterId = cc.LogoutCharacterId, LogoutCharacterId = cc.LoginCharacterId}));
   
         var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
      
@@ -51,13 +50,13 @@ public class CreateCharacterCorrelationsIfNotExistBenchmark
             }).ToList();
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
-        await _dbContext.BulkSaveChangesAsync(x => x.BatchSize = 30);
+        await _dbContext.SaveChangesAsync();
     }
     
     [Benchmark]
     public async Task CreateCharacterCorrelationsIfNotExistEfCoreNew()
     {
-        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstAsync()).LogoutOrLoginDate;
         var loginCharactersIds = CharactersIds(true);
         var logoutCharactersIds = CharactersIds(false);
         
@@ -68,12 +67,12 @@ public class CreateCharacterCorrelationsIfNotExistBenchmark
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+                .SelectMany(c => c.LoginCharacterCorrelations.Select(cc => new {LoginCharacterId = cc.LoginCharacterId, LogoutCharacterId = cc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(c => c.LoginCharacterCorrelations.Select(cc => new {LoginCharacterId = cc.LogoutCharacterId, LogoutCharacterId = cc.LoginCharacterId}));
   
         var newCorrelations = correlationsDataToCreate
             .Where(cc => !existingCharacterCorrelationsPart1.Concat(existingCharacterCorrelationsPart2)
@@ -88,7 +87,7 @@ public class CreateCharacterCorrelationsIfNotExistBenchmark
             }).ToList();
         
          _dbContext.CharacterCorrelations.AddRange(newCorrelations);
-        await _dbContext.BulkSaveChangesAsync(x => x.BatchSize = 30);
+        await _dbContext.SaveChangesAsync();
     }
     
     private IQueryable<int> CharactersIds(bool isOnline)

@@ -12,13 +12,13 @@ public class CharacterActionSeederBenchmark
     [Benchmark(Baseline = true)]
     public async Task CharacterActionSeederDelete()
     {
-        var ConnectionString = "Server=localhost;Port=5432;Database=local_database2;User Id=sa;Password=pass;";
-        TibiaCharacterFinderDbContext _dbContext = new(new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
-            .UseNpgsql(ConnectionString).UseSnakeCaseNamingConvention().Options);
+        var connectionString = "Server=localhost;Port=5432;Database=local_database2;User Id=sa;Password=pass;";
+        TibiaCharacterFinderDbContext dbContext = new(new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
+            .UseNpgsql(connectionString).UseSnakeCaseNamingConvention().Options);
 
         List<WorldScan> GetFirstTwoWorldScansAsync(short worldId)
         {
-            return _dbContext.WorldScans
+            return dbContext.WorldScans
                 .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
                 .OrderBy(scan => scan.ScanCreateDateTime)
                 .Take(2)
@@ -26,17 +26,17 @@ public class CharacterActionSeederBenchmark
                 .ToList();
         }
 
-        var _twoWorldScans = GetFirstTwoWorldScansAsync(2);
-        var _loginNames = GetLoginNames(_twoWorldScans);
-        var _logoutNames = GetLogoutNames(_twoWorldScans);
-        var logoutCharacters = CreateCharactersActionsAsync(_logoutNames, _twoWorldScans[0], false);
-        var loginCharacters = CreateCharactersActionsAsync(_loginNames, _twoWorldScans[1], true);
+        var twoWorldScans = GetFirstTwoWorldScansAsync(2);
+        var loginNames = GetLoginNames(twoWorldScans);
+        var logoutNames = GetLogoutNames(twoWorldScans);
+        var logoutCharacters = CreateCharactersActionsAsync(logoutNames, twoWorldScans[0], false);
+        var loginCharacters = CreateCharactersActionsAsync(loginNames, twoWorldScans[1], true);
 
-        _dbContext.CharacterActions.AddRange(logoutCharacters.Concat(loginCharacters));
+        dbContext.CharacterActions.AddRange(logoutCharacters.Concat(loginCharacters));
 
-        await _dbContext.BulkSaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
-        await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM character_actions");
+        await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM character_actions");
     }
 
 

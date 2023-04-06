@@ -18,11 +18,11 @@ public class SeedOnCharacterCorrelationSeederTests : IAsyncLifetime
     }
     
     [Fact]
-    public async Task CharacterCorrelationSeeder_Seed_ShouldUpdateNumberOfMatchWhenRecordExist()
+    public async Task CharacterCorrelationUpdater_Seed_ShouldUpdateNumberOfMatchWhenRecordExist()
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var correlationSeeder = scope.ServiceProvider.GetRequiredService<CharacterCorrelationSeeder>();
+        var correlationSeeder = scope.ServiceProvider.GetRequiredService<CharacterCorrelationUpdater>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
 
         var characterActions =  new List<CharacterAction>

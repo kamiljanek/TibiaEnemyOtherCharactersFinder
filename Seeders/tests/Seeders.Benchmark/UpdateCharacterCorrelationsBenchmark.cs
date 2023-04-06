@@ -1,9 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Microsoft.EntityFrameworkCore;
-using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
-using Z.EntityFramework.Plus;
 
 namespace Seeders.Benchmark;
 
@@ -12,15 +10,15 @@ namespace Seeders.Benchmark;
 [RankColumn]
 public class UpdateCharacterCorrelationsBenchmark
 {
-    private const string ConnectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
+    private const string _connectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
 
     private readonly TibiaCharacterFinderDbContext _dbContext = new (new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
-            .UseNpgsql(ConnectionString).UseSnakeCaseNamingConvention().Options);
+            .UseNpgsql(_connectionString).UseSnakeCaseNamingConvention().Options);
     
     [Benchmark(Baseline = true)]
     public async Task UpdateCharacterCorrelationsEfCore()
     {
-        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstAsync()).LogoutOrLoginDate;
         var loginCharactersIds = CharactersIds(true);
         var logoutCharactersIds = CharactersIds(false);
 
@@ -43,7 +41,7 @@ public class UpdateCharacterCorrelationsBenchmark
     [Benchmark]
     public async Task UpdateCharacterCorrelationsEfCoreNew()
     {
-        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstAsync()).LogoutOrLoginDate;
         var loginCharactersIds = CharactersIds(true);
         var logoutCharactersIds = CharactersIds(false);
         
