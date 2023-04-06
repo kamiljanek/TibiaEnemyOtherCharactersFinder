@@ -13,7 +13,7 @@ public class SeedOnWorldSeederTests : IAsyncLifetime
 {
     private readonly TibiaSeederFactory _factory;
     private readonly Func<Task> _resetDatabase;
-    private readonly Mock<ITibiaApi> _tibiaApiMock = new();
+    private readonly Mock<ITibiaDataProvider> _tibiaApiMock = new();
 
     public SeedOnWorldSeederTests(TibiaSeederFactory factory)
     {

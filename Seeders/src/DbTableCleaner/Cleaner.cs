@@ -16,6 +16,7 @@ public class Cleaner : ICleaner
     {
         await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlClearDeletedWorldScans);
         await _repository.ExecuteRawSqlAsync("TRUNCATE TABLE character_actions RESTART IDENTITY;", timeOut: 60);
+        await _repository.DeleteIrrelevantCharacterCorrelations(numberOfDays: 14, matchingNumber: 5);
     }
     
     public async Task VacuumTables()

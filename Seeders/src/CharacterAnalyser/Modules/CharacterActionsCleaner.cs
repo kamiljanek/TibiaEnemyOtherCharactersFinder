@@ -17,8 +17,9 @@ public class CharacterActionsCleaner
         await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlClearCharacterActions);
     }
 
-    public async Task ResetFoundInScanInCharactersAsync()
+    public async Task ResetFoundInScanOnCharactersAsync()
     {
+        // await _repository.ResetCharacterFoundInScan();
         await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlUpdateCharactersSetFoundInScanFalse);
     }
 }

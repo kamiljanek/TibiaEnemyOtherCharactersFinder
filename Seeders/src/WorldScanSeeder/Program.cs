@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reflection;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 using WorldScanSeeder.Configuration;
 
@@ -8,20 +14,53 @@ public class Program
 {
     private static async Task Main(string[] args)
     {
-        var services = new ServiceCollection();
-        services
-            .AddWorldScanSeeder()
-            .AddServices()
-            .AddTibiaDbContext();
-
-        var serviceProvider = services.BuildContainer();
-
-        var seeder = serviceProvider.GetService<IScanSeeder>();
-
-        await seeder.SetProperties();
-        foreach (var availableWorld in seeder.AvailableWorlds)
+        try
         {
-            await seeder.Seed(availableWorld);
+            var host = CreateHostBuilder();
+
+            Log.Information("Starting application");
+
+            var service = ActivatorUtilities.CreateInstance<WorldScanService>(host.Services);
+            await service.Run();
+
+            Log.Information("Ending application properly");
         }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            await Log.CloseAndFlushAsync();
+        }
+    }
+
+    private static IHost CreateHostBuilder()
+    {
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+            })
+            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+            .ConfigureContainer<ContainerBuilder>(builder =>
+            {
+                builder.RegisterModule<AutofacModule>();
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services
+                    .AddWorldScanSeeder()
+                    .AddServices()
+                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
+                    .AddTibiaDbContext(context.Configuration);
+            })
+            .UseSerilog()
+            .Build();
+
+        return host;
     }
 }

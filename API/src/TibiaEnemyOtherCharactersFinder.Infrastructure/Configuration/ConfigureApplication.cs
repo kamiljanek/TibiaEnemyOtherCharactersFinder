@@ -33,10 +33,24 @@ public static class ConfigureApplication
 
     public static IServiceCollection AddTibiaDbContext(this IServiceCollection services)
     {
-        var configuration = new ConfigurationBuilder().AddJsonFile(ApplicationSettingsSections.FileName, optional: false, reloadOnChange: true).Build();
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile(ApplicationSettingsSections.FileName, optional: false, reloadOnChange: true).Build();
 
         services.AddInfrastructure(configuration);
 
+        return services;
+    }
+
+    public static IServiceCollection AddTibiaDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddInfrastructure(configuration);
+
+        return services;
+    }
+
+    public static IServiceCollection AddSerilog(this IServiceCollection services, IConfiguration configuration, string projectName)
+    {
+        LoggerConfiguration.ConfigureLogger(configuration, projectName);
         return services;
     }
 

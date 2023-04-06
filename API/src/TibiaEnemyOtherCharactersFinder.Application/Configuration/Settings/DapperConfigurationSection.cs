@@ -2,5 +2,6 @@
 
 public class DapperConfigurationSection
 {
+    public const string SectionName = "Dapper";
     public int CommandTimeout { get; set; }
 }
