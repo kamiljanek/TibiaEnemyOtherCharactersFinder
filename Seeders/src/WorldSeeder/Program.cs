@@ -1,5 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 using WorldSeeder.Configuration;
 
@@ -9,18 +14,53 @@ public class Program
 {
     private static async Task Main(string[] args)
     {
-        var services = new ServiceCollection();
-        services
-            .AddWorldSeeder()
-            .AddServices()
-            .AddTibiaDbContext();
+        try
+        {
+            var host = CreateHostBuilder();
 
-        var serviceProvider = services.BuildContainer();
+            Log.Information("Starting application");
 
-        var seeder = serviceProvider.GetService<IWorldSeeder>();
+            var service = ActivatorUtilities.CreateInstance<WorldService>(host.Services);
+            await service.Run();
 
-        await seeder.SetProperties();
-        await seeder.Seed();
-        await seeder.TurnOffIfWorldIsUnavailable();
+            Log.Information("Ending application properly");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            await Log.CloseAndFlushAsync();
+        }
+    }
+
+    private static IHost CreateHostBuilder()
+    {
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+            })
+            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+            .ConfigureContainer<ContainerBuilder>(builder =>
+            {
+                builder.RegisterModule<AutofacModule>();
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services
+                    .AddWorldSeeder()
+                    .AddServices()
+                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
+                    .AddTibiaDbContext(context.Configuration);
+            })
+            .UseSerilog()
+            .Build();
+
+        return host;
     }
 }

@@ -4,14 +4,14 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider.Dtos
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider;
 
-public class TibiaApi : ITibiaApi
+public class TibiaDataProvider : ITibiaDataProvider
 {
     private const string _baseUrl = $"https://api.tibiadata.com/v3/";
     private const string _worldsEndpoint = $"worlds/";
     private const string _worldEndpoint = $"world/";
     private readonly HttpClient _httpClient;
 
-    public TibiaApi(HttpClient httpClient)
+    public TibiaDataProvider(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }

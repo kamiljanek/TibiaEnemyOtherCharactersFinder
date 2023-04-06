@@ -34,10 +34,10 @@ public class RemoveCharacterCorrelationsBenchmark
                                         (SELECT character_id
                                             FROM characters WHERE found_in_scan = true)";
 
-    private const string ConnectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
+    private const string _connectionString = "Server=localhost;Port=5432;Database=local_database;User Id=sa;Password=pass;";
 
     private readonly TibiaCharacterFinderDbContext _dbContext = new (new DbContextOptionsBuilder<TibiaCharacterFinderDbContext>()
-            .UseNpgsql(ConnectionString).UseSnakeCaseNamingConvention().Options);
+            .UseNpgsql(_connectionString).UseSnakeCaseNamingConvention().Options);
     
     [Benchmark(Baseline = true)]
     public async Task RemoveCharacterCorrelationsEfCore()

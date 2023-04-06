@@ -1,46 +1,66 @@
-﻿using CharacterAnalyser.Configuration;
+﻿using System.Reflection;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using CharacterAnalyser.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace CharacterAnalyser;
 
 public class Program
 {
-    private static bool _hasDataToAnalyse = true;
     private static async Task Main(string[] args)
     {
-        while (_hasDataToAnalyse)
+        try
         {
-            await Analyse();
+            var host = CreateHostBuilder();
+
+            Log.Information("Starting application");
+
+            var service = ActivatorUtilities.CreateInstance<AnalyserService>(host.Services);
+            await service.Run();
+
+            Log.Information("Ending application properly");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            await Log.CloseAndFlushAsync();
         }
     }
 
-    private static async Task Analyse()
+    private static IHost CreateHostBuilder()
     {
-        var services = new ServiceCollection();
-        services
-            .AddCharacterAnalyser()
-            .AddServices()
-            .AddTibiaDbContext();
-
-        var serviceProvider = services.BuildContainer();
-        var seeder = serviceProvider.GetService<IAnalyser>();
-
-        _hasDataToAnalyse = await seeder.HasDataToAnalyse();
-        if (!_hasDataToAnalyse)
-            return;
-
-        foreach (var worldId in seeder.UniqueWorldIds)
-        {
-            try
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var worldScans = await seeder.GetWorldScansToAnalyseAsync(worldId);
-                await seeder.Seed(worldScans);
-            }
-            catch (Exception e)
+                config
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+            })
+            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+            .ConfigureContainer<ContainerBuilder>(builder =>
             {
-                Console.WriteLine(e);
-            }
-        }
+                builder.RegisterModule<AutofacModule>();
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services
+                    .AddCharacterAnalyser()
+                    .AddServices()
+                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
+                    .AddTibiaDbContext(context.Configuration);
+            })
+            .UseSerilog()
+            .Build();
+
+        return host;
     }
 }

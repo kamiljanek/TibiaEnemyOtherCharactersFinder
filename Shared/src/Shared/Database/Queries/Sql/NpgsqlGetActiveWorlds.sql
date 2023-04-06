@@ -1,0 +1,1 @@
+SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name

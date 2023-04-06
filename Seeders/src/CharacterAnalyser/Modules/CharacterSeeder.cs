@@ -1,4 +1,6 @@
-﻿using Shared.Database.Queries.Sql;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
@@ -14,6 +16,8 @@ public class CharacterSeeder : ISeeder
 
     public async Task Seed()
     {
+
         await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Z.BulkOperations;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 

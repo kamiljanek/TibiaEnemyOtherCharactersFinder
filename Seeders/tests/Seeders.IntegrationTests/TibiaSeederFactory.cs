@@ -85,6 +85,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             services.AddSingleton<Analyser>();
             services.AddSingleton<CharacterSeeder>();
             services.AddSingleton<CharacterCorrelationSeeder>();
+            services.AddSingleton<CharacterCorrelationUpdater>();
             services.AddSingleton<CharacterCorrelationDeleter>();
             services.AddSingleton<Cleaner>();
             services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.ConnectionString).UseSnakeCaseNamingConvention());

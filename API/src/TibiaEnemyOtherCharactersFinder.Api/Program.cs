@@ -1,3 +1,4 @@
+using System.Configuration;
 using Autofac.Extensions.DependencyInjection;
 using Serilog;
 
@@ -17,5 +18,4 @@ public class Program
             .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
             .UseSerilog();
     }
-    // UNDONE:  dodac serilog z możliwością logowania generowanych zapytań SQL
 }
