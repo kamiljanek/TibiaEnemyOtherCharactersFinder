@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\src\Shared\Shared.csproj" />
+    <ProjectReference Include="..\TibiaEnemyOtherCharactersFinder.Domain\TibiaEnemyOtherCharactersFinder.Domain.csproj" />
   </ItemGroup>
 
 </Project>

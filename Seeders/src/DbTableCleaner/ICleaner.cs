@@ -2,6 +2,12 @@
 
 public interface ICleaner
 {
-    Task ClearTables();
-    Task VacuumTables();
+    Task ClearDeletedWorldScans();
+    Task TruncateCharacterActions();
+    Task DeleteIrrelevantCharacterCorrelations();
+    Task VacuumCharacterActions();
+    Task VacuumWorldScans();
+    Task VacuumCharacters();
+    Task VacuumWorlds();
+    Task VacuumCharacterCorrelations();
 }

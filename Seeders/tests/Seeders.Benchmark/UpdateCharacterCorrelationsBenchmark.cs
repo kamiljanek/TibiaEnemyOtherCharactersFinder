@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Microsoft.EntityFrameworkCore;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.Benchmark;
 

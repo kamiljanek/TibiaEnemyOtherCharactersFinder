@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 public interface ITibiaCharacterFinderDbContext
 {

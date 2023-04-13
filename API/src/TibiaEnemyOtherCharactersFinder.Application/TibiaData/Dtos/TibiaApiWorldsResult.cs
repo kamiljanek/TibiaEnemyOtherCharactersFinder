@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider.Dtos;
+﻿namespace TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 
 public class TibiaApiWorldsResult
 {

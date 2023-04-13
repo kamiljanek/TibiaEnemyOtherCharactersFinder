@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 

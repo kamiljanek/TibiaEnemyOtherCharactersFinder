@@ -14,6 +14,4 @@ public static class LoggerConfiguration
 
         Log.Logger = loggerConfiguration.CreateLogger();
     }
-    // UNDONE: dodać informacje o characterze podczas pobierania jego innych postaci (np. lvl, server itp)
-    // UNDONE: jeżeli character nie został znaleziony lub ma pusty array wtedy zwrocic jakis komunikat
 }

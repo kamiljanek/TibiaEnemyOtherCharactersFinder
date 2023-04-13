@@ -1,7 +1,8 @@
 ﻿using CharacterAnalyser.Modules;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.CharacterAnalysers.CharactersSeeder;
 
@@ -21,7 +22,7 @@ public class SeedOnCharacterSeederTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var seeder = scope.ServiceProvider.GetRequiredService<CharacterSeeder>();
+        var seeder = scope.ServiceProvider.GetRequiredService<CharacterSeederService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
 
         var characterActions =  new List<CharacterAction>
@@ -52,7 +53,7 @@ public class SeedOnCharacterSeederTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var seeder = scope.ServiceProvider.GetRequiredService<CharacterSeeder>();
+        var seeder = scope.ServiceProvider.GetRequiredService<CharacterSeederService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
 
         var characterActions =  new List<CharacterAction>

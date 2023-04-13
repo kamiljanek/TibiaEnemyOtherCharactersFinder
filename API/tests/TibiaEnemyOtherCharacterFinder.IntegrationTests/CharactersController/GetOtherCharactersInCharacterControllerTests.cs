@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using FluentAssertions;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;
 
@@ -18,19 +18,6 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
     }
 
     [Fact]
-    public async Task GetOtherCharactersEndpoint_WithRouteParameters_ReturnsStatusOk()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-
-        // Act
-        var response = await client.GetAsync($"{_controllerBase}/{_defaultName}");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
     public async Task GetOtherCharactersEndpoint_WithRouteParametersThatFoundInDatabase_ReturnsCorrectData()
     {
         // Arrange
@@ -38,12 +25,12 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
 
         // Act
         var response = await client.GetAsync($"{_controllerBase}/{_nameInDatabase}");
-        var result = await response.Content.ReadFromJsonAsync<List<CharacterWithCorrelationsResult>>();
+        var result = await response.Content.ReadFromJsonAsync<CharacterWithCorrelationsResult>();
 
         // Assert
-        result.Should().NotBeEmpty();
-        result!.Count.Should().Be(2);
-        result.First(c => c.OtherCharacterName == "abargo maewa").NumberOfMatches.Should().Be(4);
+        result.Should().NotBeNull();
+        result!.Correlations.Count.Should().Be(2);
+        result.Correlations.First(c => c.OtherCharacterName == "abargo maewa").NumberOfMatches.Should().Be(4);
     }
     
     [Fact]
@@ -53,12 +40,10 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
         var client = _factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync($"{_controllerBase}/{_defaultName}");
-        var result = await response.Content.ReadFromJsonAsync<List<CharacterWithCorrelationsResult>>();
+        var result = await client.GetAsync($"{_controllerBase}/{_defaultName}");
 
         // Assert
-        result.Should().BeEmpty();
-        result.Should().BeEmpty();
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]

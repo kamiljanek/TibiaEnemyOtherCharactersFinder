@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿namespace TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
 public class Character : IEntity
 {

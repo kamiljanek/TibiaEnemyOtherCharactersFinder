@@ -5,6 +5,6 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration
 {
     public static class Assemblies
     {
-        public static Assembly ApplicationAssembly { get; } = typeof(AssembliesApplication).Assembly;
+        public static Assembly ApplicationAssembly { get; } = typeof(AssembliesHook).Assembly;
     }
 }

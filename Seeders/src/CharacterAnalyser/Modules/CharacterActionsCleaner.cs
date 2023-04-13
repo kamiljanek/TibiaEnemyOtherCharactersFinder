@@ -1,4 +1,5 @@
 ﻿using Shared.Database.Queries.Sql;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
@@ -19,7 +20,6 @@ public class CharacterActionsCleaner
 
     public async Task ResetFoundInScanOnCharactersAsync()
     {
-        // await _repository.ResetCharacterFoundInScan();
         await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlUpdateCharactersSetFoundInScanFalse);
     }
 }

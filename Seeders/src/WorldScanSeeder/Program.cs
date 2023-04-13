@@ -41,7 +41,7 @@ public class Program
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config
-                    .SetBasePath(Directory.GetCurrentDirectory())
+                    // .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
             })

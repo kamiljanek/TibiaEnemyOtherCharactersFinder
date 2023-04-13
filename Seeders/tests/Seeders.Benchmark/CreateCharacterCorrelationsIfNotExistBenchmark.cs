@@ -1,7 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Microsoft.EntityFrameworkCore;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
+
 // ReSharper disable RedundantAnonymousTypePropertyName
 
 namespace Seeders.Benchmark;

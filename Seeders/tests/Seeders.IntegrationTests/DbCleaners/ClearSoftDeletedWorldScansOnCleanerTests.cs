@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.DbCleaners;
 
@@ -30,8 +30,15 @@ public class ClearSoftDeletedWorldScansOnCleanerTests : IAsyncLifetime
         await dbContext.SaveChangesAsync();
         
         // Act
-        await cleaner.ClearTables();
-        await cleaner.VacuumTables();
+        await cleaner.ClearDeletedWorldScans();
+        await cleaner.TruncateCharacterActions();
+        await cleaner.DeleteIrrelevantCharacterCorrelations();
+        await cleaner.VacuumCharacterActions();
+        await cleaner.VacuumWorldScans();
+        await cleaner.VacuumCharacters();
+        await cleaner.VacuumWorlds();
+        await cleaner.VacuumCharacterCorrelations();
+
         var worldScans = dbContext.WorldScans.AsNoTracking().ToList();
 
         // Assert

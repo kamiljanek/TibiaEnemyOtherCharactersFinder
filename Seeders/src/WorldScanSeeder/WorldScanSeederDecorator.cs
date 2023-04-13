@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
 
 namespace WorldScanSeeder;
 

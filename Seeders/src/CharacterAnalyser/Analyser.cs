@@ -3,7 +3,8 @@ using CharacterAnalyser.ActionRules;
 using CharacterAnalyser.ActionRules.Rules;
 using CharacterAnalyser.Modules;
 using Microsoft.Extensions.Logging;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser;
@@ -16,9 +17,9 @@ public class Analyser : ActionRule, IAnalyser
     private readonly ILogger<Analyser> _logger;
     private readonly CharacterManager _characterManager;
     private readonly CharacterActionsCleaner _characterActionsCleaner;
-    private readonly CharacterSeeder _characterSeeder;
+    private readonly CharacterSeederService _characterSeederService;
     private readonly CharacterCorrelationUpdater _characterCorrelationUpdater;
-    private readonly CharacterCorrelationSeeder _characterCorrelationSeeder;
+    private readonly CharacterCorrelationSeederService _characterCorrelationSeederService;
     private readonly CharacterCorrelationDeleter _characterCorrelationDeleter;
 
     public List<short> UniqueWorldIds => _uniqueWorldIds;
@@ -27,18 +28,18 @@ public class Analyser : ActionRule, IAnalyser
         ILogger<Analyser> logger,
         CharacterManager characterManager,
         CharacterActionsCleaner characterActionsCleaner,
-        CharacterSeeder characterSeeder,
+        CharacterSeederService characterSeederService,
         CharacterCorrelationUpdater characterCorrelationUpdater,
-        CharacterCorrelationSeeder characterCorrelationSeeder,
+        CharacterCorrelationSeederService characterCorrelationSeederService,
         CharacterCorrelationDeleter characterCorrelationDeleter)
     {
         _repository = repository;
         _logger = logger;
         _characterManager = characterManager;
         _characterActionsCleaner = characterActionsCleaner;
-        _characterSeeder = characterSeeder;
+        _characterSeederService = characterSeederService;
         _characterCorrelationUpdater = characterCorrelationUpdater;
-        _characterCorrelationSeeder = characterCorrelationSeeder;
+        _characterCorrelationSeederService = characterCorrelationSeederService;
         _characterCorrelationDeleter = characterCorrelationDeleter;
     }
 
@@ -114,7 +115,7 @@ public class Analyser : ActionRule, IAnalyser
 
     private async Task CreateCharacterCorrelations(List<WorldScan> twoWorldScans)
     {
-        await _characterCorrelationSeeder.Seed();
+        await _characterCorrelationSeederService.Seed();
     }
 
     private async Task UpdateCharacterCorrelations(List<WorldScan> twoWorldScans)
@@ -124,7 +125,7 @@ public class Analyser : ActionRule, IAnalyser
 
     private async Task SeedCharacters(List<WorldScan> twoWorldScans)
     {
-        await _characterSeeder.Seed();
+        await _characterSeederService.Seed();
     }
 
     private async Task SeedCharacterActions(List<WorldScan> twoWorldScans)

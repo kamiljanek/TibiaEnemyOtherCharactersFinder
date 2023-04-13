@@ -4,7 +4,7 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace DbCleaner;
 
-public class CleanerDecorator : ILoggerDecorator, ICleaner
+public class CleanerDecorator : ILoggerDecorator
 {
     private readonly ILogger<CleanerDecorator> _logger;
     private readonly ICleaner _cleaner;
@@ -17,12 +17,14 @@ public class CleanerDecorator : ILoggerDecorator, ICleaner
 
     public async Task ClearTables()
     {
-        await Decorate(_cleaner.ClearTables);
-    }
-
-    public async Task VacuumTables()
-    {
-        await Decorate(_cleaner.VacuumTables);
+        await Decorate(_cleaner.ClearDeletedWorldScans);
+        await Decorate(_cleaner.TruncateCharacterActions);
+        await Decorate(_cleaner.DeleteIrrelevantCharacterCorrelations);
+        await Decorate(_cleaner.VacuumCharacterActions);
+        await Decorate(_cleaner.VacuumWorldScans);
+        await Decorate(_cleaner.VacuumCharacters);
+        await Decorate(_cleaner.VacuumWorlds);
+        await Decorate(_cleaner.VacuumCharacterCorrelations);
     }
 
     public async Task Decorate(Func<Task> function)

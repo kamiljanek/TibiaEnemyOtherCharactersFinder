@@ -1,28 +1,28 @@
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Application.Services;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
 namespace WorldSeeder;
 
-public class WorldSeeder : IWorldSeeder
+public class WorldSeederService : IWorldSeederService
 {
     private const string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
 
     private readonly IRepository _repository;
-    private readonly ITibiaDataProvider _tibiaDataProvider;
+    private readonly ITibiaDataService _tibiaDataService;
 
     private List<string> _worldsNamesFromTibiaDataProvider;
     private List<World> _worldsFromDb;
 
-    public WorldSeeder(IRepository repository, ITibiaDataProvider tibiaDataProvider)
+    public WorldSeederService(IRepository repository, ITibiaDataService tibiaDataService)
     {
         _repository = repository;
-        _tibiaDataProvider = tibiaDataProvider;
+        _tibiaDataService = tibiaDataService;
     }
 
     public async Task SetProperties()
     {
-        _worldsNamesFromTibiaDataProvider = await _tibiaDataProvider.FetchWorldsNamesFromTibiaApi();
+        _worldsNamesFromTibiaDataProvider = await _tibiaDataService.FetchWorldsNames();
         _worldsFromDb = await _repository.GetWorldsAsNoTrackingAsync();
     }
 
