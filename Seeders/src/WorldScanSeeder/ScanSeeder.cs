@@ -1,22 +1,22 @@
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Application.Services;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
 namespace WorldScanSeeder;
 
 public class ScanSeeder : IScanSeeder
 {
     private readonly IRepository _repository;
-    private readonly ITibiaDataProvider _tibiaDataProvider;
+    private readonly ITibiaDataService _tibiaDataService;
 
     private List<World> _availableWorlds;
 
     public List<World> AvailableWorlds => _availableWorlds;
 
-    public ScanSeeder(IRepository repository, ITibiaDataProvider tibiaDataProvider)
+    public ScanSeeder(IRepository repository, ITibiaDataService tibiaDataService)
     {
         _repository = repository;
-        _tibiaDataProvider = tibiaDataProvider;
+        _tibiaDataService = tibiaDataService;
     }
 
     public async Task SetProperties()
@@ -32,7 +32,7 @@ public class ScanSeeder : IScanSeeder
 
     private async Task<WorldScan> CreateWorldScanAsync(World world)
     {
-        var charactersOnline = await _tibiaDataProvider.FetchCharactersOnlineFromTibiaApi(world.Name);
+        var charactersOnline = await _tibiaDataService.FetchCharactersOnline(world.Name);
 
         return new WorldScan
         {

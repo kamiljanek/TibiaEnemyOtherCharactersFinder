@@ -22,6 +22,11 @@ public class CharacterController : CharacterBaseController
     public async Task<IActionResult> GetOtherCharacters([FromRoute] string characterName)
     {
         var result = await _mediator.Send(new GetCharacterWithCorrelationsQuery(characterName));
+        if (result is null)
+        {
+            return NotFound("Character does not exist");
+        }
+
         return Ok(result);
     }
 }

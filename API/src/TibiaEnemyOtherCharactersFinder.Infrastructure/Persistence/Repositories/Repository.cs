@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+// ReSharper disable RedundantAnonymousTypePropertyName
+
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence.Repositories;
 
 public class Repository : IRepository
 {
@@ -63,8 +66,11 @@ public class Repository : IRepository
 
     public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity
     {
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         _dbContext.Set<T>().AddRange(entities);
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         await _dbContext.SaveChangesAsync();
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
     }
 
     public async Task UpdateWorldAsync(World newWorld)
@@ -104,13 +110,13 @@ public class Repository : IRepository
             .Where(c => logoutCharactersIds.Contains(c.LoginCharacterId) && loginCharactersIds.Contains(c.LogoutCharacterId))
             .Select(cc => cc.CorrelationId);
 
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         await _dbContext.CharacterCorrelations
            .Where(cc => characterCorrelationsIdsPart1.Concat(characterCorrelationsIdsPart2).Contains(cc.CorrelationId))
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
                .SetProperty(c => c.LastMatchDate, lastMatchDate));
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
     }
 
     /// <param name="rawSql">Sql command to execute</param>
@@ -125,15 +131,15 @@ public class Repository : IRepository
         await _dbContext.Database.ExecuteSqlRawAsync(rawSql);
     }
 
-    /// <param name="numberOfDays">Removes records older than the number of days</param>
-    /// <param name="matchingNumber">Removes records that have less "NumberOfMatches" than input</param>
     public async Task DeleteIrrelevantCharacterCorrelations(int numberOfDays, int matchingNumber)
     {
         var thresholdDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-numberOfDays));
 
-        _dbContext.CharacterCorrelations.RemoveRange(_dbContext.CharacterCorrelations
-            .Where(c => c.NumberOfMatches < matchingNumber && c.LastMatchDate < thresholdDate));
-        await _dbContext.SaveChangesAsync();
+        _dbContext.Database.SetCommandTimeout(600);
+
+        await _dbContext.CharacterCorrelations
+            .Where(c => c.NumberOfMatches < matchingNumber && c.LastMatchDate < thresholdDate)
+            .ExecuteDeleteAsync();
     }
 
     public async Task CreateCharacterCorrelationsIfNotExist()
@@ -149,12 +155,12 @@ public class Repository : IRepository
         var existingCharacterCorrelationsPart1 =
             _dbContext.Characters
                 .Where(c => loginCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LoginCharacterId, LogoutCharacterId = wc.LogoutCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(cc => new {LoginCharacterId = cc.LoginCharacterId, LogoutCharacterId = cc.LogoutCharacterId}));
         
         var existingCharacterCorrelationsPart2 =
             _dbContext.Characters
                 .Where(c => logoutCharactersIds.Contains(c.CharacterId))
-                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(wc => new {LoginCharacterId = wc.LogoutCharacterId, LogoutCharacterId = wc.LoginCharacterId}));
+                .SelectMany(wc => wc.LoginCharacterCorrelations.Select(cc => new {LoginCharacterId = cc.LogoutCharacterId, LogoutCharacterId = cc.LoginCharacterId}));
   
         var correlationsDataToInsert = correlationsDataToCreate.Except(existingCharacterCorrelationsPart1).Except(existingCharacterCorrelationsPart2);
 
@@ -167,13 +173,13 @@ public class Repository : IRepository
                 CreateDate = lastMatchDate,
                 LastMatchDate = lastMatchDate
             }).ToList();
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
         await _dbContext.SaveChangesAsync();
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
 
     }
 
@@ -181,15 +187,20 @@ public class Repository : IRepository
     {
         var charactersToRemove = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
 
-        var correlationsToRemove = _dbContext.CharacterCorrelations
-        .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId));
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+        await _dbContext.CharacterCorrelations
+        .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId)).ExecuteDeleteAsync();
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
-        _dbContext.CharacterCorrelations.RemoveRange(correlationsToRemove);
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+        // _dbContext.CharacterCorrelations.RemoveRange(correlationsToRemove);
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
-        await _dbContext.SaveChangesAsync();
-        _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+        // await _dbContext.SaveChangesAsync();
+        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+    }
+
+    public async Task ClearChangeTracker()
+    {
+        await Task.Run(() => _dbContext.ChangeTracker.Clear());
     }
     
     private IQueryable<int> CharactersIds(bool isOnline)

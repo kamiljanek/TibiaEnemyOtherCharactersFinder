@@ -1,4 +1,4 @@
-﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+﻿using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
 namespace CharacterAnalyser.ActionRules.Rules;
 

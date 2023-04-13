@@ -1,24 +1,24 @@
-﻿using Newtonsoft.Json;
-using System.IO.Compression;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider.Dtos;
+﻿using System.IO.Compression;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Providers.DataProvider;
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaDataApi;
 
-public class TibiaDataProvider : ITibiaDataProvider
+public class TibiaDataApiClient : ITibiaDataApiClient
 {
-    private const string _baseUrl = $"https://api.tibiadata.com/v3/";
-    private const string _worldsEndpoint = $"worlds/";
-    private const string _worldEndpoint = $"world/";
     private readonly HttpClient _httpClient;
+    private readonly string _apiVersion;
 
-    public TibiaDataProvider(HttpClient httpClient)
+    public TibiaDataApiClient(HttpClient httpClient, IOptions<TibiaDataApiSection> tibiaDataApi)
     {
         _httpClient = httpClient;
+        _apiVersion = tibiaDataApi.Value.ApiVersion;
     }
 
     public async Task<List<string>> FetchWorldsNamesFromTibiaApi()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{_worldsEndpoint}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/worlds");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
@@ -27,17 +27,16 @@ public class TibiaDataProvider : ITibiaDataProvider
             var contentDeserialized = JsonConvert.DeserializeObject<TibiaApiWorldsResult>(content);
             var worldNames = contentDeserialized.worlds.regular_worlds.Select(world => world.name).ToList();
 
-            Console.WriteLine($"Status Code during 'Fetching Worlds names from Tibia Api' is success");
             return worldNames;
         }
 
-        Console.WriteLine($"Status Code during 'Fetching Worlds names from Tibia Api' isn't success");
         return new List<string>();
+        // UNDONE: dorobić logger
     }
 
     public async Task<string> FetchCharactersOnlineFromTibiaApi(string name)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}{_worldEndpoint}{name}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/world/{name}");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
@@ -48,13 +47,27 @@ public class TibiaDataProvider : ITibiaDataProvider
 
             var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
 
-            Console.WriteLine($"{name} - successfull");
-
             return string.Join("|", onlinePlayers);
         }
-        Console.WriteLine($"{name} - code isn't success");
 
         return string.Empty;
+        // UNDONE: dorobić logger
+    }
+
+    public async Task<TibiaApiCharacterInformationResult> FetchCharacterFromTibiaApi(string name)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/character/{name}");
+
+        using var response = await _httpClient.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await ReadContentAsString(response);
+
+            return JsonConvert.DeserializeObject<TibiaApiCharacterInformationResult>(content);
+        }
+
+        return null;
+        // UNDONE: dorobić logger
     }
 
     private async Task<string> ReadContentAsString(HttpResponseMessage response)
