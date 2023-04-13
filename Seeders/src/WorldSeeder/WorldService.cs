@@ -2,17 +2,17 @@
 
 public class WorldService : IWorldService
 {
-    private readonly IWorldSeeder _worldSeeder;
+    private readonly IWorldSeederService _worldSeederService;
 
-    public WorldService(WorldSeederDecorator worldSeeder)
+    public WorldService(WorldSeederServiceDecorator worldSeederService)
     {
-        _worldSeeder = worldSeeder;
+        _worldSeederService = worldSeederService;
     }
 
     public async Task Run()
     {
-        await _worldSeeder.SetProperties();
-        await _worldSeeder.Seed();
-        await _worldSeeder.TurnOffIfWorldIsUnavailable();
+        await _worldSeederService.SetProperties();
+        await _worldSeederService.Seed();
+        await _worldSeederService.TurnOffIfWorldIsUnavailable();
     }
 }

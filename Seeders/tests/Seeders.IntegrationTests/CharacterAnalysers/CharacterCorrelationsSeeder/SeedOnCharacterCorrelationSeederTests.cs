@@ -2,7 +2,8 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.CharacterAnalysers.CharacterCorrelationsSeeder;
 
@@ -50,8 +51,8 @@ public class SeedOnCharacterCorrelationSeederTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var characterSeeder = scope.ServiceProvider.GetRequiredService<CharacterSeeder>();
-        var correlationSeeder = scope.ServiceProvider.GetRequiredService<CharacterCorrelationSeeder>();
+        var characterSeeder = scope.ServiceProvider.GetRequiredService<CharacterSeederService>();
+        var correlationSeeder = scope.ServiceProvider.GetRequiredService<CharacterCorrelationSeederService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
 
         var characterActions =  new List<CharacterAction>

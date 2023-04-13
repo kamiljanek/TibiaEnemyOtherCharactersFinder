@@ -1,21 +1,15 @@
-﻿using System.Text.Json.Serialization;
-
+﻿
 namespace TibiaEnemyOtherCharactersFinder.Application.Dtos;
 
 public class CharacterWithCorrelationsResult
 {
-    [JsonPropertyName("Other character name")]
-    public string OtherCharacterName { get; set; }
-
-    [JsonPropertyName("Number of matches")]
-    public short NumberOfMatches { get; set; }
-
-    [JsonPropertyName("First match date")]
-    public DateOnly CreateDateOnly => DateOnly.FromDateTime(CreateDate);
-
-    [JsonPropertyName("Last match date")]
-    public DateOnly LastMatchDateOnly => DateOnly.FromDateTime(LastMatchDate);
-
-    private DateTime CreateDate { get; set; }
-    private DateTime LastMatchDate { get; set; }
+    public string Name { get; set; }
+    public string World { get; set; }
+    public string Vocation { get; set; }
+    public int Level { get; set; }
+    public string LastLogin { get; set; }
+    public List<string> FormerNames { get; set; }
+    public List<string> FormerWorlds { get; set; }
+    public bool Traded { get; set; }
+    public List<CorrelationResult> Correlations { get; set; }
 }

@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Application.Services;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaDataApi;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure
 {
@@ -24,6 +27,17 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
                                .Get<int>());
                    })
                .UseSnakeCaseNamingConvention());
+
+            services.AddOptions<TibiaDataApiSection>()
+                .Bind(configuration.GetSection(TibiaDataApiSection.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddHttpClient<ITibiaDataApiClient, TibiaDataApiClient>("TibiaDataApiClient", httpClient =>
+                {
+                    httpClient.BaseAddress = new Uri(configuration[$"{TibiaDataApiSection.SectionName}:{nameof(TibiaDataApiSection.BaseAddress)}"]);
+                    httpClient.Timeout = TimeSpan.Parse(configuration[$"{TibiaDataApiSection.SectionName}:{nameof(TibiaDataApiSection.Timeout)}"]);
+                });
 
             return services;
         }

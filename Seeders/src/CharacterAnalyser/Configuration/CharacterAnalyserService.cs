@@ -11,10 +11,10 @@ public static class CharacterAnalyserService
         services.AddScoped<IAnalyser, Analyser>();
         services.AddScoped<CharacterManager>();
         services.AddScoped<CharacterActionsCleaner>();
-        services.AddScoped<CharacterCorrelationSeeder>();
+        services.AddScoped<CharacterCorrelationSeederService>();
         services.AddScoped<CharacterCorrelationUpdater>();
         services.AddScoped<CharacterCorrelationDeleter>();
-        services.AddScoped<CharacterSeeder>();
+        services.AddScoped<CharacterSeederService>();
 
         return services;
     }

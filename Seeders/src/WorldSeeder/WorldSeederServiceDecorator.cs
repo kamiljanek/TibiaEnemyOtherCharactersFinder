@@ -4,30 +4,30 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace WorldSeeder;
 
-public class WorldSeederDecorator : ILoggerDecorator, IWorldSeeder
+public class WorldSeederServiceDecorator : ILoggerDecorator, IWorldSeederService
 {
-    private readonly ILogger<WorldSeederDecorator> _logger;
-    private readonly IWorldSeeder _worldSeeder;
+    private readonly ILogger<WorldSeederServiceDecorator> _logger;
+    private readonly IWorldSeederService _worldSeederService;
 
-    public WorldSeederDecorator(ILogger<WorldSeederDecorator> logger, IWorldSeeder worldSeeder)
+    public WorldSeederServiceDecorator(ILogger<WorldSeederServiceDecorator> logger, IWorldSeederService worldSeederService)
     {
         _logger = logger;
-        _worldSeeder = worldSeeder;
+        _worldSeederService = worldSeederService;
     }
 
     public async Task Seed()
     {
-        await Decorate(_worldSeeder.Seed);
+        await Decorate(_worldSeederService.Seed);
     }
 
     public async Task SetProperties()
     {
-        await Decorate(_worldSeeder.SetProperties);
+        await Decorate(_worldSeederService.SetProperties);
     }
 
     public async Task TurnOffIfWorldIsUnavailable()
     {
-        await Decorate(_worldSeeder.TurnOffIfWorldIsUnavailable);
+        await Decorate(_worldSeederService.TurnOffIfWorldIsUnavailable);
     }
 
     public async Task Decorate(Func<Task> function)

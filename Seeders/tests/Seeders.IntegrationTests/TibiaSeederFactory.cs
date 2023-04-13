@@ -12,7 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TibiaEnemyOtherCharactersFinder.Api;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 #pragma warning disable CS0618
 
@@ -83,8 +84,8 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             services.AddSingleton<CharacterManager>();
             services.AddSingleton<CharacterActionsCleaner>();
             services.AddSingleton<Analyser>();
-            services.AddSingleton<CharacterSeeder>();
-            services.AddSingleton<CharacterCorrelationSeeder>();
+            services.AddSingleton<CharacterSeederService>();
+            services.AddSingleton<CharacterCorrelationSeederService>();
             services.AddSingleton<CharacterCorrelationUpdater>();
             services.AddSingleton<CharacterCorrelationDeleter>();
             services.AddSingleton<Cleaner>();

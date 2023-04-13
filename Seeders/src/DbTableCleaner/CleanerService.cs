@@ -12,6 +12,5 @@ public class CleanerService : ICleanerService
     public async Task Run()
     {
         await _cleaner.ClearTables();
-        await _cleaner.VacuumTables();
     }
 }

@@ -1,8 +1,10 @@
-﻿using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+﻿using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Application.Services;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
-public class CharacterCorrelationUpdater : ISeeder
+public class CharacterCorrelationUpdater : ISeederService
 {
     private readonly IRepository _repository;
 

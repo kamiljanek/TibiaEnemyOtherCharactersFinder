@@ -1,7 +1,8 @@
 ﻿using CharacterAnalyser.Modules;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.CharacterAnalysers.CharacterAnalysersCleaner;
 

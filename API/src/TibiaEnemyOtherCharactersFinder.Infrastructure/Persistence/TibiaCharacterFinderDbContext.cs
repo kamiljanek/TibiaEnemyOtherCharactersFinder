@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Entities;
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbContext
 {
