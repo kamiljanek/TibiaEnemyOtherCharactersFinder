@@ -33,16 +33,16 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
         var correlations = await connection.QueryAsync<CorrelationResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
         var result = new CharacterWithCorrelationsResult
         {
-            FormerNames = character.characters.character.former_names,
-            FormerWorlds = character.characters.character.former_worlds,
+            FormerNames = character.characters.character.former_names ?? new List<string>(),
+            FormerWorlds = character.characters.character.former_worlds ?? new List<string>(),
             Name = character.characters.character.name,
             Level = character.characters.character.level,
             Traded = character.characters.character.traded,
             Vocation = character.characters.character.vocation,
             World = character.characters.character.world,
             LastLogin = character.characters.character.last_login,
-            OtherVisibleCharacters = character.characters.other_characters.Select(ch => ch.name).ToList(),
-            PossibleInvisibleCharacters = correlations.ToList()
+            OtherVisibleCharacters = character.characters.other_characters is null ? new List<string>() : character.characters.other_characters.Select(ch => ch.name).ToList(),
+            PossibleInvisibleCharacters = correlations is null ? new List<CorrelationResult>() : correlations.ToList()
         };
 
         return result;
