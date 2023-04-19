@@ -66,13 +66,13 @@ The more player plays, the more likely result will be close to true.
 ## Screenshots
 
 <h4 align="center">Swagger Api view</h>
-![Example screenshot](./img/main_window.png)
+![](img/main_window.png)
 
 <h4 align="center">Character Controller</h>
-![Example screenshot](./img/character_endpoint.png) 
+![](img/character_endpoint.png) 
 
 <h4 align="center">Example result</h>
-![Example screenshot](./img/result.png)
+![](img/result.png)
 
 ---
 ## Setup
@@ -131,7 +131,7 @@ Project is: _still in progress_ .
 ---
 ## License
 
-You can check out the full license [_here_]()
+You can check out the full license [_here_](LICENSE.md)
 
 This project is licensed under the terms of the **_MIT_** license.
 
