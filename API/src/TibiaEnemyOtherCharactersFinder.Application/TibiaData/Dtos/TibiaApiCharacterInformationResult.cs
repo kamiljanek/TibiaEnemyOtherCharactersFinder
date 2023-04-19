@@ -8,6 +8,12 @@ public class TibiaApiCharacterInformationResult
 public class CharactersResult
 {
     public CharacterResult character { get; set; }
+    public List<OtherCharacterResult> other_characters { get; set; }
+}
+
+public class OtherCharacterResult
+{
+    public string name { get; set; }
 }
 
 public class CharacterResult
