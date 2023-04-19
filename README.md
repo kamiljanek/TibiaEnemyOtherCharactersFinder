@@ -77,6 +77,7 @@ The more player plays, the more likely result will be close to true.
 
 ![](img/result.png)
 
+
 ---
 ## Setup
 
@@ -137,6 +138,5 @@ Project is: _still in progress_ .
 You can check out the full license [_here_](LICENSE.md)
 
 This project is licensed under the terms of the **_MIT_** license.
-
 
 >Created by [@kamiljanek](https://github.com/kamiljanek) GitHub
