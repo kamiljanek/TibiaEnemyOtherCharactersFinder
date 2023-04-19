@@ -11,5 +11,6 @@ public class CharacterWithCorrelationsResult
     public List<string> FormerNames { get; set; }
     public List<string> FormerWorlds { get; set; }
     public bool Traded { get; set; }
-    public List<CorrelationResult> Correlations { get; set; }
+    public List<string> OtherVisibleCharacters { get; set; }
+    public List<CorrelationResult> PossibleInvisibleCharacters { get; set; }
 }

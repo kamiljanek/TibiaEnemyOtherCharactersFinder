@@ -41,7 +41,8 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
             Vocation = character.characters.character.vocation,
             World = character.characters.character.world,
             LastLogin = character.characters.character.last_login,
-            Correlations = correlations.ToList()
+            OtherVisibleCharacters = character.characters.other_characters.Select(ch => ch.name).ToList(),
+            PossibleInvisibleCharacters = correlations.ToList()
         };
 
         return result;

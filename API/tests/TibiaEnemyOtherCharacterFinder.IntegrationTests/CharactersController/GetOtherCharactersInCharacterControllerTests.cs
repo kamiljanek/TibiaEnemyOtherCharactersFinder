@@ -29,8 +29,8 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
 
         // Assert
         result.Should().NotBeNull();
-        result!.Correlations.Count.Should().Be(2);
-        result.Correlations.First(c => c.OtherCharacterName == "abargo maewa").NumberOfMatches.Should().Be(4);
+        result!.PossibleInvisibleCharacters.Count.Should().Be(2);
+        result.PossibleInvisibleCharacters.First(c => c.OtherCharacterName == "abargo maewa").NumberOfMatches.Should().Be(4);
     }
     
     [Fact]
