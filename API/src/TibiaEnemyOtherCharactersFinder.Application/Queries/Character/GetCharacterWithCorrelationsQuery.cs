@@ -22,7 +22,7 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
 
     public async Task<CharacterWithCorrelationsResult> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
     {
-        var parameters = new { CharacterName = request.Name.ToLower() };
+        var parameters = new { CharacterName = request.Name.Replace('+', ' ').Trim().ToLower() };
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
         var character = await _tibiaDataService.FetchCharacter(request.Name);
         if (string.IsNullOrWhiteSpace(character.characters.character.name))

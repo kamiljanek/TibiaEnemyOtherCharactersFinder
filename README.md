@@ -3,7 +3,7 @@
 <table>
     <tr>
         <td>
-            Tibia Enemy Other Characters Finder is a simple ASP.NET Api that helps players to detect other characters of your enemy.
+            Tibia Enemy Other Characters Finder is a simple ASP.NET Api that helps players to detect other characters of their enemy.
         </td>
     </tr>
 </table>
@@ -29,7 +29,7 @@ You can check out https://tibia.bieda.it/
 #### Dear Tibia Players ! 
 - Have you ever been killed or cheated by some noob character and you want revenge on his main character ? 
 
-- Now it's possible! Application gives opportunity to find all characters of the same player. Just type your suspect character name and it gives you list of most possible other characters.
+- Now it's possible! Application gives opportunity to find all characters of that player. Just type your suspect character name and it gives you list of most possible other characters.
 
 #### Important!
 - You have to remember that application does not have 100% sure of other character match, it is only sugestion based on propability.

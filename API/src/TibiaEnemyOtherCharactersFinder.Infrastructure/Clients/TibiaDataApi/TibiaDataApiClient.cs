@@ -31,7 +31,6 @@ public class TibiaDataApiClient : ITibiaDataApiClient
         }
 
         return new List<string>();
-        // UNDONE: dorobić logger
     }
 
     public async Task<string> FetchCharactersOnlineFromTibiaApi(string name)
@@ -51,7 +50,6 @@ public class TibiaDataApiClient : ITibiaDataApiClient
         }
 
         return string.Empty;
-        // UNDONE: dorobić logger
     }
 
     public async Task<TibiaApiCharacterInformationResult> FetchCharacterFromTibiaApi(string name)
@@ -67,7 +65,6 @@ public class TibiaDataApiClient : ITibiaDataApiClient
         }
 
         return null;
-        // UNDONE: dorobić logger
     }
 
     private async Task<string> ReadContentAsString(HttpResponseMessage response)
@@ -76,16 +73,10 @@ public class TibiaDataApiClient : ITibiaDataApiClient
         if (response.Content.Headers.ContentEncoding.Any(x => x == "gzip"))
         {
             // Decompress manually
-            using (var s = await response.Content.ReadAsStreamAsync())
-            {
-                using (var decompressed = new GZipStream(s, CompressionMode.Decompress))
-                {
-                    using (var rdr = new StreamReader(decompressed))
-                    {
-                        return await rdr.ReadToEndAsync();
-                    }
-                }
-            }
+            await using var stream = await response.Content.ReadAsStreamAsync();
+            await using var decompressed = new GZipStream(stream, CompressionMode.Decompress);
+            using var streamReader = new StreamReader(decompressed);
+            return await streamReader.ReadToEndAsync();
         }
         // Use standard implementation if not compressed
         return await response.Content.ReadAsStringAsync();
