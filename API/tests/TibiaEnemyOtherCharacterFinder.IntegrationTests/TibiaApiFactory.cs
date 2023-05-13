@@ -24,7 +24,7 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
                 Username = "username",
                 Password = "password"
             })
-            .WithImage("postgres:14.6")
+            .WithImage("postgres:14.2")
             .Build();
 
     public async Task InitializeAsync()

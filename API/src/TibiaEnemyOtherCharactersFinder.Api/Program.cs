@@ -1,4 +1,3 @@
-using System.Configuration;
 using Autofac.Extensions.DependencyInjection;
 using Serilog;
 

@@ -16,7 +16,7 @@ public class Program
     {
         try
         {
-            var host = CreateHostBuilder();
+            var host = CreateHostBuilder(args);
 
             Log.Information("Starting application");
 
@@ -35,15 +35,15 @@ public class Program
         }
     }
 
-    private static IHost CreateHostBuilder()
+    private static IHost CreateHostBuilder(string [] args)
     {
-        var host = Host.CreateDefaultBuilder()
+        var host = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config
-                    // .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables();
             })
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureContainer<ContainerBuilder>(builder =>
