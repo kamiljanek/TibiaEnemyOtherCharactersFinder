@@ -1,10 +1,14 @@
 name: Deploy
 on:
   workflow_dispatch:
+    inputs:
+      image_version:
+        description: 'The version of the Docker image'
+        required: true
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  IMAGE_NAME: teocf
+  IMAGE_NAME: TibiaEOCF
   IMAGE_VERSION: ${{ github.event.inputs.image_version }}
 
 jobs:
