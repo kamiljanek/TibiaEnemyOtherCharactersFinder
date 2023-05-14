@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  IMAGE_NAME: TibiaEOCF
+  IMAGE_NAME: tibia-eocf
   IMAGE_VERSION: ${{ github.event.inputs.image_version }}
 
 jobs:
