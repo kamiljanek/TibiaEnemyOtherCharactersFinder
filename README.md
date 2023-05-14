@@ -19,6 +19,7 @@ You can check out https://tibia.bieda.it/
 * [Screenshots](#screenshots)
 * [Setup](#setup)
 * [Usage](#usage)
+* [Docker Usage](#docker-usage)
 * [Project Status](#project-status)
 * [Room for Improvement](#room-for-improvement)
 * [Contact](#contact)
@@ -53,6 +54,7 @@ The more player plays, the more likely result will be close to true.
 - MediatR
 - FluentAssertions
 - Autofac
+- Docker
 
 ---
 ## Features
@@ -87,21 +89,21 @@ The more player plays, the more likely result will be close to true.
 3. Clone repository `git clone https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder.git`
 4. Seq enviroment on Windows [_here_](https://docs.datalust.co/docs/getting-started) or docker container [_here_](https://docs.datalust.co/docs/getting-started-with-docker)
 5. Your own Postgres Database
-6. Configure `appsettings.json` or if you have Development enviroment copy `appsettings.Development-template.json` change file name to `appsettings.Development.json` and input your secrets
+6. Create database in Postgres and configure `appsettings.json` or if you have Development enviroment copy `appsettings.Development-template.json` change file name to `appsettings.Development.json` and input your secrets
 7. Configure `launchSettings.json`
 
 ---
-
 ## [Usage](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder)
 
 1. Firstly you need to build project - go into repo directory, open CMD and type (`dotnet build`)
-2. Next you should run `TibiaEnemyOtherCharactersFinder.Api` to add all migrations - go into project directory, open CMD and type `dotnet run`
-3. Last step is to configure `cron` on your machine with periods as below:
+2. Than `dotnet publish -c Release -o /app`
+3. Next you should firstly run `TibiaEnemyOtherCharactersFinder.Api` to add all migrations - go into `./app`, open CMD and type `dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
+4. Last step is to configure `cron` on your machine with periods as below:
 
-- `CharacterAnalyser` - (`dotnet run`) - ones per day
-- `WorldScanSeeder` - (`dotnet run`) - minimum ones per 5 min
-- `DbCleaner` - (`dotnet run`) - ones per day/week
-- `WorldSeeder` - (`dotnet run`) - best practise ones per day
+- `CharacterAnalyser` - (`dotnet CharacterAnalyser.dll`) - ones per day
+- `WorldScanSeeder` - (`dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
+- `DbCleaner` - (`dotnet DbCleaner.dll`) - ones per day/week
+- `WorldSeeder` - (`dotnet WorldSeeder.dll`) - best practise ones per day
 
 ### Development
 Want to contribute? Great!
@@ -116,6 +118,21 @@ To fix a bug, enhance an existing module or add something new, follow these step
 - Push to the branch (`git push origin feature/<new_feature_or_improve_name>`)
 - Create a Pull Request
 
+
+---
+## [Docker Usage](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder/pkgs/container/tibia-eocf)
+
+1. Firstly pull image
+2. Create database in Postgres 
+3. Than create and configure file `.env` with enviroment variables as [_here_](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder/blob/develop/.env-template)
+4. Than open CMD and run container `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_eocf_api -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
+5. Last step is to configure `cron` on your machine with periods as below:
+- `docker run --env-file .env -p <other_port>:80 --network <seq_container_network> --name tibia_character_analyser -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet CharacterAnalyser.dll`) - ones per day
+- `docker run --env-file .env -p <another_port>:80 --network <seq_container_network> --name tibia_world_scan_seeder -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
+- `docker run --env-file .env -p <and_another_port>:80 --network <seq_container_network> --name tibia_db_cleaner -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet DbCleaner.dll`) - ones per day/week
+- `docker run --env-file .env -p <and_and_another_port>:80 --network <seq_container_network> --name tibia_world_seeder -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldSeeder.dll`) - best practise ones per day
+
+
 ---
 ## Project Status
 
@@ -126,7 +143,6 @@ Project is: _still in progress_ .
 ## Room for Improvement
 
 ### To do:
-- Add automatic contenerized
 - Add autorization and autentication
 - Add "changing character name"
 - Add "character trade"
