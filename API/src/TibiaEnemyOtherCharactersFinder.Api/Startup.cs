@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
@@ -20,7 +21,6 @@ public class Startup
             Assembly.GetExecutingAssembly().GetName().Name);
     }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureContainer(ContainerBuilder builder)
     {
         builder.RegisterModule<AutofacModule>();
@@ -54,17 +54,20 @@ public class Startup
             {
                 Version = "v1",
                 Title = "Tibia Enemy Other Characters Finder API",
-                Description = "API for retrieving other characters of our enemy"
+                Description = "API for retrieving other characters of our enemy",
+                Contact = new OpenApiContact
+                {
+                    Name = "API Support",
+                    Url = new Uri("https://github.com/kamiljanek")
+                }
             });
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             settings.IncludeXmlComments(xmlPath);
         });
-
-        ConfigureApplicationOptions.Configure(services);
+        ConfigureOptions(services);
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         // if (env.IsDevelopment())
@@ -87,5 +90,18 @@ public class Startup
         app.UseRouting();
         app.UseCors("TibiaEnemyOtherCharacterFinderApi");
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+    }
+
+    private static void ConfigureOptions(IServiceCollection services)
+    {
+        services.AddOptions<ConnectionStringsSection>()
+            .BindConfiguration(ConnectionStringsSection.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddOptions<DapperConfigurationSection>()
+            .BindConfiguration(DapperConfigurationSection.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
     }
 }
