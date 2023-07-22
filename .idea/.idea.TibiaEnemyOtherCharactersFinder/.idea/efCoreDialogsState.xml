@@ -3,7 +3,7 @@
   <component name="EfCoreDialogsState">
     <option name="keyValueStorage">
       <map>
-        <entry key="Common:b1a02783-d5eb-4f68-a15a-ca9d53819a05:dbContext" value="TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.TibiaCharacterFinderDbContext" />
+        <entry key="Common:b1a02783-d5eb-4f68-a15a-ca9d53819a05:dbContext" value="TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence.TibiaCharacterFinderDbContext" />
         <entry key="Common:buildConfiguration" value="Debug" />
         <entry key="Common:noBuild" value="false" />
         <entry key="Common:outputFolder" value="Migrations" />

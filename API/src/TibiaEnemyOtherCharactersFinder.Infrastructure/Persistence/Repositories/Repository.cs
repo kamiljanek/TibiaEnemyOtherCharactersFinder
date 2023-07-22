@@ -8,11 +8,16 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence.Repositorie
 
 public class Repository : IRepository
 {
-    private readonly TibiaCharacterFinderDbContext _dbContext;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
 
-    public Repository(TibiaCharacterFinderDbContext dbContext)
+    public Repository(ITibiaCharacterFinderDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+    {
+        return await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public Task<List<World>> GetAvailableWorldsAsync()
@@ -66,11 +71,8 @@ public class Repository : IRepository
 
     public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity
     {
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         _dbContext.Set<T>().AddRange(entities);
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         await _dbContext.SaveChangesAsync();
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
     }
 
     public async Task UpdateWorldAsync(World newWorld)
@@ -94,6 +96,7 @@ public class Repository : IRepository
            .Where(ch => ch.FoundInScan)
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.FoundInScan, c => false));
+        // UNDONE: sprawdzić czy ta metoda jest dalej potrzebna
     }
 
     public async Task UpdateCharacterCorrelations()
@@ -110,13 +113,22 @@ public class Repository : IRepository
             .Where(c => logoutCharactersIds.Contains(c.LoginCharacterId) && loginCharactersIds.Contains(c.LogoutCharacterId))
             .Select(cc => cc.CorrelationId);
 
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         await _dbContext.CharacterCorrelations
            .Where(cc => characterCorrelationsIdsPart1.Concat(characterCorrelationsIdsPart2).Contains(cc.CorrelationId))
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
                .SetProperty(c => c.LastMatchDate, lastMatchDate));
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+    }
+
+    public async Task ReplaceCharacterIdInCharacterCorrelations(int oldCharacterId, int newCharacterId)
+    {
+        await _dbContext.CharacterCorrelations
+            .Where(cc => cc.LoginCharacterId == oldCharacterId)
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LoginCharacterId, newCharacterId));
+
+        await _dbContext.CharacterCorrelations
+            .Where(cc => cc.LogoutCharacterId == oldCharacterId)
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LogoutCharacterId, newCharacterId));
     }
 
     /// <param name="rawSql">Sql command to execute</param>
@@ -173,14 +185,10 @@ public class Repository : IRepository
                 CreateDate = lastMatchDate,
                 LastMatchDate = lastMatchDate
             }).ToList();
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
         await _dbContext.SaveChangesAsync();
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
-
     }
 
     public async Task DeleteCharacterCorrelationIfCorrelationExistInScan()
@@ -189,20 +197,69 @@ public class Repository : IRepository
 
         await _dbContext.CharacterCorrelations
         .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId)).ExecuteDeleteAsync();
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
-        // _dbContext.CharacterCorrelations.RemoveRange(correlationsToRemove);
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
-        // await _dbContext.SaveChangesAsync();
-        // _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
     }
 
     public async Task ClearChangeTracker()
     {
         await Task.Run(() => _dbContext.ChangeTracker.Clear());
     }
-    
+
+    public async Task<Character> GetFirstCharacterByVerifiedDate()
+    {
+        return await _dbContext.Characters
+            .Where(c => c.TradedDate == null || c.TradedDate < DateOnly.FromDateTime(DateTime.Now.AddDays(-30)))
+            .OrderByDescending(c => c.VerifiedDate == null)
+            .ThenBy(c => c.VerifiedDate)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<T>> SqlQueryRaw<T>(string query, params object[] parameters) where T : class
+    {
+        return await Task.Run(() => _dbContext.Database.SqlQueryRaw<T>(query, parameters).AsEnumerable());
+    }
+
+    public async Task DeleteAsync<T>(T entity) where T : class, IEntity
+    {
+        await Task.Run(() => _dbContext.Set<T>().Remove(entity));
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteCharacterCorrelationsByCharacterId(int characterId)
+    {
+        await _dbContext.CharacterCorrelations
+            .Where(c => c.LoginCharacterId == characterId || c.LogoutCharacterId == characterId)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task DeleteCharacterCorrelationsByIds(IReadOnlyList<int> characterCorrelationsIds)
+    {
+        await _dbContext.CharacterCorrelations
+            .Where(c => characterCorrelationsIds.Contains(c.CorrelationId))
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task UpdateVerifiedDate(int characterId)
+    {
+        await _dbContext.Characters
+            .Where(cc => cc.CharacterId == characterId)
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.VerifiedDate, DateOnly.FromDateTime(DateTime.Now)));
+    }
+
+    public async Task ReplaceCharacterIdInCharacterCorrelations(Character oldCharacter, Character newCharacter)
+    {
+        await _dbContext.CharacterCorrelations
+            .Where(cc => cc.LoginCharacterId == oldCharacter.CharacterId)
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LoginCharacterId, newCharacter.CharacterId));
+        await _dbContext.CharacterCorrelations
+            .Where(cc => cc.LogoutCharacterId == oldCharacter.CharacterId)
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LogoutCharacterId, newCharacter.CharacterId));
+    }
+
+    public async Task<Character> GetCharacterByName(string characterName)
+    {
+        return await _dbContext.Characters.Where(c => c.Name == characterName.ToLower()).FirstOrDefaultAsync();
+    }
+
     private IQueryable<int> CharactersIds(bool isOnline)
     {
         return _dbContext.Characters

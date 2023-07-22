@@ -127,10 +127,10 @@ To fix a bug, enhance an existing module or add something new, follow these step
 3. Than create and configure file `.env` with enviroment variables as [_here_](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder/blob/develop/.env-template)
 4. Than open CMD and run container `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_eocf_api -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
 5. Last step is to configure `cron` on your machine with periods as below:
-- `docker run --env-file .env -p <other_port>:80 --network <seq_container_network> --name tibia_character_analyser -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet CharacterAnalyser.dll`) - ones per day
-- `docker run --env-file .env -p <another_port>:80 --network <seq_container_network> --name tibia_world_scan_seeder -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
-- `docker run --env-file .env -p <and_another_port>:80 --network <seq_container_network> --name tibia_db_cleaner -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet DbCleaner.dll`) - ones per day/week
-- `docker run --env-file .env -p <and_and_another_port>:80 --network <seq_container_network> --name tibia_world_seeder -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldSeeder.dll`) - best practise ones per day
+- `docker run --env-file .env -p <other_port>:80 --network <seq_container_network> --name tibia_character_analyser --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet CharacterAnalyser.dll`) - ones per day
+- `docker run --env-file .env -p <another_port>:80 --network <seq_container_network> --name tibia_world_scan_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
+- `docker run --env-file .env -p <and_another_port>:80 --network <seq_container_network> --name tibia_db_cleaner --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet DbCleaner.dll`) - ones per day/week
+- `docker run --env-file .env -p <and_and_another_port>:80 --network <seq_container_network> --name tibia_world_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldSeeder.dll`) - best practise ones per day
 
 
 ---
@@ -144,8 +144,7 @@ Project is: _still in progress_ .
 
 ### To do:
 - Add autorization and autentication
-- Add "changing character name"
-- Add "character trade"
+- Frontend
 
 
 ---

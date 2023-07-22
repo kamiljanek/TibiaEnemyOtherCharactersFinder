@@ -41,10 +41,12 @@ public class Program
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                        // UNDONE: możliwe ze to wywalenia tak samo w innych projektach
+                    // .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    // .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                     .AddEnvironmentVariables();
-            })
+            });
+            var host2 = host
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureContainer<ContainerBuilder>(builder =>
             {
@@ -54,13 +56,13 @@ public class Program
             {
                 services
                     .AddDbCleaner()
-                    .AddServices()
+                    // .AddCustomHttpClient()
                     .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
                     .AddTibiaDbContext(context.Configuration);
             })
             .UseSerilog()
             .Build();
 
-        return host;
+        return host2;
     }
 }

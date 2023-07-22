@@ -22,27 +22,31 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
 
     public async Task<CharacterWithCorrelationsResult> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
     {
-        var parameters = new { CharacterName = request.Name.Replace('+', ' ').Trim().ToLower() };
-        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
         var character = await _tibiaDataService.FetchCharacter(request.Name);
         if (string.IsNullOrWhiteSpace(character.characters.character.name))
         {
             return null;
         }
 
+        using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
+        var parameters = new
+        {
+            CharacterName = character.characters.character.name.ToLower()
+        };
+
         var correlations = await connection.QueryAsync<CorrelationResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
         var result = new CharacterWithCorrelationsResult
         {
-            FormerNames = character.characters.character.former_names ?? new List<string>(),
-            FormerWorlds = character.characters.character.former_worlds ?? new List<string>(),
+            FormerNames = character.characters.character.former_names ?? Array.Empty<string>(),
+            FormerWorlds = character.characters.character.former_worlds ?? Array.Empty<string>(),
             Name = character.characters.character.name,
             Level = character.characters.character.level,
             Traded = character.characters.character.traded,
             Vocation = character.characters.character.vocation,
             World = character.characters.character.world,
             LastLogin = character.characters.character.last_login,
-            OtherVisibleCharacters = character.characters.other_characters is null ? new List<string>() : character.characters.other_characters.Select(ch => ch.name).ToList(),
-            PossibleInvisibleCharacters = correlations is null ? new List<CorrelationResult>() : correlations.ToList()
+            OtherVisibleCharacters = character.characters.other_characters is null ? Array.Empty<string>() : character.characters.other_characters.Select(ch => ch.name).ToList(),
+            PossibleInvisibleCharacters = correlations is null ? Array.Empty<CorrelationResult>() : correlations.ToList()
         };
 
         return result;

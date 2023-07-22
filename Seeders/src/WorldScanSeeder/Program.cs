@@ -54,7 +54,7 @@ public class Program
             {
                 services
                     .AddWorldScanSeeder()
-                    .AddServices()
+                    // .AddCustomHttpClient()
                     .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
                     .AddTibiaDbContext(context.Configuration);
             })

@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaDataApi;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Policies;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Traceability;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure
 {
@@ -28,16 +28,18 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
                    })
                .UseSnakeCaseNamingConvention());
 
-            services.AddOptions<TibiaDataApiSection>()
-                .Bind(configuration.GetSection(TibiaDataApiSection.SectionName))
+            services.AddOptions<TibiaDataSection>()
+                .Bind(configuration.GetSection(TibiaDataSection.SectionName))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddHttpClient<ITibiaDataApiClient, TibiaDataApiClient>("TibiaDataApiClient", httpClient =>
+            services.AddHttpClient<ITibiaDataClient, TibiaDataClient>("TibiaDataClient", httpClient =>
                 {
-                    httpClient.BaseAddress = new Uri(configuration[$"{TibiaDataApiSection.SectionName}:{nameof(TibiaDataApiSection.BaseAddress)}"]);
-                    httpClient.Timeout = TimeSpan.Parse(configuration[$"{TibiaDataApiSection.SectionName}:{nameof(TibiaDataApiSection.Timeout)}"]);
-                });
+                    httpClient.BaseAddress = new Uri(configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.BaseAddress)}"]);
+                    httpClient.Timeout = TimeSpan.Parse(configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.Timeout)}"]);
+                })
+                .AddHttpMessageHandler<HttpClientDecompressionHandler>()
+                .AddPolicyHandler(CommunicationPolicies.GetTibiaDataRetryPolicy());
 
             return services;
         }

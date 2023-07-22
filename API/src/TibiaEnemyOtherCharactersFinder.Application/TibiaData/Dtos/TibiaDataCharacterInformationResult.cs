@@ -1,6 +1,6 @@
 ﻿namespace TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 
-public class TibiaApiCharacterInformationResult
+public class TibiaDataCharacterInformationResult
 {
     public CharactersResult characters { get; set; }
 }
@@ -8,7 +8,7 @@ public class TibiaApiCharacterInformationResult
 public class CharactersResult
 {
     public CharacterResult character { get; set; }
-    public List<OtherCharacterResult> other_characters { get; set; }
+    public IReadOnlyList<OtherCharacterResult> other_characters { get; set; }
 }
 
 public class OtherCharacterResult
@@ -18,8 +18,8 @@ public class OtherCharacterResult
 
 public class CharacterResult
 {
-    public List<string> former_names { get; set; }
-    public List<string> former_worlds { get; set; }
+    public IReadOnlyList<string> former_names { get; set; }
+    public IReadOnlyList<string> former_worlds { get; set; }
     public string last_login { get; set; }
     public int level { get; set; }
     public string name { get; set; }

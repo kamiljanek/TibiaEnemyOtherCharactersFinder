@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaDataApi;
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 
-public class TibiaDataApiSection
+public class TibiaDataSection
 {
-    public const string SectionName = "TibiaDataApi";
+    public const string SectionName = "TibiaData";
 
     [Required]
     public string BaseAddress { get; init; }

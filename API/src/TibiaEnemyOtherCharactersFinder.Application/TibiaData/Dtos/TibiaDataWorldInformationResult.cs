@@ -1,6 +1,6 @@
 ﻿namespace TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 
-public class TibiaApiWorldInformationResult
+public class TibiaDataWorldInformationResult
 {
     public WorldsResult worlds { get; set; }
     public WorldInformationResult information { get; set; }

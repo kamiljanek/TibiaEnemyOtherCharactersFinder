@@ -6,7 +6,7 @@ namespace WorldSeeder;
 
 public class WorldSeederService : IWorldSeederService
 {
-    private const string _mainUrl = "https://www.tibia.com/community/?subtopic=worlds";
+    private const string MainUrl = "https://www.tibia.com/community/?subtopic=worlds";
 
     private readonly IRepository _repository;
     private readonly ITibiaDataService _tibiaDataService;
@@ -63,6 +63,6 @@ public class WorldSeederService : IWorldSeederService
 
     private string BuildWorldUrl(string worldName)
     {
-        return $"{_mainUrl}&world={worldName}";
+        return $"{MainUrl}&world={worldName}";
     }
 }

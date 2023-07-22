@@ -3,28 +3,31 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaDataApi;
+namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 
-public class TibiaDataApiClient : ITibiaDataApiClient
+public class TibiaDataClient : ITibiaDataClient
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiVersion;
 
-    public TibiaDataApiClient(HttpClient httpClient, IOptions<TibiaDataApiSection> tibiaDataApi)
+    public TibiaDataClient(HttpClient httpClient, IOptions<TibiaDataSection> tibiaData)
     {
         _httpClient = httpClient;
-        _apiVersion = tibiaDataApi.Value.ApiVersion;
+        _apiVersion = tibiaData.Value.ApiVersion;
     }
 
-    public async Task<List<string>> FetchWorldsNamesFromTibiaApi()
+    public async Task<List<string>> FetchWorldsNames()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/worlds");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            string content = await ReadContentAsString(response);
-            var contentDeserialized = JsonConvert.DeserializeObject<TibiaApiWorldsResult>(content);
+            // string content = await ReadContentAsString(response);
+            // UNDONE: możliwe że do wywalenia zakomentowane czesci
+
+            string content = await response.Content.ReadAsStringAsync();
+            var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldsResult>(content);
             var worldNames = contentDeserialized.worlds.regular_worlds.Select(world => world.name).ToList();
 
             return worldNames;
@@ -33,16 +36,17 @@ public class TibiaDataApiClient : ITibiaDataApiClient
         return new List<string>();
     }
 
-    public async Task<string> FetchCharactersOnlineFromTibiaApi(string name)
+    public async Task<string> FetchCharactersOnline(string name)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/world/{name}");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            string content = await ReadContentAsString(response);
+            // string content = await ReadContentAsString(response);
+            string content = await response.Content.ReadAsStringAsync();
 
-            var contentDeserialized = JsonConvert.DeserializeObject<TibiaApiWorldInformationResult>(content);
+            var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldInformationResult>(content);
 
             var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
 
@@ -52,16 +56,17 @@ public class TibiaDataApiClient : ITibiaDataApiClient
         return string.Empty;
     }
 
-    public async Task<TibiaApiCharacterInformationResult> FetchCharacterFromTibiaApi(string name)
+    public async Task<TibiaDataCharacterInformationResult> FetchCharacter(string name)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/character/{name}");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            string content = await ReadContentAsString(response);
+            // string content = await ReadContentAsString(response);
+            string content = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<TibiaApiCharacterInformationResult>(content);
+            return JsonConvert.DeserializeObject<TibiaDataCharacterInformationResult>(content);
         }
 
         return null;
