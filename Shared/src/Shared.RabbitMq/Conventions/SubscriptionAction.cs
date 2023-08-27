@@ -9,7 +9,9 @@ public class SubscriptionAction<T>
     private readonly EventBusSubscriberBuilder _builder;
     private readonly IRabbitMqConventionProvider _conventionProvider;
 
-    public SubscriptionAction(Action<IEventBusSubscriber> subscribeAction, EventBusSubscriberBuilder builder, IRabbitMqConventionProvider conventionProvider)
+    public SubscriptionAction(Action<IEventBusSubscriber> subscribeAction,
+        EventBusSubscriberBuilder builder,
+        IRabbitMqConventionProvider conventionProvider)
     {
         _subscribeAction = subscribeAction;
         _builder = builder;

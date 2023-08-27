@@ -15,7 +15,6 @@ public class CharacterCorrelationSeederService : ISeederService
     
     public async Task Seed()
     {
-        await _repository.CreateCharacterCorrelationsIfNotExist();
-        // await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlCreateCharacterCorrelationIfNotExist);
+        await _repository.CreateCharacterCorrelationsIfNotExistAsync();
     }
 }

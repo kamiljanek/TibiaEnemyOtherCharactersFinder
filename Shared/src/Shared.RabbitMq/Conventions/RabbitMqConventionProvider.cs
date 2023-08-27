@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Shared.RabbitMQ.Configuration;
+using Shared.RabbitMq.Conventions;
 
 namespace Shared.RabbitMQ.Conventions;
 
@@ -19,7 +20,7 @@ public class RabbitMqConventionProvider : IRabbitMqConventionProvider
 
     private QueueBinding CreateBinding(Type messageType)
     {
-        if (_typeBindings.TryGetValue(messageType, out QueueBinding existingBinding))
+        if (_typeBindings.TryGetValue(messageType, out QueueBinding? existingBinding))
         {
             return existingBinding;
         }

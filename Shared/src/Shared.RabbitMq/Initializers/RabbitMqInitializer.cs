@@ -14,7 +14,7 @@ public class RabbitMqInitializer : IRabbitMqInitializer
     private readonly ILogger<RabbitMqInitializer> _logger;
     private readonly EventBusSubscriberBuilder _eventBusSubscriberBuilder;
 
-    public RabbitMqInitializer(SubscriberConnection connection,
+    public RabbitMqInitializer(RabbitMqConnection connection,
         IOptions<RabbitMqSection> options,
         ILogger<RabbitMqInitializer> logger,
         EventBusSubscriberBuilder eventBusSubscriberBuilder)
@@ -24,7 +24,7 @@ public class RabbitMqInitializer : IRabbitMqInitializer
         _logger = logger;
         _eventBusSubscriberBuilder = eventBusSubscriberBuilder;
     }
-    public Task InitializeAsync(CancellationToken cancellationToken)
+    public Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         using (IModel channel = _connection.CreateModel())
         {

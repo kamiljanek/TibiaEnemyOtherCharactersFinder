@@ -9,11 +9,13 @@ public class EventBusSubscriberBuilder
 {
     private readonly IRabbitMqConventionProvider _conventionsProvider;
     private readonly ConcurrentDictionary<QueueBinding, Action<IEventBusSubscriber>> _subscribers = new();
+    public IEnumerable<Action<IEventBusSubscriber>> SubscribeActions => _subscribers.Values;
 
     public EventBusSubscriberBuilder(IRabbitMqConventionProvider conventionsProvider)
     {
         _conventionsProvider = conventionsProvider;
     }
+
 
     public SubscriptionAction<T> SubscribeEvent<T>(EventBusHandler<T> handler) where T : class, IIntegrationEvent
     {

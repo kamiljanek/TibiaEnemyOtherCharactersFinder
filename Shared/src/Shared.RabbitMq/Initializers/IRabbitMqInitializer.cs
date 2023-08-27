@@ -2,5 +2,5 @@
 
 public interface IRabbitMqInitializer
 {
-     Task InitializeAsync(CancellationToken cancellationToken);
+     Task InitializeAsync(CancellationToken cancellationToken = default);
 }

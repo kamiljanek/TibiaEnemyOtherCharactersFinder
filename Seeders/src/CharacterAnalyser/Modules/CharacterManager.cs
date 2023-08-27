@@ -26,7 +26,7 @@ public class CharacterManager : ISeeder<List<WorldScan>>
         var characterActionsToAdd = logoutCharacters.Concat(loginCharacters);
         await _repository.AddRangeAsync(characterActionsToAdd);
 
-        await _repository.SetCharacterFoundInScan(_firstScanNames, foundInScan: true);
+        await _repository.SetCharacterFoundInScanAsync(_firstScanNames, foundInScan: true);
     }
 
     public IReadOnlyList<string> GetAndSetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToArray();

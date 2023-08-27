@@ -25,7 +25,7 @@ public class Cleaner : ICleaner
 
     public async Task DeleteIrrelevantCharacterCorrelations()
     {
-        await _repository.DeleteIrrelevantCharacterCorrelations(numberOfDays: 30, matchingNumber: 3);
+        await _repository.DeleteIrrelevantCharacterCorrelationsAsync(numberOfDays: 30, matchingNumber: 3);
     }
 
     public async Task VacuumCharacterActions()

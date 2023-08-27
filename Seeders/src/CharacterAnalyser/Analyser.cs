@@ -45,7 +45,7 @@ public class Analyser : ActionRule, IAnalyser
 
     public async Task<bool> HasDataToAnalyse()
     {
-        var availableWorldIds = await _repository.NumberOfAvailableWorldScansAsync();
+        var availableWorldIds = _repository.NumberOfAvailableWorldScans();
         _uniqueWorldIds = await _repository.GetDistinctWorldIdsFromWorldScansAsync();
 
         return availableWorldIds > _uniqueWorldIds.Count;

@@ -28,7 +28,7 @@ public class AnalyserFullTests : IAsyncLifetime
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         
         await _factory.ClearDatabaseAsync(dbContext);
-        await SeedDatabseAsync(dbContext);
+        await SeedDatabaseAsync(dbContext);
         
         // Act
         while (await analyser.HasDataToAnalyse())
@@ -82,7 +82,7 @@ public class AnalyserFullTests : IAsyncLifetime
         return _resetDatabase();
     }
     
-    private async Task SeedDatabseAsync(TibiaCharacterFinderDbContext dbContext)
+    private async Task SeedDatabaseAsync(TibiaCharacterFinderDbContext dbContext)
     {
         await dbContext.Worlds.AddRangeAsync(GetWorlds());
         await dbContext.WorldScans.AddRangeAsync(GetWorldScans());

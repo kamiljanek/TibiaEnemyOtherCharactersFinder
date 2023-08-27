@@ -8,6 +8,7 @@ using Polly.Retry;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Shared.RabbitMQ.Configuration;
+using Shared.RabbitMq.Conventions;
 using Shared.RabbitMQ.Conventions;
 using Shared.RabbitMQ.EventBus;
 
@@ -26,7 +27,7 @@ public class RabbitMqBusSubscriber : IEventBusSubscriber
     private readonly RabbitMqSection _options;
 
     public RabbitMqBusSubscriber(IRabbitMqConventionProvider conventionProvider,
-        SubscriberConnection connection,
+        RabbitMqConnection connection,
         ILogger<RabbitMqBusSubscriber> logger,
         MessageSerializer serializer,
         IServiceProvider serviceProvider,
@@ -111,7 +112,7 @@ public class RabbitMqBusSubscriber : IEventBusSubscriber
             args.Exchange,
             queue,
             typeof(TMessage).AssemblyQualifiedName,
-            _serializer.Serialize(message));
+            _serializer.Serialize(message!));
 
         handleResult.StartProcessing();
 

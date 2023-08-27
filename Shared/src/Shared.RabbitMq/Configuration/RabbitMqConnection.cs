@@ -2,12 +2,12 @@
 
 namespace Shared.RabbitMQ.Configuration;
 
-public class PublisherConnection
+public class RabbitMqConnection
 {
     public IConnection Connection { get; }
     public bool IsConnected => Connection.IsOpen;
 
-    public PublisherConnection(IConnection connection)
+    public RabbitMqConnection(IConnection connection)
     {
         Connection = connection;
     }

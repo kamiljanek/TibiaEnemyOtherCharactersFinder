@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Shared.RabbitMQ;
 using Shared.RabbitMQ.Extensions;
+using Shared.RabbitMQ.Initializers;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace ChangeNameDetector;
@@ -21,9 +21,12 @@ public class Program
             var host = CreateHostBuilder(args);
 
             Log.Information("Starting application");
+            await host.StartAsync();
 
             var service = ActivatorUtilities.CreateInstance<ChangeNameDetectorService>(host.Services);
             await service.Run();
+
+            await host.StopAsync();
 
             Log.Information("Ending application properly");
         }
@@ -59,7 +62,6 @@ public class Program
                     .AddNameDetector()
                     .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
                     .AddTibiaDbContext(context.Configuration)
-                    .AddIntegrationEvents()
                     .AddRabbitMqPublisher(context.Configuration);
             })
             .UseSerilog()

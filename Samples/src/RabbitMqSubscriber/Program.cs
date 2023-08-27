@@ -4,8 +4,12 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RabbitMqSubscriber.Events.Handlers;
+using RabbitMqSubscriber.Configurations;
+using RabbitMqSubscriber.Subscribers;
 using Serilog;
+using Shared.RabbitMQ.EventBus;
+using Shared.RabbitMQ.Events;
+using Shared.RabbitMq.Extensions;
 using Shared.RabbitMQ.Extensions;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
@@ -20,13 +24,13 @@ public class Program
             var host = CreateHostBuilder(args);
 
             Log.Information("Starting application");
-            // UNDONE: możliwe że będę musiał dodać do zmiennych środowiskowych develop aby czytał appsettings.development.json
+            await host.StartAsync();
 
             var service = ActivatorUtilities.CreateInstance<TibiaSubscriber>(host.Services);
+
             service.Subscribe();
 
-        Console.ReadLine();
-        Console.ReadKey();
+            await host.StopAsync();
             Log.Information("Ending application properly");
         }
         catch (Exception ex)
@@ -37,7 +41,6 @@ public class Program
         {
             await Log.CloseAndFlushAsync();
         }
-
     }
 
     private static IHost CreateHostBuilder(string [] args)
@@ -55,14 +58,13 @@ public class Program
             .ConfigureContainer<ContainerBuilder>(builder =>
             {
                 builder.RegisterModule<AutofacModule>();
+                builder.RegisterEventSubscribers();
             })
             .ConfigureServices((context, services) =>
             {
                 services
                     .AddSingleton<TibiaSubscriber>()
-                    .AddSingleton<IEventSubscriber, MergeCharacterCorrelationsOfGivenCharactersSubscriber>()
-                    // .AddNameDetector()
-                    // .AddCustomHttpClient()
+                    // .AddSingleton<IEventSubscriber, MergeTwoCharactersEventSubscriber>()
                     .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
                     .AddTibiaDbContext(context.Configuration)
                     .AddRabbitMqSubscriber(context.Configuration);

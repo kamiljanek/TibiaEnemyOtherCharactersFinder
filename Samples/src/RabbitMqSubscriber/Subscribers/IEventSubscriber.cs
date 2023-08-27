@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client.Events;
 
-namespace RabbitMqSubscriber.Events.Handlers;
+namespace RabbitMqSubscriber.Subscribers;
 
 public interface IEventSubscriber
 {

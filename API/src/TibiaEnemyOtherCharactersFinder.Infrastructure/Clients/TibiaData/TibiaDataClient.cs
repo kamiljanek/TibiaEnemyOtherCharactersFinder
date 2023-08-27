@@ -23,9 +23,6 @@ public class TibiaDataClient : ITibiaDataClient
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            // string content = await ReadContentAsString(response);
-            // UNDONE: możliwe że do wywalenia zakomentowane czesci
-
             string content = await response.Content.ReadAsStringAsync();
             var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldsResult>(content);
             var worldNames = contentDeserialized.worlds.regular_worlds.Select(world => world.name).ToList();
@@ -36,18 +33,15 @@ public class TibiaDataClient : ITibiaDataClient
         return new List<string>();
     }
 
-    public async Task<string> FetchCharactersOnline(string name)
+    public async Task<string> FetchCharactersOnline(string worldName)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/world/{name}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/world/{worldName}");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            // string content = await ReadContentAsString(response);
             string content = await response.Content.ReadAsStringAsync();
-
             var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldInformationResult>(content);
-
             var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
 
             return string.Join("|", onlinePlayers);
@@ -56,14 +50,13 @@ public class TibiaDataClient : ITibiaDataClient
         return string.Empty;
     }
 
-    public async Task<TibiaDataCharacterInformationResult> FetchCharacter(string name)
+    public async Task<TibiaDataCharacterInformationResult> FetchCharacter(string characterName)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/character/{name}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/character/{characterName}");
 
         using var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            // string content = await ReadContentAsString(response);
             string content = await response.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<TibiaDataCharacterInformationResult>(content);
@@ -85,5 +78,6 @@ public class TibiaDataClient : ITibiaDataClient
         }
         // Use standard implementation if not compressed
         return await response.Content.ReadAsStringAsync();
+        // UNDONE: przetestować i możliwe że to wywalenia
     }
 }

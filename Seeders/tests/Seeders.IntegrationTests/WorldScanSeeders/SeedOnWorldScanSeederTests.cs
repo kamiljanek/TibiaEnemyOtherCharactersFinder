@@ -14,7 +14,7 @@ public class SeedOnWorldScanSeederTests : IAsyncLifetime
 {
     private readonly TibiaSeederFactory _factory;
     private readonly Func<Task> _resetDatabase;
-    private readonly Mock<ITibiaDataService> _tibiaApiMock = new();
+    private readonly Mock<ITibiaDataService> _tibiaDataServiceMock = new();
 
     public SeedOnWorldScanSeederTests(TibiaSeederFactory factory)
     {
@@ -30,8 +30,8 @@ public class SeedOnWorldScanSeederTests : IAsyncLifetime
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var worlds = dbContext.Worlds.AsNoTracking().ToList();
-        _tibiaApiMock.Setup(r => r.FetchCharactersOnline(worlds[0].Name)).ReturnsAsync("aphov|armystrong|asiier|braws");
-        var worldScanSeeder = new ScanSeeder(repository, _tibiaApiMock.Object);
+        _tibiaDataServiceMock.Setup(r => r.FetchCharactersOnline(worlds[0].Name)).ReturnsAsync("aphov|armystrong|asiier|braws");
+        var worldScanSeeder = new ScanSeeder(repository, _tibiaDataServiceMock.Object);
         await worldScanSeeder.SetProperties();
         
         // Act

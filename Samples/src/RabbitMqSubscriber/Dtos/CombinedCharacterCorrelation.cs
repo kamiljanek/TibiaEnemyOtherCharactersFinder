@@ -1,6 +1,6 @@
 ﻿using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
-namespace ChangeNameDetector;
+namespace RabbitMqSubscriber.Dtos;
 
 public class CombinedCharacterCorrelation
 {

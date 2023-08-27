@@ -29,5 +29,5 @@ public static class ConfigureApplication
     //
     //     return services;
     // }
-    // UNDONE: do wywalenia
+    // UNDONE: do wywalenia jeżeli przejdą wszystkie testy
 }

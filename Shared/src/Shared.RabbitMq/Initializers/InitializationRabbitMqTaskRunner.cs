@@ -2,10 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shared.RabbitMq.Extensions;
 
 namespace Shared.RabbitMQ.Initializers;
 
-public class InitializationRabbitMqTaskRunner : IHostedService
+public sealed class InitializationRabbitMqTaskRunner : IHostedService
 {
     private readonly ILogger<InitializationRabbitMqTaskRunner> _logger;
     private readonly IServiceProvider _serviceProvider;
@@ -18,32 +19,30 @@ public class InitializationRabbitMqTaskRunner : IHostedService
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken = default)
     {
         using IServiceScope scope = _serviceProvider.CreateScope();
-
-        var initializationTasks = scope.ServiceProvider.GetServices<IRabbitMqInitializer>().ToList();
-        _logger.LogDebug("Found: {InitializationTasksCount} tasks to run", initializationTasks.Count);
+        var initializationTask = scope.ServiceProvider.GetRequiredService<IRabbitMqInitializer>();
+        var anotherTask = scope.ServiceProvider.GetRequiredService<EventBusApplicationBuilder>();
+        _logger.LogInformation("Found: {InitializationTasksCount} tasks to run", initializationTask);
 
         var timer = new Stopwatch();
 
-        foreach (var task in initializationTasks)
+        var taskName = initializationTask.GetType().Name;
+        timer.Restart();
+
+        try
         {
-            var taskName = task.GetType().Name;
-            timer.Restart();
+            _logger.LogInformation("Running initialization task: {TaskName}", taskName);
 
-            try
-            {
-                _logger.LogDebug("Running initialization task: {TaskName}", taskName);
+            await initializationTask.InitializeAsync(cancellationToken);
+            anotherTask.UseEventBus(_serviceProvider);
 
-                await task.InitializeAsync(cancellationToken);
-
-                _logger.LogDebug("Task: {TaskName} initialized in {TimerElapsed}", taskName, timer.Elapsed);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Task: {TaskName} thrown exception {Message}", taskName, exception.Message);
-            }
+            _logger.LogInformation("Task: {TaskName} initialized in {TimerElapsed}", taskName, timer.Elapsed);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Task: {TaskName} thrown exception {Message}", taskName, exception.Message);
         }
     }
 

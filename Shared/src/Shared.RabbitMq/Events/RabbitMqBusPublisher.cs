@@ -16,14 +16,14 @@ public class RabbitMqBusPublisher : IEventBusPublisher
 {
     private readonly IRabbitMqConventionProvider _conventionProvider;
     private readonly ILogger<RabbitMqBusPublisher> _logger;
-    private readonly PublisherConnection _connection;
+    private readonly RabbitMqConnection _connection;
     private readonly MessageSerializer _serializer;
     private readonly RabbitMqSection _options;
 
     public RabbitMqBusPublisher(IRabbitMqConventionProvider conventionProvider,
         ILogger<RabbitMqBusPublisher> logger,
         IOptions<RabbitMqSection> options,
-        PublisherConnection connection,
+        RabbitMqConnection connection,
         MessageSerializer serializer)
     {
         _conventionProvider = conventionProvider;
