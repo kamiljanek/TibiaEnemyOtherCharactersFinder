@@ -14,7 +14,6 @@ public class TibiaSubscriber
     private readonly RabbitMqSection _options;
     private readonly SceduleOptions _scedule;
     private const string RetryHeaderName = "x-redelivered-count";
-    private bool _shouldRun = true;
 
     public TibiaSubscriber(IEnumerable<IEventSubscriber> subscribers, ILogger<TibiaSubscriber> logger, RabbitMqConnection connection, IOptions<RabbitMqSection> options)
     {
@@ -33,11 +32,13 @@ public class TibiaSubscriber
         }
     }
 
-    public void Stop()
-    {
-        _shouldRun = false;
-    }
+    // public void Stop()
+    // {
+        // _shouldRun = false;
+    // }
+    // UNDONE: wywalic powyższy kod jeżeli subscriber bedzie dobrze działał (musze przetestować ręczenie czy zbiera wiadomości i sam sie nie wyłącza)
 
+    // TODO: teraz włączyć debugowanie 2 projektów na raz i sprawdzić czy subscriber działa w odpowiednich godzinach i czy się nie wyłącza
     private void RegisterConsumer(IEventSubscriber eventSubscriber)
     {
         IModel channel = _connection.Connection.CreateModel();
@@ -46,12 +47,7 @@ public class TibiaSubscriber
         var consumer = new AsyncEventingBasicConsumer(channel);
         consumer.Received += async (_, deliveryArguments) =>
         {
-            if (!_shouldRun)
-            {
-                return;
-            }
-
-            var retryCount = GetRetryCount(deliveryArguments.BasicProperties);;
+            var retryCount = GetRetryCount(deliveryArguments.BasicProperties);
 
             if (retryCount >= _options.Retries)
             {
@@ -59,25 +55,29 @@ public class TibiaSubscriber
                 return;
             }
 
-
-                // UNDONE: sprawdzić czy rabbit pobiera wiadomości w odpowiednich godzinach
-                try
-                {
-                    await eventSubscriber.OnReceived(deliveryArguments);
-                    channel.BasicAck(deliveryTag: deliveryArguments.DeliveryTag, multiple: false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error on received message: {Message}", ex.Message);
-                    channel.BasicReject(deliveryArguments.DeliveryTag, false);
-                }
+            try
+            {
+                await eventSubscriber.OnReceived(deliveryArguments);
+                channel.BasicAck(deliveryTag: deliveryArguments.DeliveryTag, multiple: false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error on received message: {Message}", ex.Message);
+                channel.BasicReject(deliveryArguments.DeliveryTag, false);
+            }
         };
 
         try
         {
+            // UNDONE: sprawdzić czy rabbit pobiera wiadomości w odpowiednich godzinach
             if (IsSubscriptionTime())
             {
                 channel.BasicConsume(queue: eventSubscriber.GetQueueName(), autoAck: false, consumer: consumer);
+            }
+            else
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(10));
+                // UNDONE: zmienić czas na jakiś lepsz
             }
         }
         catch (Exception ex)
@@ -87,8 +87,6 @@ public class TibiaSubscriber
                 eventSubscriber.GetType(),
                 ex.Message);
         }
-
-        // Console.ReadLine();
     }
 
     private bool IsSubscriptionTime()

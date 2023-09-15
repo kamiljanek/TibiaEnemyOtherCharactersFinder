@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using ChangeNameDetector;
+using ChangeNameDetector.Services;
+using ChangeNameDetector.Validators;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +44,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
         var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var validator = scope.ServiceProvider.GetRequiredService<INameDetectorValidator>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
 
@@ -50,7 +53,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             _tibiaDataServiceMock.Setup(r => r.FetchCharacter(character.Name)).ReturnsAsync(PrepareExistingTibiaDataCharacter(character.Name));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
 
 
         // Act
@@ -76,6 +79,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
         var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var validator = scope.ServiceProvider.GetRequiredService<INameDetectorValidator>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
 
@@ -84,7 +88,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             SetupTibiaDataServiceMock(charactersBeforeDetector[i].Name, (i < 2, PrepareNonExistingTibiaDataCharacter));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
 
 
         // Act
@@ -116,6 +120,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
         var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var validator = scope.ServiceProvider.GetRequiredService<INameDetectorValidator>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
 
@@ -124,7 +129,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             SetupTibiaDataServiceMock(charactersBeforeDetector[i].Name, (i < 2, () => PrepareTradedTibiaDataCharacter(charactersBeforeDetector[i].Name)));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
 
 
         // Act
@@ -156,6 +161,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
         var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var validator = scope.ServiceProvider.GetRequiredService<INameDetectorValidator>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
 
@@ -164,7 +170,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             SetupTibiaDataServiceMock(charactersBeforeDetector[i].Name, (i < 1, () => PrepareChangedNameCharacter(charactersBeforeDetector[i].Name)));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
 
 
         // Act
@@ -197,6 +203,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
         var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+        var validator = scope.ServiceProvider.GetRequiredService<INameDetectorValidator>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
 
@@ -206,7 +213,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
                 (i < 1, () => PrepareChangedNameCharacterWithNameNonExistentInDatabase(charactersBeforeDetector[i].Name)));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
 
 
         // Act

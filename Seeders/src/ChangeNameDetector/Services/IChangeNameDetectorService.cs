@@ -1,4 +1,4 @@
-﻿namespace ChangeNameDetector;
+﻿namespace ChangeNameDetector.Services;
 
 public interface IChangeNameDetectorService
 {

@@ -22,7 +22,9 @@ public static class CustomHostBuilder
             //         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             //         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
             //         .AddEnvironmentVariables();
-            // }) // UNDONE: remove when application on prod will work
+            // })
+
+            // UNDONE: remove when application on prod will work properly
             .ConfigureAppConfiguration((_, config) =>
             {
                 config.AddEnvironmentVariables();

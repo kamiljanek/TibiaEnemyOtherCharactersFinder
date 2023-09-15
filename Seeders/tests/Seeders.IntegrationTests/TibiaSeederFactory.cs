@@ -1,4 +1,5 @@
-﻿using CharacterAnalyser;
+﻿using ChangeNameDetector.Validators;
+using CharacterAnalyser;
 using CharacterAnalyser.Modules;
 using DbCleaner;
 using Microsoft.AspNetCore.Hosting;
@@ -106,6 +107,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             services.AddSingleton<CharacterCorrelationUpdater>();
             services.AddSingleton<CharacterCorrelationDeleter>();
             services.AddSingleton<Cleaner>();
+            services.AddSingleton<INameDetectorValidator, NameDetectorValidator>();
             services.AddSingleton<IEventSubscriber, DeleteCharacterWithCorrelationsEventSubscriber>();
             services.AddSingleton<IEventSubscriber, DeleteCharacterCorrelationsEventSubscriber>();
             services.AddSingleton<IEventSubscriber, MergeTwoCharactersEventSubscriber>();

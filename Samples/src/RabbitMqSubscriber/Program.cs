@@ -32,6 +32,8 @@ public class Program
             service.Subscribe();
             await host.StopAsync();
 
+            Console.ReadKey();
+
             Log.Information("Ending application properly");
         }
         catch (Exception ex)
@@ -42,37 +44,5 @@ public class Program
         {
             await Log.CloseAndFlushAsync();
         }
-    }
-
-    private static IHost CreateHostBuilder(string [] args)
-    {
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                // config.Properties["reloadConfigOnChange"] = true;
-                config
-                    // .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    // .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables();
-            })
-            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-            .ConfigureContainer<ContainerBuilder>(builder =>
-            {
-                builder.RegisterModule<AutofacModule>();
-                builder.RegisterEventSubscribers();
-            })
-            .ConfigureServices((context, services) =>
-            {
-                services
-                    .AddSingleton<TibiaSubscriber>()
-                    // .AddSingleton<IEventSubscriber, MergeTwoCharactersEventSubscriber>()
-                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
-                    .AddTibiaDbContext(context.Configuration)
-                    .AddRabbitMqSubscriber(context.Configuration);
-            })
-            .UseSerilog()
-            .Build();
-
-        return host;
     }
 }

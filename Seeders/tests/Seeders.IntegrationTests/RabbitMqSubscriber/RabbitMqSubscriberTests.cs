@@ -52,7 +52,7 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
         // Act
         tibiaSubscriber.Subscribe();
         Thread.Sleep(100);
-        tibiaSubscriber.Stop();
+        // tibiaSubscriber.Stop();
 
         publisherConnection.Connection.Close();
         subscriberConnection.Connection.Close();
@@ -93,7 +93,7 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
         // Act
         tibiaSubscriber.Subscribe();
         Thread.Sleep(100);
-        tibiaSubscriber.Stop();
+        // tibiaSubscriber.Stop();
 
         publisherConnection.Connection.Close();
         subscriberConnection.Connection.Close();
@@ -135,7 +135,9 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
         // Act
         tibiaSubscriber.Subscribe();
         Thread.Sleep(100);
-        tibiaSubscriber.Stop();
+        // tibiaSubscriber.Stop();
+
+        // UNDONE: wywalic zakomentowany kod z 3 testów
 
         publisherConnection.Connection.Close();
         subscriberConnection.Connection.Close();

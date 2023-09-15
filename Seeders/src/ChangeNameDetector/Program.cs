@@ -1,4 +1,5 @@
 ﻿using ChangeNameDetector.Configuration;
+using ChangeNameDetector.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.RabbitMQ.Extensions;
