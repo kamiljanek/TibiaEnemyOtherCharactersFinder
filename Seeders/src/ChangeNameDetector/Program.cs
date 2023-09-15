@@ -1,14 +1,8 @@
-﻿using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using ChangeNameDetector.Configuration;
-using Microsoft.Extensions.Configuration;
+﻿using ChangeNameDetector.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Shared.RabbitMQ.Extensions;
-using Shared.RabbitMQ.Initializers;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
 
 namespace ChangeNameDetector;
 
@@ -18,14 +12,17 @@ public class Program
     {
         try
         {
-            var host = CreateHostBuilder(args);
+            var host = CustomHostBuilder.Create((context, services) =>
+            {
+                services.AddNameDetector();
+                services.AddRabbitMqPublisher(context.Configuration);
+            });
 
             Log.Information("Starting application");
-            await host.StartAsync();
 
+            await host.StartAsync();
             var service = ActivatorUtilities.CreateInstance<ChangeNameDetectorService>(host.Services);
             await service.Run();
-
             await host.StopAsync();
 
             Log.Information("Ending application properly");
@@ -38,36 +35,5 @@ public class Program
         {
             await Log.CloseAndFlushAsync();
         }
-    }
-
-    private static IHost CreateHostBuilder(string [] args)
-    {
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                // config.Properties["reloadConfigOnChange"] = true;
-                config
-                    // .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    // .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables();
-            })
-            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-            .ConfigureContainer<ContainerBuilder>(builder =>
-            {
-                builder.RegisterModule<AutofacModule>();
-            })
-            .ConfigureServices((context, services) =>
-            {
-                services
-                    .AddNameDetector()
-                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
-                    .AddTibiaDbContext(context.Configuration)
-                    .AddRabbitMqPublisher(context.Configuration);
-            })
-            .UseSerilog()
-            .Build();
-
-        return host;
-        // UNDONE: wyeksportowac ta metode do shared
     }
 }

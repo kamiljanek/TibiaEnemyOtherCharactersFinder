@@ -197,7 +197,6 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
             UserName = options.Username,
             Password = options.Password,
             DispatchConsumersAsync = true
-// UNDONE: sprawdzić co tu dodać a co odjąć
         };
 
         IConnection connection = factory.CreateConnection(conectionName);

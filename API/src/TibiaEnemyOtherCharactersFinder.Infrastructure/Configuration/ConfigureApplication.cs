@@ -18,16 +18,4 @@ public static class ConfigureApplication
         LoggerConfiguration.ConfigureLogger(configuration, projectName);
         return services;
     }
-
-    // public static IServiceCollection AddCustomHttpClient(this IServiceCollection services, IConfiguration configuration)
-    // {
-    //     services.AddHttpClient<ITibiaDataClient, TibiaDataClient>("TibiaDataClient", client =>
-    //     {
-    //         client.BaseAddress = new Uri(configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.BaseAddress)}"]);
-    //         client.Timeout = TimeSpan.Parse(configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.Timeout)}"]);
-    //     });
-    //
-    //     return services;
-    // }
-    // UNDONE: do wywalenia jeżeli przejdą wszystkie testy
 }

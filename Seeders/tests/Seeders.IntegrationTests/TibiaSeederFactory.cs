@@ -1,5 +1,4 @@
-﻿using Autofac.Extensions.DependencyInjection;
-using CharacterAnalyser;
+﻿using CharacterAnalyser;
 using CharacterAnalyser.Modules;
 using DbCleaner;
 using Microsoft.AspNetCore.Hosting;
@@ -8,12 +7,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using RabbitMQ.Client;
 using RabbitMqSubscriber.Events;
 using RabbitMqSubscriber.Subscribers;
-using Shared.RabbitMQ.Configuration;
 using Shared.RabbitMQ.Extensions;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
@@ -49,9 +45,6 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     .WithPortBinding(15672, 15672)
     .WithPortBinding(5672, 5672)
     .Build();
-
-    private IServiceCollection _tibiaCollection;
-    public IServiceProvider TibiaServices;
 
     public async Task ResetDatabaseAsync()
     {

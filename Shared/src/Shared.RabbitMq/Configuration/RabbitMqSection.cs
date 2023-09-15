@@ -25,8 +25,8 @@ public class RabbitMqSection
 public class SceduleOptions
 {
     [Required] public bool Enabled { get; init; }
-    [Required] public int StartSubscribeHour { get; init; }
-    [Required] public int EndSubscribeHour { get; init; }
+    [Required] public string StartSubscribeTime { get; init; }
+    [Required] public string EndSubscribeTime { get; init; }
 }
 
 public class ExchangeOptions

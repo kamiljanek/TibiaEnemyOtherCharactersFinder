@@ -1,5 +1,5 @@
-using EkoProTech.Shared.RabbitMQ.EventBus;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.RabbitMq.EventBus;
 using Shared.RabbitMQ.Events;
 
 namespace Shared.RabbitMQ.Handlers;

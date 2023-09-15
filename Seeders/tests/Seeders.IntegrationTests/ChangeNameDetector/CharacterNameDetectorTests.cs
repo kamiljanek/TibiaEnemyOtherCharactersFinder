@@ -40,7 +40,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         var dbContextForMock = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
-        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventBusPublisher>();
+        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
@@ -74,7 +74,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         var dbContextForMock = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
-        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventBusPublisher>();
+        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
@@ -114,7 +114,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         var dbContextForMock = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
-        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventBusPublisher>();
+        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
@@ -154,7 +154,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         var dbContextForMock = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
-        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventBusPublisher>();
+        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();
@@ -195,7 +195,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         var dbContextForMock = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChangeNameDetectorService>>();
-        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventBusPublisher>();
+        var busPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
         var charactersBeforeDetector = dbContextForMock.Characters.AsNoTracking().ToList();

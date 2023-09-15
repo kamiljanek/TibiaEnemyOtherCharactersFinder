@@ -19,7 +19,7 @@ public class CharacterSeederService : ISeederService
     public async Task Seed()
     {
 
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlCreateCharacterIfNotExist);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.CreateCharacterIfNotExist);
 
     }
 }

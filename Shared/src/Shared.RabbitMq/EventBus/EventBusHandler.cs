@@ -1,6 +1,6 @@
 using Shared.RabbitMQ.EventBus;
 
-namespace EkoProTech.Shared.RabbitMQ.EventBus;
+namespace Shared.RabbitMq.EventBus;
 
 public abstract class EventBusHandler<T> : EventBusHandler<T, ValueTuple>
 {

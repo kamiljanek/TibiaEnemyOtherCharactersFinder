@@ -57,7 +57,7 @@ public class WorldSeederService : IWorldSeederService
         {
             Name = worldName,
             Url = BuildWorldUrl(worldName),
-            IsAvailable = false
+            IsAvailable = true
         };
     }
 

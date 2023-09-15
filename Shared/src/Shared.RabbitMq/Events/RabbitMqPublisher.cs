@@ -12,16 +12,16 @@ using Shared.RabbitMQ.EventBus;
 
 namespace Shared.RabbitMQ.Events;
 
-public class RabbitMqBusPublisher : IEventBusPublisher
+public class RabbitMqPublisher : IEventPublisher
 {
     private readonly IRabbitMqConventionProvider _conventionProvider;
-    private readonly ILogger<RabbitMqBusPublisher> _logger;
+    private readonly ILogger<RabbitMqPublisher> _logger;
     private readonly RabbitMqConnection _connection;
     private readonly MessageSerializer _serializer;
     private readonly RabbitMqSection _options;
 
-    public RabbitMqBusPublisher(IRabbitMqConventionProvider conventionProvider,
-        ILogger<RabbitMqBusPublisher> logger,
+    public RabbitMqPublisher(IRabbitMqConventionProvider conventionProvider,
+        ILogger<RabbitMqPublisher> logger,
         IOptions<RabbitMqSection> options,
         RabbitMqConnection connection,
         MessageSerializer serializer)

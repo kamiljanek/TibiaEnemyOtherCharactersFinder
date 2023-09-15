@@ -72,11 +72,6 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // if (env.IsDevelopment())
-        // {
-        //     app.UseDeveloperExceptionPage();
-        // }
-        // UNDONE: możliwe że powyższe do wywalenia
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {

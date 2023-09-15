@@ -13,17 +13,17 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
     private readonly ILogger<ChangeNameDetectorService> _logger;
     private readonly IRepository _repository;
     private readonly ITibiaDataService _tibiaDataService;
-    private readonly IEventBusPublisher _busPublisher;
+    private readonly IEventPublisher _publisher;
 
     public ChangeNameDetectorService(ILogger<ChangeNameDetectorService> logger,
         IRepository repository,
         ITibiaDataService tibiaDataService,
-        IEventBusPublisher busPublisher)
+        IEventPublisher publisher)
     {
         _logger = logger;
         _repository = repository;
         _tibiaDataService = tibiaDataService;
-        _busPublisher = busPublisher;
+        _publisher = publisher;
     }
 
     public async Task Run()
@@ -48,7 +48,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             // If TibiaData cannot find character just delete with all correlations.
             else if (!IsCharacterExist(fechedCharacter))
             {
-                await _busPublisher.PublishAsync($"{character.Name}-{DateTime.Now}",
+                await _publisher.PublishAsync($"{character.Name}-{DateTime.Now}",
                     new DeleteCharacterWithCorrelationsEvent(character.CharacterId));
             }
 
@@ -56,7 +56,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             // If Character was Traded just delete all correlations.
             else if (IsCharacterTraded(fechedCharacter))
             {
-                await _busPublisher.PublishAsync($"{character.Name}-{DateTime.Now}",
+                await _publisher.PublishAsync($"{character.Name}-{DateTime.Now}",
                     new DeleteCharacterCorrelationsEvent(character.CharacterId));
             }
 
@@ -69,7 +69,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
                 // If new character name is not yet in the databese just proceed.
                 if (newCharacter is not null)
                 {
-                    await _busPublisher.PublishAsync($"{character.Name}-{DateTime.Now}",
+                    await _publisher.PublishAsync($"{character.Name}-{DateTime.Now}",
                         new MergeTwoCharactersEvent(character.CharacterId, newCharacter.CharacterId));
                 }
             }

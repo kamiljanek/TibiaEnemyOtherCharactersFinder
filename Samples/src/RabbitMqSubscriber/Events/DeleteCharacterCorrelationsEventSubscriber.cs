@@ -43,7 +43,6 @@ public class DeleteCharacterCorrelationsEventSubscriber : IEventSubscriber
         {
             await _repository.DeleteCharacterCorrelationsByCharacterIdAsync(character.CharacterId, cancellationToken);
             character.TradedDate = DateOnly.FromDateTime(DateTime.Now);
-            // await _repository.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+        });
     }
 }

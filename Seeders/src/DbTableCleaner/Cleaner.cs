@@ -15,7 +15,7 @@ public class Cleaner : ICleaner
 
     public async Task ClearDeletedWorldScans()
     {
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlClearDeletedWorldScans, timeOut: 60);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.ClearDeletedWorldScans, timeOut: 60);
     }
 
     public async Task TruncateCharacterActions()

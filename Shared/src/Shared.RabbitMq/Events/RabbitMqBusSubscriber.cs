@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
-using EkoProTech.Shared.RabbitMQ.EventBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -10,6 +9,7 @@ using RabbitMQ.Client.Events;
 using Shared.RabbitMQ.Configuration;
 using Shared.RabbitMq.Conventions;
 using Shared.RabbitMQ.Conventions;
+using Shared.RabbitMq.EventBus;
 using Shared.RabbitMQ.EventBus;
 
 namespace Shared.RabbitMQ.Events;

@@ -59,8 +59,7 @@ public class TibiaSubscriber
                 return;
             }
 
-            // if (IsSubscriptionTime())
-            // {
+
                 // UNDONE: sprawdzić czy rabbit pobiera wiadomości w odpowiednich godzinach
                 try
                 {
@@ -72,12 +71,14 @@ public class TibiaSubscriber
                     _logger.LogError(ex, "Error on received message: {Message}", ex.Message);
                     channel.BasicReject(deliveryArguments.DeliveryTag, false);
                 }
-            // }
         };
 
         try
         {
-            channel.BasicConsume(queue: eventSubscriber.GetQueueName(), autoAck: false, consumer: consumer);
+            if (IsSubscriptionTime())
+            {
+                channel.BasicConsume(queue: eventSubscriber.GetQueueName(), autoAck: false, consumer: consumer);
+            }
         }
         catch (Exception ex)
         {
@@ -92,10 +93,11 @@ public class TibiaSubscriber
 
     private bool IsSubscriptionTime()
     {
-        var currentTime = DateTime.Now;
-        var currentHour = currentTime.Hour;
+        var currentTime = DateTime.Now.TimeOfDay;
+        var startSubscribeTime = TimeSpan.Parse(_scedule.StartSubscribeTime);
+        var endSubscribeTime = TimeSpan.Parse(_scedule.EndSubscribeTime);
 
-        return _scedule.Enabled && currentHour >= _scedule.StartSubscribeHour && currentHour <= _scedule.EndSubscribeHour;
+        return _scedule.Enabled && currentTime >= startSubscribeTime && currentTime <= endSubscribeTime;
     }
 
     private static int GetRetryCount(IBasicProperties messageProperties)
@@ -105,4 +107,5 @@ public class TibiaSubscriber
 
          return result;
     }
+    // UNDONE: poprawić zwykłe appsettings.json
 }

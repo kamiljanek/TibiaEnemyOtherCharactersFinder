@@ -5,7 +5,7 @@ namespace TibiaEnemyOtherCharactersFinder.Application.Persistence;
 public interface IRepository
 {
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-    Task<bool> ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default);
+    Task<bool> ExecuteInTransactionAsync(Func<Task> action);
     Task<List<World>> GetAvailableWorldsAsync(CancellationToken cancellationToken = default);
     Task<List<World>> GetWorldsAsNoTrackingAsync(CancellationToken cancellationToken = default);
     Task<List<WorldScan>> GetFirstTwoWorldScansAsync(short worldId, CancellationToken cancellationToken = default);

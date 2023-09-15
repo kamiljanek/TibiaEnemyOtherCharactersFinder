@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Shared.RabbitMq.Extensions;
 
 namespace Shared.RabbitMQ.Initializers;
 
@@ -23,7 +22,6 @@ public sealed class InitializationRabbitMqTaskRunner : IHostedService
     {
         using IServiceScope scope = _serviceProvider.CreateScope();
         var initializationTask = scope.ServiceProvider.GetRequiredService<IRabbitMqInitializer>();
-        var anotherTask = scope.ServiceProvider.GetRequiredService<EventBusApplicationBuilder>();
         _logger.LogInformation("Found: {InitializationTasksCount} tasks to run", initializationTask);
 
         var timer = new Stopwatch();
@@ -34,10 +32,7 @@ public sealed class InitializationRabbitMqTaskRunner : IHostedService
         try
         {
             _logger.LogInformation("Running initialization task: {TaskName}", taskName);
-
             await initializationTask.InitializeAsync(cancellationToken);
-            anotherTask.UseEventBus(_serviceProvider);
-
             _logger.LogInformation("Task: {TaskName} initialized in {TimerElapsed}", taskName, timer.Elapsed);
         }
         catch (Exception exception)

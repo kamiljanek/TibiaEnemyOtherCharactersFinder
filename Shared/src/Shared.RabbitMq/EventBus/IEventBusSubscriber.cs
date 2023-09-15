@@ -1,4 +1,4 @@
-﻿using EkoProTech.Shared.RabbitMQ.EventBus;
+﻿using Shared.RabbitMq.EventBus;
 
 namespace Shared.RabbitMQ.EventBus;
 

@@ -18,19 +18,19 @@ public class Repository : IRepository
         _logger = logger;
     }
 
-    public async Task<bool> ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default)
+    public async Task<bool> ExecuteInTransactionAsync(Func<Task> action)
     {
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
             await action.Invoke();
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
             return true;
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync(cancellationToken);
+            await transaction.RollbackAsync();
             _logger.LogError("Transaction failed: {ErrorMessage}" ,ex.Message);
             return false;
         }

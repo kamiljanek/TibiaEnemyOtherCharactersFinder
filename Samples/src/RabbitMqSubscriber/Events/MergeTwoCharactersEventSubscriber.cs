@@ -43,15 +43,14 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
         await _repository.ReplaceCharacterIdInCorrelationsAsync(oldCharacter, newCharacter, cancellationToken);
         List<CharacterCorrelation> correlations = new();
         List<string> combinedCharacterCorrelations = new();
-        // List<CombinedCharacterCorrelation> combinedCharacterCorrelations = new();
         List<int> correlationIdsToDelete = new();
 
         var sameCharacterCorrelations =
-            (await _repository.SqlQueryRaw<string>(GenerateQueries.NpgsqlGetSameCharacterCorrelations,
+            (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelations,
                 newCharacter.CharacterId)).ToList();
 
         var sameCharacterCorrelationsCrossed =
-            (await _repository.SqlQueryRaw<string>(GenerateQueries.NpgsqlGetSameCharacterCorrelationsCrossed,
+            (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelationsCrossed,
                 newCharacter.CharacterId)).ToList();
 
         combinedCharacterCorrelations.AddRange(sameCharacterCorrelations);
@@ -62,18 +61,9 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
             var combinedCorrelation = JsonConvert.DeserializeObject<CombinedCharacterCorrelation>(row);
             correlationIdsToDelete.Add(combinedCorrelation.FirstCombinedCorrelation.CorrelationId);
             correlationIdsToDelete.Add(combinedCorrelation.SecondCombinedCorrelation.CorrelationId);
-            // combinedCharacterCorrelations.Add(combinedCorrelation);
             var characterCorrelation = PrepareCharacterCorrelation(combinedCorrelation);
             correlations.Add(characterCorrelation);
         }
-
-        // var correlationIdsToDelete = combinedCharacterCorrelations
-        //     .SelectMany(c => new[] { c.FirstCombinedCorrelation.CorrelationId, c.SecondCombinedCorrelation.CorrelationId })
-        //     .ToArray();
-        // UNDONE: sprawdzić czy tego już nie potrzebuję wraz z zakomentowanymi liniami wyżej
-
-
-        // UNDONE: poniższe operacje na bazie zamknąć w jedną transakcje
 
         await _repository.ExecuteInTransactionAsync(async () =>
         {
@@ -84,8 +74,7 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
             await _repository.DeleteCharacterCorrelationsByIdsAsync(correlationIdsToDelete, cancellationToken);
 
             oldCharacter.VerifiedDate = DateOnly.FromDateTime(DateTime.Now);
-            // await _repository.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+        });
     }
 
     private CharacterCorrelation PrepareCharacterCorrelation(CombinedCharacterCorrelation combinedCorrelation)

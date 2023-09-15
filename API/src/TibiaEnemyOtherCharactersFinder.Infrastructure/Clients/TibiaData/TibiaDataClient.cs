@@ -64,20 +64,4 @@ public class TibiaDataClient : ITibiaDataClient
 
         return null;
     }
-
-    private async Task<string> ReadContentAsString(HttpResponseMessage response)
-    {
-        // Check whether response is compressed
-        if (response.Content.Headers.ContentEncoding.Any(x => x == "gzip"))
-        {
-            // Decompress manually
-            await using var stream = await response.Content.ReadAsStreamAsync();
-            await using var decompressed = new GZipStream(stream, CompressionMode.Decompress);
-            using var streamReader = new StreamReader(decompressed);
-            return await streamReader.ReadToEndAsync();
-        }
-        // Use standard implementation if not compressed
-        return await response.Content.ReadAsStringAsync();
-        // UNDONE: przetestować i możliwe że to wywalenia
-    }
 }

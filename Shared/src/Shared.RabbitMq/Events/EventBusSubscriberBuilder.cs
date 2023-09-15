@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using EkoProTech.Shared.RabbitMQ.EventBus;
 using Shared.RabbitMQ.Conventions;
+using Shared.RabbitMq.EventBus;
 using Shared.RabbitMQ.EventBus;
 
 namespace Shared.RabbitMQ.Events;

@@ -34,7 +34,7 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
             CharacterName = character.characters.character.name.ToLower()
         };
 
-        var correlations = await connection.QueryAsync<CorrelationResult>(GenerateQueries.NpgsqlGetOtherPossibleCharacters, parameters);
+        var correlations = await connection.QueryAsync<CorrelationResult>(GenerateQueries.GetOtherPossibleCharacters, parameters);
         var result = new CharacterWithCorrelationsResult
         {
             FormerNames = character.characters.character.former_names ?? Array.Empty<string>(),
