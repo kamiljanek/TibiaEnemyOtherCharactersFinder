@@ -12,7 +12,6 @@ public class TibiaSubscriber
     private readonly ILogger<TibiaSubscriber> _logger;
     private readonly RabbitMqConnection _connection;
     private readonly RabbitMqSection _options;
-    private readonly SceduleOptions _scedule;
     private const string RetryHeaderName = "x-redelivered-count";
 
     public TibiaSubscriber(IEnumerable<IEventSubscriber> subscribers, ILogger<TibiaSubscriber> logger, RabbitMqConnection connection, IOptions<RabbitMqSection> options)
@@ -20,7 +19,6 @@ public class TibiaSubscriber
         _subscribers = subscribers;
         _logger = logger;
         _connection = connection;
-        _scedule = options.Value.Scedule;
         _options = options.Value;
     }
 
@@ -31,12 +29,6 @@ public class TibiaSubscriber
             RegisterConsumer(eventSubscriber);
         }
     }
-
-    // public void Stop()
-    // {
-        // _shouldRun = false;
-    // }
-    // UNDONE: wywalic powyższy kod jeżeli subscriber bedzie dobrze działał (musze przetestować ręczenie czy zbiera wiadomości i sam sie nie wyłącza)
 
     // TODO: teraz włączyć debugowanie 2 projektów na raz i sprawdzić czy subscriber działa w odpowiednich godzinach i czy się nie wyłącza
     private void RegisterConsumer(IEventSubscriber eventSubscriber)
@@ -69,16 +61,7 @@ public class TibiaSubscriber
 
         try
         {
-            // UNDONE: sprawdzić czy rabbit pobiera wiadomości w odpowiednich godzinach
-            if (IsSubscriptionTime())
-            {
-                channel.BasicConsume(queue: eventSubscriber.GetQueueName(), autoAck: false, consumer: consumer);
-            }
-            else
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(10));
-                // UNDONE: zmienić czas na jakiś lepsz
-            }
+            channel.BasicConsume(queue: eventSubscriber.GetQueueName(), autoAck: false, consumer: consumer);
         }
         catch (Exception ex)
         {
@@ -89,15 +72,6 @@ public class TibiaSubscriber
         }
     }
 
-    private bool IsSubscriptionTime()
-    {
-        var currentTime = DateTime.Now.TimeOfDay;
-        var startSubscribeTime = TimeSpan.Parse(_scedule.StartSubscribeTime);
-        var endSubscribeTime = TimeSpan.Parse(_scedule.EndSubscribeTime);
-
-        return _scedule.Enabled && currentTime >= startSubscribeTime && currentTime <= endSubscribeTime;
-    }
-
     private static int GetRetryCount(IBasicProperties messageProperties)
     {
          var result = messageProperties.Headers is not null && messageProperties.Headers.ContainsKey(RetryHeaderName)
@@ -105,5 +79,4 @@ public class TibiaSubscriber
 
          return result;
     }
-    // UNDONE: poprawić zwykłe appsettings.json
 }

@@ -16,17 +16,9 @@ public class RabbitMqSection
     [Required] public string VirtualHost { get; init; }
     [Required] public int Port { get; init; }
     [Required] public string HostUrl { get; init; }
-    public SceduleOptions Scedule { get; init; }
     public ExchangeOptions Exchange { get; init; }
     public QueueOptions Queue { get; init; }
     public DeadLetterOptions DeadLetter { get; init; }
-}
-
-public class SceduleOptions
-{
-    [Required] public bool Enabled { get; init; }
-    [Required] public string StartSubscribeTime { get; init; }
-    [Required] public string EndSubscribeTime { get; init; }
 }
 
 public class ExchangeOptions
