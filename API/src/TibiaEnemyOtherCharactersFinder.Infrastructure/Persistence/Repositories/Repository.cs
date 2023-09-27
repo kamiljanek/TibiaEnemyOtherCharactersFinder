@@ -132,6 +132,7 @@ public class Repository : IRepository
 
     /// <param name="rawSql">Sql command to execute</param>
     /// <param name="timeOut">Optional value in seconds</param>
+    /// <param name="cancellationToken">Optional cancellation token</param>
     public async Task ExecuteRawSqlAsync(string rawSql, int? timeOut, CancellationToken cancellationToken = default)
     {
         if (timeOut is not null)

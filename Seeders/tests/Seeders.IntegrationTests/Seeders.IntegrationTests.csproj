@@ -31,10 +31,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\API\src\TibiaEnemyOtherCharactersFinder.Api\TibiaEnemyOtherCharactersFinder.Api.csproj" />
-      <ProjectReference Include="..\..\..\Samples\src\RabbitMqSubscriber\RabbitMqSubscriber.csproj" />
       <ProjectReference Include="..\..\src\ChangeNameDetector\ChangeNameDetector.csproj" />
       <ProjectReference Include="..\..\src\CharacterAnalyser\CharacterAnalyser.csproj" />
       <ProjectReference Include="..\..\src\DbTableCleaner\DbCleaner.csproj" />
+      <ProjectReference Include="..\..\src\RabbitMqSubscriber\RabbitMqSubscriber.csproj" />
       <ProjectReference Include="..\..\src\WorldScanSeeder\WorldScanSeeder.csproj" />
       <ProjectReference Include="..\..\src\WorldSeeder\WorldSeeder.csproj" />
     </ItemGroup>

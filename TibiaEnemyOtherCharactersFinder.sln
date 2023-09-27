@@ -51,7 +51,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChangeNameDetector", "Seede
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.RabbitMq", "Shared\src\Shared.RabbitMq\Shared.RabbitMq.csproj", "{578BBFCF-8991-4E57-A079-1962F1615B93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMqSubscriber", "Samples\src\RabbitMqSubscriber\RabbitMqSubscriber.csproj", "{693B9288-8E15-453E-AB26-7042AB9FCB70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMqSubscriber", "Seeders\src\RabbitMqSubscriber\RabbitMqSubscriber.csproj", "{693B9288-8E15-453E-AB26-7042AB9FCB70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
