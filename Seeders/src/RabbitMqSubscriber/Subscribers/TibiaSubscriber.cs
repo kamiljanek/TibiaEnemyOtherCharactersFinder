@@ -30,7 +30,6 @@ public class TibiaSubscriber
         }
     }
 
-    // TODO: teraz włączyć debugowanie 2 projektów na raz i sprawdzić czy subscriber działa w odpowiednich godzinach i czy się nie wyłącza
     private void RegisterConsumer(IEventSubscriber eventSubscriber)
     {
         IModel channel = _connection.Connection.CreateModel();
@@ -65,10 +64,7 @@ public class TibiaSubscriber
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                "Error on register consumer {Consumer}: {Message}",
-                eventSubscriber.GetType(),
-                ex.Message);
+            _logger.LogError("Error on register consumer {Consumer}: {Message}", eventSubscriber.GetType(), ex.Message);
         }
     }
 

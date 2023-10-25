@@ -5,14 +5,9 @@ namespace ChangeNameDetector.Validators;
 
 public class NameDetectorValidator : INameDetectorValidator
 {
-    public bool IsCharacterFoundInFormerNames(TibiaDataCharacterInformationResult fechedCharacter, Character character)
-    {
-        return fechedCharacter.characters.character.former_names.Any(n => string.Equals(n, character.Name, StringComparison.OrdinalIgnoreCase));
-    }
-
     public bool IsCharacterChangedName(TibiaDataCharacterInformationResult fechedCharacter, Character character)
     {
-        return fechedCharacter.characters.character.name?.ToLower() != character.Name;
+        return fechedCharacter?.characters?.character?.name?.ToLower() != character.Name;
     }
 
     public bool IsCharacterTraded(TibiaDataCharacterInformationResult fechedCharacter)

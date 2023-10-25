@@ -10,6 +10,8 @@ RUN dotnet publish Seeders/src/CharacterAnalyser/CharacterAnalyser.csproj -c Rel
 RUN dotnet publish Seeders/src/DbTableCleaner/DbCleaner.csproj -c Release -o /app --no-restore
 RUN dotnet publish Seeders/src/WorldScanSeeder/WorldScanSeeder.csproj -c Release -o /app --no-restore
 RUN dotnet publish Seeders/src/WorldSeeder/WorldSeeder.csproj -c Release -o /app --no-restore
+RUN dotnet publish Seeders/src/ChangeNameDetector/ChangeNameDetector.csproj -c Release -o /app --no-restore
+RUN dotnet publish Seeders/src/RabbitMqSubscriber/RabbitMqSubscriber.csproj -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app

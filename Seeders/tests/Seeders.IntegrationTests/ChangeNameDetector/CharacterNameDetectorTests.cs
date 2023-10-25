@@ -14,9 +14,11 @@ using Shared.RabbitMQ.Configuration;
 using Shared.RabbitMq.Conventions;
 using Shared.RabbitMQ.EventBus;
 using Shared.RabbitMQ.Events;
+using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Application.Services;
 using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.ChangeNameDetector;
@@ -26,7 +28,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 {
     private readonly TibiaSeederFactory _factory;
     private readonly Func<Task> _resetDatabase;
-    private readonly Mock<ITibiaDataService> _tibiaDataServiceMock = new();
+    private readonly Mock<ITibiaDataClient> _tibiaDataClientMock = new();
 
     public CharacterNameDetectorTests(TibiaSeederFactory factory)
     {
@@ -50,10 +52,10 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         foreach (var character in charactersBeforeDetector)
         {
-            _tibiaDataServiceMock.Setup(r => r.FetchCharacter(character.Name)).ReturnsAsync(PrepareExistingTibiaDataCharacter(character.Name));
+            _tibiaDataClientMock.Setup(r => r.FetchCharacter(character.Name)).ReturnsAsync(PrepareExistingTibiaDataCharacter(character.Name));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataClientMock.Object, busPublisher);
 
 
         // Act
@@ -88,7 +90,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             SetupTibiaDataServiceMock(charactersBeforeDetector[i].Name, (i < 2, PrepareNonExistingTibiaDataCharacter));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataClientMock.Object, busPublisher);
 
 
         // Act
@@ -129,7 +131,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             SetupTibiaDataServiceMock(charactersBeforeDetector[i].Name, (i < 2, () => PrepareTradedTibiaDataCharacter(charactersBeforeDetector[i].Name)));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataClientMock.Object, busPublisher);
 
 
         // Act
@@ -170,7 +172,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             SetupTibiaDataServiceMock(charactersBeforeDetector[i].Name, (i < 1, () => PrepareChangedNameCharacter(charactersBeforeDetector[i].Name)));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataClientMock.Object, busPublisher);
 
 
         // Act
@@ -194,7 +196,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Run_WhenCharacterWasFoundInFormerNamesButNotFoundInDatabase_ShouldOnlyUpdateVerifiedDate()
+    public async Task Run_WhenCharacterWasFoundInFormerNamesButNotFoundInDatabase_ShouldChangeOldNameToNewName()
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
@@ -213,7 +215,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
                 (i < 1, () => PrepareChangedNameCharacterWithNameNonExistentInDatabase(charactersBeforeDetector[i].Name)));
         }
 
-        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataServiceMock.Object, busPublisher);
+        var changeNameDetector = new ChangeNameDetectorService(logger, validator, repository, _tibiaDataClientMock.Object, busPublisher);
 
 
         // Act
@@ -230,6 +232,8 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         charactersAfterDetector.Select(c => c.VerifiedDate).Should().AllBeEquivalentTo(DateOnly.FromDateTime(DateTime.Now));
         charactersAfterDetector.Count.Should().Be(4);
         charactersBeforeDetector.Select(c => c.VerifiedDate).Should().OnlyContain(date => date == null);
+        charactersAfterDetector.Select(c => c.Name).Should().Contain(name => name == "test");
+        charactersAfterDetector.Select(c => c.Name).Should().NotContain(name => name == charactersBeforeDetector.Select(c => c.Name).First());
 
         receivedObjects.Count.Should().Be(0);
     }
@@ -311,7 +315,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         var result = preparation.Flag ? preparation.PrepareFunction.Invoke() : PrepareExistingTibiaDataCharacter(characterName);
 
-        _tibiaDataServiceMock
+        _tibiaDataClientMock
             .Setup(r => r.FetchCharacter(characterName))
             .ReturnsAsync(result);
     }

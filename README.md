@@ -43,6 +43,7 @@ The more player plays, the more likely result will be close to true.
 - C# 11.0
 - EF Core 7.0
 - Postgres - version 14.2
+- RabbitMq
 - TestContainers - documentation [_here_](https://github.com/testcontainers/testcontainers-dotnet)
 - BenchmarkDotNet
 - Dapper
@@ -59,7 +60,7 @@ The more player plays, the more likely result will be close to true.
 ---
 ## Features
 **List the ready features here:**
-- All data analyser mechanism with optimization data storage
+- All data analyser mechanism with optimization data storage, also work if character change name
 - GetCharacterController - return character info + other characters
 - GetWorldsController - return list of currently scanning worlds
 
@@ -89,8 +90,9 @@ The more player plays, the more likely result will be close to true.
 3. Clone repository `git clone https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder.git`
 4. Seq enviroment on Windows [_here_](https://docs.datalust.co/docs/getting-started) or docker container [_here_](https://docs.datalust.co/docs/getting-started-with-docker)
 5. Your own Postgres Database
-6. Create database in Postgres and configure `appsettings.json` or if you have Development enviroment copy `appsettings.Development-template.json` change file name to `appsettings.Development.json` and input your secrets
-7. Configure `launchSettings.json`
+6. RabbitMq enviroment or docker container
+7. Create database in Postgres and configure `appsettings.json` or if you have Development enviroment copy `appsettings.Development-template.json` change file name to `appsettings.Development.json` and input your secrets
+8. Configure `launchSettings.json`
 
 ---
 ## [Usage](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder)
@@ -104,6 +106,13 @@ The more player plays, the more likely result will be close to true.
 - `WorldScanSeeder` - (`dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
 - `DbCleaner` - (`dotnet DbCleaner.dll`) - ones per day/week
 - `WorldSeeder` - (`dotnet WorldSeeder.dll`) - best practise ones per day
+- `ChangeNameDetector` - (`dotnet ChangeNameDetector.dll`) - best practise ones per month
+
+Also 2 projects should run all the time:
+
+- `TibiaEnemyOtherCharactersFinder.Api.dll` - (`dotnet TibiaEnemyOtherCharactersFinder.Api.dll`)
+- `RabbitMqSubscriber.dll` - (`dotnet RabbitMqSubscriber.dll`)
+
 
 ### Development
 Want to contribute? Great!
@@ -125,12 +134,14 @@ To fix a bug, enhance an existing module or add something new, follow these step
 1. Firstly pull image
 2. Create database in Postgres 
 3. Than create and configure file `.env` with enviroment variables as [_here_](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder/blob/develop/.env-template)
-4. Than open CMD and run container `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_eocf_api -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
-5. Last step is to configure `cron` on your machine with periods as below:
+4. Than open CMD and run container `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_eocf_api -d --restart always ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
+5. And `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_rabbit_mq_subscriber -d --restart always ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet RabbitMqSubscriber.dll`
+6. Last step is to configure `cron` on your machine with periods as below:
 - `docker run --env-file .env -p <other_port>:80 --network <seq_container_network> --name tibia_character_analyser --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet CharacterAnalyser.dll`) - ones per day
 - `docker run --env-file .env -p <another_port>:80 --network <seq_container_network> --name tibia_world_scan_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
 - `docker run --env-file .env -p <and_another_port>:80 --network <seq_container_network> --name tibia_db_cleaner --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet DbCleaner.dll`) - ones per day/week
 - `docker run --env-file .env -p <and_and_another_port>:80 --network <seq_container_network> --name tibia_world_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldSeeder.dll`) - best practise ones per day
+- `docker run --env-file .env -p <and_and_and_another_port>:80 --network <seq_container_network> --name tibia_change_name_detector --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet ChangeNameDetector.dll`) - best practise ones per month
 
 
 ---
@@ -144,6 +155,8 @@ Project is: _still in progress_ .
 
 ### To do:
 - Add autorization and autentication
+- Health Checks
+- Kubernetes
 - Frontend
 
 

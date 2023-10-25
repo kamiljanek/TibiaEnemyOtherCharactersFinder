@@ -5,7 +5,6 @@ using CharacterAnalyser.Modules;
 using Microsoft.Extensions.Logging;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser;
 

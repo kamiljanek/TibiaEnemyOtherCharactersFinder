@@ -20,25 +20,40 @@ public class Repository : IRepository
 
     public async Task<bool> ExecuteInTransactionAsync(Func<Task> action)
     {
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        try
+        for (int retryCount = 0; retryCount < 3; retryCount++)
         {
-            await action.Invoke();
-            await _dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return true;
+            await using var transaction =
+                await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            try
+            {
+                await action.Invoke();
+                await transaction.CommitAsync();
+                _logger.LogInformation("Transaction '{action}' commited properly", action.Target?.GetType().ReflectedType?.FullName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError("Transaction failed: {ErrorMessage}", ex.Message);
+            }
         }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            _logger.LogError("Transaction failed: {ErrorMessage}" ,ex.Message);
-            return false;
-        }
+
+        return false;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            return await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return default;
     }
 
     public async Task<List<World>> GetAvailableWorldsAsync(CancellationToken cancellationToken = default)
@@ -101,7 +116,23 @@ public class Repository : IRepository
         _dbContext.Entry(currentWorld).CurrentValues.SetValues(newWorld);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
-    
+
+    public async Task UpdateCharacterNameAsync(string oldName, string newName, CancellationToken cancellationToken = default)
+    {
+        await _dbContext.Characters
+            .Where(c => c.Name == oldName.ToLower())
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(c => c.Name, newName.ToLower()), cancellationToken);
+    }
+
+    public async Task UpdateCharacterVerifiedDate(int characterId, CancellationToken cancellationToken = default)
+    {
+        await _dbContext.Characters
+            .Where(c => c.CharacterId == characterId)
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(c => c.VerifiedDate, DateOnly.FromDateTime(DateTime.Now)), cancellationToken);
+    }
+
     public async Task SetCharacterFoundInScanAsync(IReadOnlyList<string> charactersNames, bool foundInScan, CancellationToken cancellationToken = default)
     {
         await _dbContext.Characters
@@ -191,13 +222,14 @@ public class Repository : IRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync(CancellationToken cancellationToken = default)
+    public async Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync(
+        CancellationToken cancellationToken = default)
     {
         var charactersToRemove = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
 
         await _dbContext.CharacterCorrelations
-        .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId))
-        .ExecuteDeleteAsync(cancellationToken);
+            .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId))
+            .ExecuteDeleteAsync(cancellationToken);
     }
 
     public void ClearChangeTracker()
@@ -221,10 +253,11 @@ public class Repository : IRepository
         return await Task.Run(() => _dbContext.Database.SqlQueryRaw<T>(query, parameters).AsEnumerable());
     }
 
-    public async Task DeleteAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IEntity
+    public async Task DeleteCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default)
     {
-        _dbContext.Set<T>().Remove(entity);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Characters
+            .Where(c => c.CharacterId == characterId)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 
     public async Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId, CancellationToken cancellationToken = default)
@@ -260,8 +293,6 @@ public class Repository : IRepository
     {
         return await _dbContext.Characters.Where(c => c.CharacterId == characterId).FirstOrDefaultAsync(cancellationToken);
     }
-
-
 
 
     private IQueryable<int> CharactersIds(bool isOnline)

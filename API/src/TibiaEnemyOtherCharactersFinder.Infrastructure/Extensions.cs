@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
+using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Policies;
@@ -11,22 +12,24 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
 {
     public static class Extensions
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+            IConfiguration configuration)
         {
             services.AddDbContext<TibiaCharacterFinderDbContext>(opt => opt
-               .UseNpgsql(
-                   configuration.GetConnectionString(nameof(ConnectionStringsSection.PostgreSql)), 
-                   options =>
-                   {
-                       options
-                           .MinBatchSize(1)
-                           .MaxBatchSize(30)
-                           .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
-                           .CommandTimeout(configuration
-                               .GetSection($"{EfCoreConfigurationSection.SectionName}:{EfCoreConfigurationSection.CommandTimeout}")
-                               .Get<int>());
-                   })
-               .UseSnakeCaseNamingConvention());
+                .UseNpgsql(
+                    configuration.GetConnectionString(nameof(ConnectionStringsSection.PostgreSql)),
+                    options =>
+                    {
+                        options
+                            .MinBatchSize(1)
+                            .MaxBatchSize(30)
+                            .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                            .CommandTimeout(configuration
+                                .GetSection(
+                                    $"{EfCoreConfigurationSection.SectionName}:{EfCoreConfigurationSection.CommandTimeout}")
+                                .Get<int>());
+                    })
+                .UseSnakeCaseNamingConvention());
 
             services.AddOptions<TibiaDataSection>()
                 .Bind(configuration.GetSection(TibiaDataSection.SectionName))
@@ -35,8 +38,12 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
 
             services.AddHttpClient<ITibiaDataClient, TibiaDataClient>("TibiaDataClient", httpClient =>
                 {
-                    httpClient.BaseAddress = new Uri(configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.BaseAddress)}"]);
-                    httpClient.Timeout = TimeSpan.Parse(configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.Timeout)}"]);
+                    httpClient.BaseAddress =
+                        new Uri(configuration[
+                            $"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.BaseAddress)}"]);
+                    httpClient.Timeout =
+                        TimeSpan.Parse(
+                            configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.Timeout)}"]);
                 })
                 .AddHttpMessageHandler<HttpClientDecompressionHandler>()
                 .AddPolicyHandler(CommunicationPolicies.GetTibiaDataRetryPolicy());

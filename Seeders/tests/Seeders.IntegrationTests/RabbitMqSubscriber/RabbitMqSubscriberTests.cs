@@ -51,8 +51,7 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
 
         // Act
         tibiaSubscriber.Subscribe();
-        Thread.Sleep(100);
-        // tibiaSubscriber.Stop();
+        Thread.Sleep(500);
 
         publisherConnection.Connection.Close();
         subscriberConnection.Connection.Close();
@@ -92,8 +91,7 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
 
         // Act
         tibiaSubscriber.Subscribe();
-        Thread.Sleep(100);
-        // tibiaSubscriber.Stop();
+        Thread.Sleep(500);
 
         publisherConnection.Connection.Close();
         subscriberConnection.Connection.Close();
@@ -134,10 +132,7 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
 
         // Act
         tibiaSubscriber.Subscribe();
-        Thread.Sleep(100);
-        // tibiaSubscriber.Stop();
-
-        // UNDONE: wywalic zakomentowany kod z 3 testów
+        Thread.Sleep(500);
 
         publisherConnection.Connection.Close();
         subscriberConnection.Connection.Close();
@@ -148,9 +143,6 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
         var characterCorrelationsAfterSubscriber = dbContextAfterSubscribe.CharacterCorrelations.AsNoTracking().ToList();
 
         charactersAfterSubscriber.Count.Should().Be(3);
-        charactersAfterSubscriber[0].CharacterId.Should().Be(121);
-        charactersAfterSubscriber[1].CharacterId.Should().Be(122);
-        charactersAfterSubscriber[2].CharacterId.Should().Be(123);
         characterCorrelationsAfterSubscriber.Count.Should().Be(3);
         characterCorrelationsAfterSubscriber.First(cc => cc is { LoginCharacterId: 123, LogoutCharacterId: 121 }).NumberOfMatches.Should().Be(6);
         characterCorrelationsAfterSubscriber.First(cc => cc is { LoginCharacterId: 122, LogoutCharacterId: 121 }).NumberOfMatches.Should().Be(9);

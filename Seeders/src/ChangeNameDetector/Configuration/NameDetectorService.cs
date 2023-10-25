@@ -9,7 +9,7 @@ public static class NameDetectorService
     public static IServiceCollection AddNameDetector(this IServiceCollection services)
     {
         services.AddScoped<IChangeNameDetectorService, ChangeNameDetectorService>();
-        services.AddSingleton<NameDetectorValidator>();
+        services.AddScoped<INameDetectorValidator, NameDetectorValidator>();
 
         return services;
     }

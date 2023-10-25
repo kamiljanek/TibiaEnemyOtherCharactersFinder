@@ -37,12 +37,11 @@ public class DeleteCharacterCorrelationsEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<DeleteCharacterCorrelationsEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
-        var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken);
 
         await _repository.ExecuteInTransactionAsync(async () =>
         {
+            var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken);
             await _repository.DeleteCharacterCorrelationsByCharacterIdAsync(character.CharacterId, cancellationToken);
-            character.TradedDate = DateOnly.FromDateTime(DateTime.Now);
         });
     }
 }

@@ -15,6 +15,8 @@ public interface IRepository
     Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IEntity;
     Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class, IEntity;
     Task UpdateWorldAsync(World entity, CancellationToken cancellationToken = default);
+    Task UpdateCharacterNameAsync(string oldName, string newName, CancellationToken cancellationToken = default);
+    Task UpdateCharacterVerifiedDate(int characterId, CancellationToken cancellationToken = default);
     Task UpdateCharacterCorrelationsAsync(CancellationToken cancellationToken = default);
     Task ExecuteRawSqlAsync(string rawSql, int? timeOut = null, CancellationToken cancellationToken = default);
     Task CreateCharacterCorrelationsIfNotExistAsync(CancellationToken cancellationToken = default);
@@ -24,7 +26,7 @@ public interface IRepository
     void ClearChangeTracker();
     Task<Character> GetFirstCharacterByVerifiedDateAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<T>> SqlQueryRaw<T>(string query, params object[] parameters) where T : class;
-    Task DeleteAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IEntity;
+    Task DeleteCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default);
     Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId, CancellationToken cancellationToken = default);
     Task ReplaceCharacterIdInCorrelationsAsync(Character oldCharacter, Character newCharacter, CancellationToken cancellationToken = default);
     Task<Character> GetCharacterByNameAsync(string characterName, CancellationToken cancellationToken = default);

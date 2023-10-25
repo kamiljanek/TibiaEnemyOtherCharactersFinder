@@ -1,0 +1,46 @@
+version: '3.8'
+name: tibia
+services:
+  teocf-seq:
+    image: datalust/seq:2023.1.9101
+    container_name: tibia-seq
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - ${SEQ_PORT}:80
+    volumes:
+      - seq_logs:/data
+    restart: unless-stopped
+    networks:
+      - tibia_default
+    mem_limit: 200MB
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: tibia-rabbitmq
+    ports:
+      - ${RABBITMQ_LISTENER_PORT}:5672
+      - ${RABBITMQ_MANAGEMENT_PORT}:15672
+    environment:
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_HOST_NAME}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER_NAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_USER_PASSWORD}
+    volumes:
+      - rabbitmq_log:/var/log/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./config/rabbitmq/rabbitmq.config:/etc/rabbitmq/enabled_plugins
+    restart: unless-stopped
+    networks:
+      - tibia_default
+
+volumes:
+  seq_logs:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  rabbitmq_log:
+    driver: local
+
+networks:
+  tibia_default:
+    external: true

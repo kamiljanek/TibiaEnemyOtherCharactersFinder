@@ -2,28 +2,28 @@
 
 public class TibiaDataCharacterInformationResult
 {
-    public CharactersResult characters { get; set; }
+    public CharactersResult characters { get; init; }
 }
 
 public class CharactersResult
 {
-    public CharacterResult character { get; set; }
-    public IReadOnlyList<OtherCharacterResult> other_characters { get; set; }
+    public CharacterResult character { get; init; }
+    public IReadOnlyList<OtherCharacterResult> other_characters { get; init; }
 }
 
 public class OtherCharacterResult
 {
-    public string name { get; set; }
+    public string name { get; init; }
 }
 
 public class CharacterResult
 {
-    public IReadOnlyList<string> former_names { get; set; }
-    public IReadOnlyList<string> former_worlds { get; set; }
-    public string last_login { get; set; }
-    public int level { get; set; }
-    public string name { get; set; }
-    public bool traded { get; set; }
-    public string vocation { get; set; }
-    public string world { get; set; }
+    public IReadOnlyList<string> former_names { get; init; }
+    public IReadOnlyList<string> former_worlds { get; init; }
+    public string last_login { get; init; }
+    public int level { get; init; }
+    public string name { get; init; }
+    public bool traded { get; init; }
+    public string vocation { get; init; }
+    public string world { get; init; }
 }

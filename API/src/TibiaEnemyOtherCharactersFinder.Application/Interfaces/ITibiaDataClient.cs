@@ -1,6 +1,6 @@
 ﻿using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 
-namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
+namespace TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 
 public interface ITibiaDataClient
 {

@@ -3,6 +3,7 @@ using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
+using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Services;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
@@ -12,17 +13,17 @@ public record GetCharacterWithCorrelationsQuery(string Name) : IRequest<Characte
 public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetCharacterWithCorrelationsQuery, CharacterWithCorrelationsResult>
 {
     private readonly IDapperConnectionProvider _connectionProvider;
-    private readonly ITibiaDataService _tibiaDataService;
+    private readonly ITibiaDataClient _tibiaDataClient;
 
-    public GetCharacterWithCorrelationsQueryHandler(IDapperConnectionProvider connectionProvider, ITibiaDataService tibiaDataService)
+    public GetCharacterWithCorrelationsQueryHandler(IDapperConnectionProvider connectionProvider, ITibiaDataClient tibiaDataClient)
     {
         _connectionProvider = connectionProvider;
-        _tibiaDataService = tibiaDataService;
+        _tibiaDataClient = tibiaDataClient;
     }
 
     public async Task<CharacterWithCorrelationsResult> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
     {
-        var character = await _tibiaDataService.FetchCharacter(request.Name);
+        var character = await _tibiaDataClient.FetchCharacter(request.Name);
         if (string.IsNullOrWhiteSpace(character.characters.character.name))
         {
             return null;

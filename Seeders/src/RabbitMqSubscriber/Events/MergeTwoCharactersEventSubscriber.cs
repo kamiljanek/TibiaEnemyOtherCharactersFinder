@@ -39,42 +39,48 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
 
         var oldCharacter = await _repository.GetCharacterByIdAsync(eventObject.OldCharacterId, cancellationToken);
         var newCharacter = await _repository.GetCharacterByIdAsync(eventObject.NewCharacterId, cancellationToken);
-
-        await _repository.ReplaceCharacterIdInCorrelationsAsync(oldCharacter, newCharacter, cancellationToken);
-        List<CharacterCorrelation> correlations = new();
-        List<string> combinedCharacterCorrelations = new();
-        List<int> correlationIdsToDelete = new();
-
-        var sameCharacterCorrelations =
-            (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelations,
-                newCharacter.CharacterId)).ToList();
-
-        var sameCharacterCorrelationsCrossed =
-            (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelationsCrossed,
-                newCharacter.CharacterId)).ToList();
-
-        combinedCharacterCorrelations.AddRange(sameCharacterCorrelations);
-        combinedCharacterCorrelations.AddRange(sameCharacterCorrelationsCrossed);
-
-        foreach (var row in combinedCharacterCorrelations)
+        if (oldCharacter is null || newCharacter is null)
         {
-            var combinedCorrelation = JsonConvert.DeserializeObject<CombinedCharacterCorrelation>(row);
-            correlationIdsToDelete.Add(combinedCorrelation.FirstCombinedCorrelation.CorrelationId);
-            correlationIdsToDelete.Add(combinedCorrelation.SecondCombinedCorrelation.CorrelationId);
-            var characterCorrelation = PrepareCharacterCorrelation(combinedCorrelation);
-            correlations.Add(characterCorrelation);
+            _logger.LogInformation(
+                "During event {Event} - cannot find character one of the characters in database. Payload: {Payload}",
+                eventObject.GetType().Name, payload);
+            return;
         }
 
         await _repository.ExecuteInTransactionAsync(async () =>
         {
+            await _repository.ReplaceCharacterIdInCorrelationsAsync(oldCharacter, newCharacter, cancellationToken);
+            List<CharacterCorrelation> correlations = new();
+            List<string> combinedCharacterCorrelations = new();
+            List<int> correlationIdsToDelete = new();
+
+            var sameCharacterCorrelations =
+                (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelations,
+                    newCharacter.CharacterId)).ToList();
+
+            var sameCharacterCorrelationsCrossed =
+                (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelationsCrossed,
+                    newCharacter.CharacterId)).ToList();
+
+            combinedCharacterCorrelations.AddRange(sameCharacterCorrelations);
+            combinedCharacterCorrelations.AddRange(sameCharacterCorrelationsCrossed);
+
+            foreach (var row in combinedCharacterCorrelations)
+            {
+                var combinedCorrelation = JsonConvert.DeserializeObject<CombinedCharacterCorrelation>(row);
+                correlationIdsToDelete.Add(combinedCorrelation.FirstCombinedCorrelation.CorrelationId);
+                correlationIdsToDelete.Add(combinedCorrelation.SecondCombinedCorrelation.CorrelationId);
+                var characterCorrelation = PrepareCharacterCorrelation(combinedCorrelation);
+                correlations.Add(characterCorrelation);
+            }
+
             await _repository.AddRangeAsync(correlations, cancellationToken);
-            await _repository.DeleteAsync(oldCharacter, cancellationToken);
 
             // Delete already merged CharacterCorrelations
             await _repository.DeleteCharacterCorrelationsByIdsAsync(correlationIdsToDelete, cancellationToken);
-
-            oldCharacter.VerifiedDate = DateOnly.FromDateTime(DateTime.Now);
         });
+
+        await _repository.DeleteCharacterByIdAsync(oldCharacter.CharacterId, cancellationToken);
     }
 
     private CharacterCorrelation PrepareCharacterCorrelation(CombinedCharacterCorrelation combinedCorrelation)
