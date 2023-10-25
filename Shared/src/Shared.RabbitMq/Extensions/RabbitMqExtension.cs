@@ -38,6 +38,7 @@ public static class RabbitMqExtension
             .ValidateOnStart();
 
         var options = section.Get<RabbitMqSection>();
+
         var factory = new ConnectionFactory
         {
             Uri = new Uri(options!.HostUrl),

@@ -26,6 +26,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     internal readonly IConfiguration Configuration =
         new ConfigurationBuilder()
         .SetBasePath(AppContext.BaseDirectory)
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
         .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
         .Build();
 
