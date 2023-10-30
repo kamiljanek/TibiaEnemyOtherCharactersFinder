@@ -56,11 +56,12 @@ The more player plays, the more likely result will be close to true.
 - FluentAssertions
 - Autofac
 - Docker
+- Polly
 
 ---
 ## Features
 **List the ready features here:**
-- All data analyser mechanism with optimization data storage, also work if character change name
+- All data analyser mechanism with optimization data storage, also work if character changed name or was traded
 - GetCharacterController - return character info + other characters
 - GetWorldsController - return list of currently scanning worlds
 
@@ -134,15 +135,21 @@ To fix a bug, enhance an existing module or add something new, follow these step
 1. Firstly pull image
 2. Create database in Postgres 
 3. Than create and configure file `.env` with enviroment variables as [_here_](https://github.com/kamiljanek/Tibia-EnemyOtherCharactersFinder/blob/develop/.env-template)
-4. Than open CMD and run container `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_eocf_api -d --restart always ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
-5. And `docker run --env-file .env -p <port>:80 --network <seq_container_network> --name tibia_rabbit_mq_subscriber -d --restart always ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet RabbitMqSubscriber.dll`
+4. Than open CMD and run container `docker run --env-file .env -p <port1>:80 --network <seq_container_network> --name tibia_eocf_api -d --restart always ghcr.io/kamiljanek/tibia-eocf:latest dotnet TibiaEnemyOtherCharactersFinder.Api.dll`
+5. And `docker run --env-file .env -p <port2>:80 --network <seq_container_network> --name tibia_rabbit_mq_subscriber -d --restart always ghcr.io/kamiljanek/tibia-eocf:latest dotnet RabbitMqSubscriber.dll`
 6. Last step is to configure `cron` on your machine with periods as below:
-- `docker run --env-file .env -p <other_port>:80 --network <seq_container_network> --name tibia_character_analyser --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet CharacterAnalyser.dll`) - ones per day
-- `docker run --env-file .env -p <another_port>:80 --network <seq_container_network> --name tibia_world_scan_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
-- `docker run --env-file .env -p <and_another_port>:80 --network <seq_container_network> --name tibia_db_cleaner --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet DbCleaner.dll`) - ones per day/week
-- `docker run --env-file .env -p <and_and_another_port>:80 --network <seq_container_network> --name tibia_world_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet WorldSeeder.dll`) - best practise ones per day
-- `docker run --env-file .env -p <and_and_and_another_port>:80 --network <seq_container_network> --name tibia_change_name_detector --rm -d ghcr.io/kamiljanek/tibia-eocf:1.0.0 dotnet ChangeNameDetector.dll`) - best practise ones per month
+- `docker run --env-file .env -p <port3>:80 --network <seq_container_network> --name tibia_character_analyser --rm -d ghcr.io/kamiljanek/tibia-eocf:latest dotnet CharacterAnalyser.dll`) - ones per day
+- `docker run --env-file .env -p <port4>:80 --network <seq_container_network> --name tibia_world_scan_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:latest dotnet WorldScanSeeder.dll`) - minimum ones per 5 min
+- `docker run --env-file .env -p <port5>:80 --network <seq_container_network> --name tibia_db_cleaner --rm -d ghcr.io/kamiljanek/tibia-eocf:latest dotnet DbCleaner.dll`) - ones per day/week
+- `docker run --env-file .env -p <port6>:80 --network <seq_container_network> --name tibia_world_seeder --rm -d ghcr.io/kamiljanek/tibia-eocf:latest dotnet WorldSeeder.dll`) - best practise ones per day
+- `docker run --env-file .env -p <port7>:80 --network <seq_container_network> --name tibia_change_name_detector --rm -d ghcr.io/kamiljanek/tibia-eocf:latest dotnet ChangeNameDetector.dll`) - best practise ones per month
 
+### Create Docker Image:
+
+- Go into Actions section on Github
+- Than `Deploy`
+- Than `Run workflow`
+- Choose branch and input version of the Docker image
 
 ---
 ## Project Status
