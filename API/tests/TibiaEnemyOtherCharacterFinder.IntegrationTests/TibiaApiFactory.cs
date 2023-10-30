@@ -1,30 +1,23 @@
-﻿using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Testcontainers.PostgreSql;
 using TibiaEnemyOtherCharactersFinder.Api;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
-#pragma warning disable CS0618
-
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests;
 
 public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
 {
-    private readonly PostgreSqlTestcontainer _dbContainer =
-        new TestcontainersBuilder<PostgreSqlTestcontainer>()
-            .WithDatabase(new PostgreSqlTestcontainerConfiguration
-            {
-                Database = "postgres",
-                Username = "username",
-                Password = "password"
-            })
+    private readonly PostgreSqlContainer _dbContainer =
+        new PostgreSqlBuilder()
             .WithImage("postgres:14.2")
+            .WithDatabase("postgres")
+            .WithUsername("username")
+            .WithPassword("password")
             .Build();
 
     public async Task InitializeAsync()
@@ -50,8 +43,8 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             if (descriptor != null) 
                 services.Remove(descriptor);
             
-            services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.ConnectionString }));
-            services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.ConnectionString).UseSnakeCaseNamingConvention());
+            services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.GetConnectionString() }));
+            services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.GetConnectionString()).UseSnakeCaseNamingConvention());
         });
     }
 
