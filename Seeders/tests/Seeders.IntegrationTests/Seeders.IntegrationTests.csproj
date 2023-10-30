@@ -15,7 +15,9 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
         <PackageReference Include="Moq" Version="4.18.4" />
         <PackageReference Include="Respawn" Version="6.0.0" />
-        <PackageReference Include="Testcontainers" Version="2.4.0" />
+        <PackageReference Include="Testcontainers" Version="3.4.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="3.4.0" />
+        <PackageReference Include="Testcontainers.RabbitMq" Version="3.4.0" />
         <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,8 +31,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\API\src\TibiaEnemyOtherCharactersFinder.Api\TibiaEnemyOtherCharactersFinder.Api.csproj" />
+      <ProjectReference Include="..\..\src\ChangeNameDetector\ChangeNameDetector.csproj" />
       <ProjectReference Include="..\..\src\CharacterAnalyser\CharacterAnalyser.csproj" />
       <ProjectReference Include="..\..\src\DbTableCleaner\DbCleaner.csproj" />
+      <ProjectReference Include="..\..\src\RabbitMqSubscriber\RabbitMqSubscriber.csproj" />
       <ProjectReference Include="..\..\src\WorldScanSeeder\WorldScanSeeder.csproj" />
       <ProjectReference Include="..\..\src\WorldSeeder\WorldSeeder.csproj" />
     </ItemGroup>

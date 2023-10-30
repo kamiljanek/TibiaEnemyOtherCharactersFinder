@@ -5,7 +5,6 @@ using CharacterAnalyser.Modules;
 using Microsoft.Extensions.Logging;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser;
 
@@ -45,7 +44,7 @@ public class Analyser : ActionRule, IAnalyser
 
     public async Task<bool> HasDataToAnalyse()
     {
-        var availableWorldIds = await _repository.NumberOfAvailableWorldScansAsync();
+        var availableWorldIds = _repository.NumberOfAvailableWorldScans();
         _uniqueWorldIds = await _repository.GetDistinctWorldIdsFromWorldScansAsync();
 
         return availableWorldIds > _uniqueWorldIds.Count;

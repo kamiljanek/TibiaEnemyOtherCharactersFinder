@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Shared.RabbitMQ;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
@@ -65,15 +66,12 @@ public class Startup
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             settings.IncludeXmlComments(xmlPath);
         });
+
         ConfigureOptions(services);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // if (env.IsDevelopment())
-        // {
-        //     app.UseDeveloperExceptionPage();
-        // }
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {

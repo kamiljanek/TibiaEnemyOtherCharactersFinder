@@ -7,9 +7,9 @@ namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;
 
 public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaApiFactory>
 {
-    private const string _controllerBase = "api/character";
-    private const string _defaultName = "_defaultName";
-    private const string _nameInDatabase = "duzzerah";
+    private const string ControllerBase = "api/character";
+    private const string DefaultName = "_defaultName";
+    private const string NameInDatabase = "duzzerah";
     private readonly TibiaApiFactory _factory;
 
     public GetOtherCharactersInCharacterControllerTests(TibiaApiFactory factory)
@@ -24,7 +24,7 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
         var client = _factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync($"{_controllerBase}/{_nameInDatabase}");
+        var response = await client.GetAsync($"{ControllerBase}/{NameInDatabase}");
         var result = await response.Content.ReadFromJsonAsync<CharacterWithCorrelationsResult>();
 
         // Assert
@@ -40,7 +40,7 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
         var client = _factory.CreateClient();
 
         // Act
-        var result = await client.GetAsync($"{_controllerBase}/{_defaultName}");
+        var result = await client.GetAsync($"{ControllerBase}/{DefaultName}");
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);

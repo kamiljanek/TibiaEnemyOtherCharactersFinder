@@ -22,6 +22,16 @@ public class Character : IEntity
     /// </summary>
     public bool FoundInScan { get; set; }
 
+    /// <summary>
+    /// Date of verified character when changed name
+    /// </summary>
+    public DateOnly? VerifiedDate { get; set; }
+
+    /// <summary>
+    /// Approximately date of trade character
+    /// </summary>
+    public DateOnly? TradedDate { get; set; }
+
     // Associations
     public World World { get; set; }
     public List<CharacterCorrelation> LogoutCharacterCorrelations { get; set; }

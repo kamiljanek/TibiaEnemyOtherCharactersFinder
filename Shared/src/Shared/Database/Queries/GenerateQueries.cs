@@ -12,94 +12,12 @@ namespace Shared.Database.Queries.Sql
 {
     public static class GenerateQueries
     {
-        public const string MssqlClearCharacterLogoutOrLogins = @"DELETE FROM CharacterLogoutOrLogins;";
+        public const string ClearCharacterActions = @"DELETE FROM character_actions;";
 
-        public const string MssqlCreateCharacterCorrelation = @"
-WITH CartesianProduct AS 
-(
-SELECT 
- f.CharacterId AS LogoutCharacterId
-,t.CharacterId AS LoginCharacterId
-FROM 
-	(SELECT ch.CharacterName, c.CharacterId
-	FROM CharacterLogoutOrLogins ch
-	INNER JOIN Characters c ON ch.CharacterName = c.Name
-	WHERE ch.IsOnline = 0) AS f, 
-	(SELECT CharacterName, c.CharacterId
-	FROM CharacterLogoutOrLogins ch
-	INNER JOIN Characters c ON ch.CharacterName = c.Name
-	WHERE IsOnline = 1) AS t 
-)
-
- MERGE CharacterCorrelations AS target
- USING CartesianProduct AS source ON 
-	(target.LogoutCharacterId = source.LogoutCharacterId AND target.LoginCharacterId = source.LoginCharacterId) OR 
-	(target.LogoutCharacterId = source.LoginCharacterId AND target.LoginCharacterId = source.LogoutCharacterId)
-
- WHEN MATCHED
- THEN
-     UPDATE SET
-         target.NumberOfMatches += 1
-  
- WHEN NOT MATCHED
- THEN
-     INSERT (
-	 LogoutCharacterId, 
-	 LoginCharacterId, 
-	 NumberOfMatches
-	 )
-     VALUES (
-	 source.LogoutCharacterId, 
-	 source.LoginCharacterId, 
-	 1
-	 );";
-
-        public const string MssqlCreateCharacterIfNotExist = @"INSERT INTO Characters (Name, WorldId)
-SELECT DISTINCT CharacterName, WorldId
-FROM CharacterLogoutOrLogins clol
-WHERE NOT EXISTS (
-          SELECT Name
-          FROM Characters c
-          WHERE clol.CharacterName = c.Name);";
-
-        /// <summary>
-        /// Required parameters: 
-        ///    @CharacterName
-        /// </summary>
-        public const string MssqlGetOtherPossibleCharacters = @"WITH cor AS (
-SELECT TOP 10 CorrelationId
-      ,f.Name AS LogoutName
-      ,t.Name AS LoginName
-      ,NumberOfMatches
-  FROM CharacterCorrelations cc
-  INNER JOIN Characters f on f.CharacterId = cc.LogoutCharacterId
-  INNER JOIN Characters t on t.CharacterId = cc.LoginCharacterId
-  where t.Name = @CharacterName OR f.Name = @CharacterName
-  ORDER BY NumberOfMatches DESC
-  )
-
-  SELECT CorrelationId
-        ,LoginName AS OtherCharacterName
-        ,NumberOfMatches
-  FROM cor
-  WHERE NOT LoginName = @CharacterName
-  
-  UNION
-
-  SELECT CorrelationId
-        ,LogoutName AS OtherCharacterName
-        ,NumberOfMatches
-  FROM cor
-  WHERE NOT LogoutName = @CharacterName
-  ORDER BY NumberOfMatches DESC
-";
-
-        public const string NpgsqlClearCharacterActions = @"DELETE FROM character_actions;";
-
-        public const string NpgsqlClearDeletedWorldScans = @"DELETE FROM world_scans
+        public const string ClearDeletedWorldScans = @"DELETE FROM world_scans
 	WHERE is_deleted;";
 
-        public const string NpgsqlCreateCharacterCorrelationIfNotExist = @"WITH cp AS (
+        public const string CreateCharacterCorrelationIfNotExist = @"WITH cp AS (
     SELECT f.character_id AS logout, t.character_id AS login, f.logout_or_login_date AS creating_date
     FROM (
         SELECT ch.character_name, c.character_id, ch.logout_or_login_date
@@ -122,13 +40,13 @@ ON (cc.logout_character_id = logout AND cc.login_character_id = login)
     OR (cc.logout_character_id = login AND cc.login_character_id = logout)
 WHERE cc.logout_character_id IS NULL;";
 
-        public const string NpgsqlCreateCharacterIfNotExist = @"INSERT INTO characters (name, world_id)
+        public const string CreateCharacterIfNotExist = @"INSERT INTO characters (name, world_id)
 SELECT DISTINCT ca.character_name, ca.world_id
 FROM character_actions ca
 LEFT JOIN characters c ON ca.character_name = c.name
 WHERE c.name IS NULL;";
 
-        public const string NpgsqlDeleteCharacterCorrelationIfCorrelationExistInFirstScan = @"WITH online_characters AS (SELECT character_id FROM ""characters"" c INNER JOIN character_actions ca ON c.""name"" = ca.character_name WHERE is_online = true)
+        public const string DeleteCharacterCorrelationIfCorrelationExistInFirstScan = @"WITH online_characters AS (SELECT character_id FROM ""characters"" c INNER JOIN character_actions ca ON c.""name"" = ca.character_name WHERE is_online = true)
 DELETE FROM character_correlations
 WHERE logout_character_id IN
       (SELECT character_id
@@ -137,7 +55,7 @@ WHERE logout_character_id IN
         (SELECT character_id
          FROM online_characters)";
 
-        public const string NpgsqlDeleteCharacterCorrelationIfCorrelationExistInScan = @"WITH online_characters AS
+        public const string DeleteCharacterCorrelationIfCorrelationExistInScan = @"WITH online_characters AS
          (SELECT character_id FROM characters c WHERE found_in_scan = true)
 
 DELETE FROM character_correlations
@@ -149,7 +67,7 @@ WHERE logout_character_id IN
       (SELECT character_id
        FROM online_characters)";
 
-        public const string NpgsqlDeleteCharacterCorrelationIfCorrelationExistInSecondScan = @"WITH offline_characters AS (SELECT character_id FROM ""characters"" c INNER JOIN character_actions ca ON c.""name"" = ca.character_name WHERE is_online = false)
+        public const string DeleteCharacterCorrelationIfCorrelationExistInSecondScan = @"WITH offline_characters AS (SELECT character_id FROM ""characters"" c INNER JOIN character_actions ca ON c.""name"" = ca.character_name WHERE is_online = false)
 DELETE FROM character_correlations
 WHERE logout_character_id IN
       (SELECT character_id
@@ -158,13 +76,13 @@ WHERE logout_character_id IN
         (SELECT character_id
          FROM offline_characters)";
 
-        public const string NpgsqlGetActiveWorlds = @"SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name";
+        public const string GetActiveWorlds = @"SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name";
 
         /// <summary>
         /// Required parameters: 
         ///    @CharacterName
         /// </summary>
-        public const string NpgsqlGetOtherPossibleCharacters = @"WITH character_id_CTE AS (SELECT character_id FROM characters WHERE name = @CharacterName)
+        public const string GetOtherPossibleCharacters = @"WITH character_id_CTE AS (SELECT character_id FROM characters WHERE name = @CharacterName)
 
 SELECT DISTINCT c.name AS other_character_name, number_of_matches, create_date, last_match_date FROM character_correlations cc 
 JOIN characters c ON c.character_id = cc.login_character_id OR c.character_id = cc.logout_character_id 
@@ -172,7 +90,68 @@ WHERE (logout_character_id = (SELECT character_id FROM character_id_CTE) OR logi
 AND c.character_id <> (SELECT character_id FROM character_id_CTE)
 ORDER BY number_of_matches DESC LIMIT 10";
 
-        public const string NpgsqlUpdateCharacterCorrelationIfExist = @"WITH cp AS (
+        /// <summary>
+        /// Required parameters: 
+        ///    @p0
+        /// </summary>
+        public const string GetSameCharacterCorrelations = @"WITH cte AS (SELECT * FROM character_correlations cc WHERE cc.logout_character_id = @p0 OR cc.login_character_id = @p0)
+SELECT DISTINCT ON (cc1.logout_character_id, cc1.login_character_id)
+    json_build_object(
+            'FirstCombinedCorrelation', json_build_object(
+            'CorrelationId', cc1.correlation_id,
+            'LogoutCharacterId', cc1.logout_character_id,
+            'LoginCharacterId', cc1.login_character_id,
+            'NumberOfMatches', cc1.number_of_matches,
+            'CreateDate', cc1.create_date,
+            'LastMatchDate', cc1.last_match_date
+        ),
+            'SecondCombinedCorrelation', json_build_object(
+                    'CorrelationId', cc2.correlation_id,
+                    'LogoutCharacterId', cc2.logout_character_id,
+                    'LoginCharacterId', cc2.login_character_id,
+                    'NumberOfMatches', cc2.number_of_matches,
+                    'CreateDate', cc2.create_date,
+                    'LastMatchDate', cc2.last_match_date
+                )
+        ) AS combined_json
+FROM (SELECT * FROM cte) AS cc1
+         INNER JOIN (SELECT * FROM cte) AS cc2 ON cc1.logout_character_id = cc2.logout_character_id
+    AND cc1.login_character_id = cc2.login_character_id
+    AND cc1.correlation_id <> cc2.correlation_id
+WHERE cc1.logout_character_id < cc1.login_character_id;
+";
+
+        /// <summary>
+        /// Required parameters: 
+        ///    @p0
+        /// </summary>
+        public const string GetSameCharacterCorrelationsCrossed = @"WITH cte AS (SELECT * FROM character_correlations cc WHERE cc.logout_character_id = @p0 OR cc.login_character_id = @p0)
+SELECT DISTINCT ON (cc1.correlation_id)
+    json_build_object(
+            'FirstCombinedCorrelation', json_build_object(
+            'CorrelationId', cc1.correlation_id,
+            'LogoutCharacterId', cc1.logout_character_id,
+            'LoginCharacterId', cc1.login_character_id,
+            'NumberOfMatches', cc1.number_of_matches,
+            'CreateDate', cc1.create_date,
+            'LastMatchDate', cc1.last_match_date
+        ),
+            'SecondCombinedCorrelation', json_build_object(
+                    'CorrelationId', cc2.correlation_id,
+                    'LogoutCharacterId', cc2.logout_character_id,
+                    'LoginCharacterId', cc2.login_character_id,
+                    'NumberOfMatches', cc2.number_of_matches,
+                    'CreateDate', cc2.create_date,
+                    'LastMatchDate', cc2.last_match_date
+                )
+        ) AS combined_json
+FROM (SELECT * FROM cte) AS cc1
+         INNER JOIN (SELECT * FROM cte) AS cc2 ON cc1.logout_character_id = cc2.login_character_id
+    AND cc1.login_character_id = cc2.logout_character_id
+    AND cc1.correlation_id <> cc2.correlation_id
+WHERE cc1.logout_character_id < cc1.login_character_id;";
+
+        public const string UpdateCharacterCorrelationIfExist = @"WITH cp AS (
   SELECT 
     f.character_id AS logout,
     t.character_id AS login,
@@ -201,7 +180,7 @@ WHERE
   OR 
   (cc.logout_character_id = cp.login AND cc.login_character_id = cp.logout);";
 
-        public const string NpgsqlUpdateCharactersSetFoundInScanFalse = @"UPDATE characters SET found_in_scan = FALSE WHERE found_in_scan = TRUE";
+        public const string UpdateCharactersSetFoundInScanFalse = @"UPDATE characters SET found_in_scan = FALSE WHERE found_in_scan = TRUE";
 
     }
 

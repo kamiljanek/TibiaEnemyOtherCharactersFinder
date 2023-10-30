@@ -1,6 +1,5 @@
 ﻿using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace DbCleaner;
 
@@ -15,7 +14,7 @@ public class Cleaner : ICleaner
 
     public async Task ClearDeletedWorldScans()
     {
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlClearDeletedWorldScans, timeOut: 60);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.ClearDeletedWorldScans, timeOut: 60);
     }
 
     public async Task TruncateCharacterActions()
@@ -25,7 +24,7 @@ public class Cleaner : ICleaner
 
     public async Task DeleteIrrelevantCharacterCorrelations()
     {
-        await _repository.DeleteIrrelevantCharacterCorrelations(numberOfDays: 14, matchingNumber: 2);
+        await _repository.DeleteIrrelevantCharacterCorrelationsAsync(numberOfDays: 30, matchingNumber: 3);
     }
 
     public async Task VacuumCharacterActions()

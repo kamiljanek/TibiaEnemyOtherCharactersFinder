@@ -25,6 +25,10 @@ jobs:
         env:
           Serilog.WriteTo.2.Args.serverUrl: http://localhost:5341
           Serilog.WriteTo.2.Args.apiKey: xxxxxx
+          RabbitMq.username: guest
+          RabbitMq.password: guest
+          RabbitMq.port: 5672
+          RabbitMq.hostUrl: amqp://localhost
 
       - name: Restore NuGet Packages
         run: dotnet restore

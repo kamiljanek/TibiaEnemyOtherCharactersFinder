@@ -28,7 +28,7 @@ public class DeleteOnCharacterCorrelationDeleterTests : IAsyncLifetime
 
         await dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE character_correlations CASCADE");
         await dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE characters CASCADE");
-        await SeedDatabseAsync(dbContext);
+        await SeedDatabaseAsync(dbContext);
 
         // Act
         var characterCorrelationsBeforeDelete = dbContext.CharacterCorrelations.ToList();
@@ -44,7 +44,7 @@ public class DeleteOnCharacterCorrelationDeleterTests : IAsyncLifetime
     
     public Task DisposeAsync() => _resetDatabase();
     
-    private async Task SeedDatabseAsync(TibiaCharacterFinderDbContext dbContext)
+    private async Task SeedDatabaseAsync(TibiaCharacterFinderDbContext dbContext)
     {
         await dbContext.CharacterActions.AddRangeAsync(GetCharacterActions());
         await dbContext.Characters.AddRangeAsync(GetCharacters());

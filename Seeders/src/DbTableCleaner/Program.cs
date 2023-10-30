@@ -1,12 +1,7 @@
-﻿using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using DbCleaner.Configuration;
-using Microsoft.Extensions.Configuration;
+﻿using DbCleaner.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
 
 namespace DbCleaner;
 
@@ -16,7 +11,10 @@ public class Program
     {
         try
         {
-            var host = CreateHostBuilder();
+            var host = CustomHostBuilder.Create((_, services) =>
+            {
+                services.AddDbCleaner();
+            });
 
             Log.Information("Starting application");
 
@@ -33,34 +31,5 @@ public class Program
         {
             await Log.CloseAndFlushAsync();
         }
-    }
-
-    private static IHost CreateHostBuilder()
-    {
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables();
-            })
-            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-            .ConfigureContainer<ContainerBuilder>(builder =>
-            {
-                builder.RegisterModule<AutofacModule>();
-            })
-            .ConfigureServices((context, services) =>
-            {
-                services
-                    .AddDbCleaner()
-                    .AddServices()
-                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
-                    .AddTibiaDbContext(context.Configuration);
-            })
-            .UseSerilog()
-            .Build();
-
-        return host;
     }
 }

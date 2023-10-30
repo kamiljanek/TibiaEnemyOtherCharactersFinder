@@ -1,5 +1,4 @@
 ﻿using TibiaEnemyOtherCharactersFinder.Application.Services;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace WorldSeeder;
 

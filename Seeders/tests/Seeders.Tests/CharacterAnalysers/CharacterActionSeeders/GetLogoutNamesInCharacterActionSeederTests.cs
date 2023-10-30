@@ -3,7 +3,6 @@ using FluentAssertions;
 using Moq;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace Seeders.Tests.CharacterAnalysers.CharacterActionSeeders;
 
