@@ -8,9 +8,9 @@ public class CharacterWithCorrelationsResult
     public string Vocation { get; set; }
     public int Level { get; set; }
     public string LastLogin { get; set; }
-    public List<string> FormerNames { get; set; }
-    public List<string> FormerWorlds { get; set; }
+    public IReadOnlyList<string> FormerNames { get; set; }
+    public IReadOnlyList<string> FormerWorlds { get; set; }
     public bool Traded { get; set; }
-    public List<string> OtherVisibleCharacters { get; set; }
-    public List<CorrelationResult> PossibleInvisibleCharacters { get; set; }
+    public IReadOnlyList<string> OtherVisibleCharacters { get; set; }
+    public IReadOnlyList<CorrelationResult> PossibleInvisibleCharacters { get; set; }
 }

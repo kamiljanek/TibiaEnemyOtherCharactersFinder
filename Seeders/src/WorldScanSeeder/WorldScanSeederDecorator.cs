@@ -42,7 +42,7 @@ public class WorldScanSeederDecorator : ILoggerDecorator, IScanSeeder
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "World Id({WorldId}) - Execution {methodName} couse error", (parameter as World)!.WorldId, function.Method.Name);
+            _logger.LogError(exception, "WorldId({WorldId}) - Execution {methodName} couse error", (parameter as World)!.WorldId, function.Method.Name);
         }
     }
 

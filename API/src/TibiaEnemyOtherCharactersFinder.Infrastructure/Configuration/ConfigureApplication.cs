@@ -1,7 +1,6 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 
 namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
@@ -17,13 +16,6 @@ public static class ConfigureApplication
     public static IServiceCollection AddSerilog(this IServiceCollection services, IConfiguration configuration, string projectName)
     {
         LoggerConfiguration.ConfigureLogger(configuration, projectName);
-        return services;
-    }
-
-    public static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        services.AddHttpClient();
-
         return services;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services;
 
 namespace CharacterAnalyser.Modules;
 
@@ -14,8 +13,7 @@ public class CharacterCorrelationDeleter
 
     public async Task Delete()
     {
-        // await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlDeleteCharacterCorrelationIfCorrelationExistInScan);
-        await _repository.DeleteCharacterCorrelationIfCorrelationExistInScan();
-        await _repository.ClearChangeTracker();
+        await _repository.DeleteCharacterCorrelationIfCorrelationExistInScanAsync();
+        _repository.ClearChangeTracker();
     }
 }

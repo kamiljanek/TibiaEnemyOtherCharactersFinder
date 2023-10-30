@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Application.Services;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.WorldSeeders;
@@ -13,7 +15,7 @@ public class TurnOffIfWorldIsUnavailableOnWorldSeederTests : IAsyncLifetime
 {
     private readonly TibiaSeederFactory _factory;
     private readonly Func<Task> _resetDatabase;
-    private readonly Mock<ITibiaDataService> _tibiaApiMock = new();
+    private readonly Mock<ITibiaDataClient> _tibiaDataClientMock = new();
 
     public TurnOffIfWorldIsUnavailableOnWorldSeederTests(TibiaSeederFactory factory)
     {
@@ -25,7 +27,7 @@ public class TurnOffIfWorldIsUnavailableOnWorldSeederTests : IAsyncLifetime
             "Adra"
         };
         
-        _tibiaApiMock.Setup(r => r.FetchWorldsNames()).ReturnsAsync(worldNames);
+        _tibiaDataClientMock.Setup(r => r.FetchWorldsNames()).ReturnsAsync(worldNames);
     }
     
     [Fact]
@@ -35,7 +37,7 @@ public class TurnOffIfWorldIsUnavailableOnWorldSeederTests : IAsyncLifetime
         using var scope = _factory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
-        var worldSeeder = new WorldSeeder.WorldSeederService(repository, _tibiaApiMock.Object);
+        var worldSeeder = new WorldSeeder.WorldSeederService(repository, _tibiaDataClientMock.Object);
         await worldSeeder.SetProperties();
         
         // Act

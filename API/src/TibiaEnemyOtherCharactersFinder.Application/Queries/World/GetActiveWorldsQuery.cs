@@ -22,7 +22,7 @@ public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery,
     public async Task<GetActiveWorldsResult> Handle(GetActiveWorldsQuery request, CancellationToken cancellationToken)
     {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
-        var activeWorlds = (await connection.QueryAsync<ActiveWorldResult>(GenerateQueries.NpgsqlGetActiveWorlds)).ToArray();
+        var activeWorlds = (await connection.QueryAsync<ActiveWorldResult>(GenerateQueries.GetActiveWorlds)).ToArray();
 
         var result = new GetActiveWorldsResult() { ActiveWorlds = activeWorlds};
 

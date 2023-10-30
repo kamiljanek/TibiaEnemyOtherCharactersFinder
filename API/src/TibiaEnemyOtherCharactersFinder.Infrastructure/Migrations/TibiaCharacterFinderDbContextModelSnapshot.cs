@@ -23,7 +23,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.Character", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.Character", b =>
                 {
                     b.Property<int>("CharacterId")
                         .ValueGeneratedOnAdd()
@@ -42,6 +42,14 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<DateOnly?>("TradedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("traded_date");
+
+                    b.Property<DateOnly?>("VerifiedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("verified_date");
 
                     b.Property<short>("WorldId")
                         .HasColumnType("smallint")
@@ -62,7 +70,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.ToTable("characters", "public");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.CharacterAction", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.CharacterAction", b =>
                 {
                     b.Property<int>("CharacterActionId")
                         .ValueGeneratedOnAdd()
@@ -107,7 +115,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.ToTable("character_actions", "public");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.CharacterCorrelation", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.CharacterCorrelation", b =>
                 {
                     b.Property<int>("CorrelationId")
                         .ValueGeneratedOnAdd()
@@ -152,7 +160,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.ToTable("character_correlations", "public");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.World", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.World", b =>
                 {
                     b.Property<short>("WorldId")
                         .ValueGeneratedOnAdd()
@@ -181,7 +189,7 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.ToTable("worlds", "public");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.WorldScan", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.WorldScan", b =>
                 {
                     b.Property<int>("WorldScanId")
                         .ValueGeneratedOnAdd()
@@ -218,9 +226,9 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.ToTable("world_scans", "public");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.Character", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.Character", b =>
                 {
-                    b.HasOne("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.World", "World")
+                    b.HasOne("TibiaEnemyOtherCharactersFinder.Domain.Entities.World", "World")
                         .WithMany("Characters")
                         .HasForeignKey("WorldId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -230,16 +238,16 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.Navigation("World");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.CharacterAction", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.CharacterAction", b =>
                 {
-                    b.HasOne("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.World", "World")
+                    b.HasOne("TibiaEnemyOtherCharactersFinder.Domain.Entities.World", "World")
                         .WithMany("CharacterLogoutOrLogins")
                         .HasForeignKey("WorldId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("fk_character_actions_worlds_world_id");
 
-                    b.HasOne("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.WorldScan", "WorldScan")
+                    b.HasOne("TibiaEnemyOtherCharactersFinder.Domain.Entities.WorldScan", "WorldScan")
                         .WithMany()
                         .HasForeignKey("WorldScanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -251,19 +259,19 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.Navigation("WorldScan");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.CharacterCorrelation", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.CharacterCorrelation", b =>
                 {
-                    b.HasOne("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.Character", "LoginCharacter")
-                        .WithMany("LoginWorldCorrelations")
+                    b.HasOne("TibiaEnemyOtherCharactersFinder.Domain.Entities.Character", "LoginCharacter")
+                        .WithMany("LoginCharacterCorrelations")
                         .HasForeignKey("LoginCharacterId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_character_correlations_characters_login_character_id");
 
-                    b.HasOne("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.Character", "LogoutCharacter")
-                        .WithMany("LogoutWorldCorrelations")
+                    b.HasOne("TibiaEnemyOtherCharactersFinder.Domain.Entities.Character", "LogoutCharacter")
+                        .WithMany("LogoutCharacterCorrelations")
                         .HasForeignKey("LogoutCharacterId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_character_correlations_characters_character_id");
 
@@ -272,9 +280,9 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.Navigation("LogoutCharacter");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.WorldScan", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.WorldScan", b =>
                 {
-                    b.HasOne("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.World", "World")
+                    b.HasOne("TibiaEnemyOtherCharactersFinder.Domain.Entities.World", "World")
                         .WithMany("WorldScans")
                         .HasForeignKey("WorldId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -284,14 +292,14 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Migrations
                     b.Navigation("World");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.Character", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.Character", b =>
                 {
-                    b.Navigation("LoginWorldCorrelations");
+                    b.Navigation("LoginCharacterCorrelations");
 
-                    b.Navigation("LogoutWorldCorrelations");
+                    b.Navigation("LogoutCharacterCorrelations");
                 });
 
-            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Infrastructure.Entities.World", b =>
+            modelBuilder.Entity("TibiaEnemyOtherCharactersFinder.Domain.Entities.World", b =>
                 {
                     b.Navigation("CharacterLogoutOrLogins");
 
