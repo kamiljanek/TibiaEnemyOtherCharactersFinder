@@ -1,5 +1,5 @@
-﻿using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
+﻿using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 
 namespace CharacterAnalyser.Modules;
 

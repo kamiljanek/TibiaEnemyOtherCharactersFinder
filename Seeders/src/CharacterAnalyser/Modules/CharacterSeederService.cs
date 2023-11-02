@@ -1,6 +1,6 @@
 ﻿using Shared.Database.Queries.Sql;
+using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
 
 namespace CharacterAnalyser.Modules;
 

@@ -1,5 +1,5 @@
-﻿using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
+﻿using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
+using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 
 namespace CharacterAnalyser.Modules;
 
@@ -15,6 +15,5 @@ public class CharacterCorrelationUpdater : ISeederService
     public async Task Seed()
     {
         await _repository.UpdateCharacterCorrelationsAsync();
-        // await _repository.ExecuteRawSqlAsync(GenerateQueries.NpgsqlUpdateCharacterCorrelationIfExist);
     }
 }

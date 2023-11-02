@@ -4,7 +4,6 @@ using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
 
