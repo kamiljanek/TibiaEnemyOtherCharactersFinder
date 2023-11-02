@@ -16,9 +16,7 @@ using Shared.RabbitMQ.EventBus;
 using Shared.RabbitMQ.Events;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
 using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.ChangeNameDetector;

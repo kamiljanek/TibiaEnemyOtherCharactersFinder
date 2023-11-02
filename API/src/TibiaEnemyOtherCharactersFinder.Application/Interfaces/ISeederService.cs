@@ -1,4 +1,4 @@
-﻿namespace TibiaEnemyOtherCharactersFinder.Application.Services;
+﻿namespace TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 
 public interface ISeederService
 {

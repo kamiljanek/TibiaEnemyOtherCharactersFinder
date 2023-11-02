@@ -23,7 +23,7 @@ public interface IRepository
     Task SetCharacterFoundInScanAsync(IReadOnlyList<string> charactersNames, bool foundInScan, CancellationToken cancellationToken = default);
     Task DeleteIrrelevantCharacterCorrelationsAsync(int numberOfDays, int matchingNumber, CancellationToken cancellationToken = default);
     Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync(CancellationToken cancellationToken = default);
-    void ClearChangeTracker();
+    Task ClearChangeTracker();
     Task<Character> GetFirstCharacterByVerifiedDateAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<T>> SqlQueryRaw<T>(string query, params object[] parameters) where T : class;
     Task DeleteCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default);
