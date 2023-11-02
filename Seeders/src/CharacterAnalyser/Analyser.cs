@@ -24,22 +24,16 @@ public class Analyser : ActionRule, IAnalyser
     public List<short> UniqueWorldIds => _uniqueWorldIds;
 
     public Analyser(IRepository repository,
-        ILogger<Analyser> logger,
-        CharacterManager characterManager,
-        CharacterActionsCleaner characterActionsCleaner,
-        CharacterSeederService characterSeederService,
-        CharacterCorrelationUpdater characterCorrelationUpdater,
-        CharacterCorrelationSeederService characterCorrelationSeederService,
-        CharacterCorrelationDeleter characterCorrelationDeleter)
+        ILogger<Analyser> logger)
     {
         _repository = repository;
         _logger = logger;
-        _characterManager = characterManager;
-        _characterActionsCleaner = characterActionsCleaner;
-        _characterSeederService = characterSeederService;
-        _characterCorrelationUpdater = characterCorrelationUpdater;
-        _characterCorrelationSeederService = characterCorrelationSeederService;
-        _characterCorrelationDeleter = characterCorrelationDeleter;
+        _characterManager = new CharacterManager(repository);
+        _characterActionsCleaner = new CharacterActionsCleaner(repository);
+        _characterSeederService = new CharacterSeederService(repository);
+        _characterCorrelationUpdater = new CharacterCorrelationUpdater(repository);
+        _characterCorrelationSeederService = new CharacterCorrelationSeederService(repository);
+        _characterCorrelationDeleter = new CharacterCorrelationDeleter(repository);
     }
 
     public async Task<bool> HasDataToAnalyse()
@@ -72,6 +66,12 @@ public class Analyser : ActionRule, IAnalyser
         await _characterActionsCleaner.ResetFoundInScanOnCharactersAsync();
 
         await SeedAndAnalyseCharacters(twoWorldScans);
+        await _repository.ClearChangeTracker();
+    }
+
+    public async Task ClearChangeTracker()
+    {
+        await _repository.ClearChangeTracker();
     }
 
     private async Task SeedAndAnalyseCharacters(List<WorldScan> twoWorldScans)

@@ -232,9 +232,9 @@ public class Repository : IRepository
             .ExecuteDeleteAsync(cancellationToken);
     }
 
-    public void ClearChangeTracker()
+    public async Task ClearChangeTracker()
     {
-        _dbContext.ChangeTracker.Clear();
+        await Task.Run(() => _dbContext.ChangeTracker.Clear());
     }
 
     public async Task<Character> GetFirstCharacterByVerifiedDateAsync(CancellationToken cancellationToken = default)

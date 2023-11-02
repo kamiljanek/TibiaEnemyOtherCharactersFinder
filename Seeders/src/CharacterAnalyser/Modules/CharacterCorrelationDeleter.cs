@@ -14,6 +14,5 @@ public class CharacterCorrelationDeleter
     public async Task Delete()
     {
         await _repository.DeleteCharacterCorrelationIfCorrelationExistInScanAsync();
-        _repository.ClearChangeTracker();
     }
 }

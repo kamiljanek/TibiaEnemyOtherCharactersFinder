@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
-using TibiaEnemyOtherCharactersFinder.Application.Services;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.WorldSeeders;

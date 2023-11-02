@@ -1,15 +1,10 @@
-﻿using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMqSubscriber.Configurations;
 using RabbitMqSubscriber.Subscribers;
 using Serilog;
 using Shared.RabbitMQ.Extensions;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace RabbitMqSubscriber;
 
@@ -30,9 +25,7 @@ public class Program
             await host.StartAsync();
             var service = ActivatorUtilities.CreateInstance<TibiaSubscriber>(host.Services);
             service.Subscribe();
-            await host.StopAsync();
-
-            Console.ReadKey();
+            await host.WaitForShutdownAsync();
 
             Log.Information("Ending application properly");
         }

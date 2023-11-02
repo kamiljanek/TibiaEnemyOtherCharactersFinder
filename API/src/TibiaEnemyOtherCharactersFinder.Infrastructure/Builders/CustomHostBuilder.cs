@@ -16,15 +16,6 @@ public static class CustomHostBuilder
         Action<ContainerBuilder> configureContainer = null)
     {
         var host = Host.CreateDefaultBuilder()
-            // .ConfigureAppConfiguration((hostingContext, config) =>
-            // {
-            //     config
-            //         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            //         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-            //         .AddEnvironmentVariables();
-            // })
-
-            // UNDONE: remove when application on prod will work properly
             .ConfigureAppConfiguration((_, config) =>
             {
                 config.AddEnvironmentVariables();

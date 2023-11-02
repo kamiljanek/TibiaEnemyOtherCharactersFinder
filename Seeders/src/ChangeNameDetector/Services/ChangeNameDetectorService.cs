@@ -32,7 +32,6 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
     {
         while (true)
         {
-            _repository.ClearChangeTracker();
             var character = await _repository.GetFirstCharacterByVerifiedDateAsync();
             if (character is null)
             {
@@ -86,6 +85,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             }
 
             await _repository.UpdateCharacterVerifiedDate(character.CharacterId);
+            await _repository.ClearChangeTracker();
         }
     }
 }
