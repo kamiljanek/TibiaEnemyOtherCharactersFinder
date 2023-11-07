@@ -2,9 +2,14 @@ using Autofac;
 using MediatR;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shared.RabbitMQ;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using TibiaEnemyOtherCharactersFinder.Api.Swagger;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
@@ -36,6 +41,11 @@ public class Startup
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
 
+        services.AddRouting(options =>
+        {
+            options.LowercaseUrls = true;
+        });
+
         services.AddMediatR(typeof(Startup));
 
         services.AddCors(options =>
@@ -49,22 +59,28 @@ public class Startup
             });
         });
 
-        services.AddSwaggerGen(settings =>
-        {
-            settings.SwaggerDoc("v1", new OpenApiInfo
+        services
+            .AddApiVersioning(options =>
             {
-                Version = "v1",
-                Title = "Tibia Enemy Other Characters Finder API",
-                Description = "API for retrieving other characters of our enemy",
-                Contact = new OpenApiContact
-                {
-                    Name = "API Support",
-                    Url = new Uri("https://github.com/kamiljanek")
-                }
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+                options.DefaultApiVersion = new ApiVersion( 1.0 );
+            })
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
             });
+
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+        services.AddSwaggerGen(options =>
+        {
+            // Add a custom operation filter which sets default values
+            options.OperationFilter<SwaggerDefaultValues>();
+
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            settings.IncludeXmlComments(xmlPath);
+            options.IncludeXmlComments(xmlPath);
         });
 
         ConfigureOptions(services);
@@ -73,10 +89,18 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        app.UseSwaggerUI(options =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "TibiaEnemyOtherCharactersFinder API v1");
-            c.RoutePrefix = string.Empty;
+            var descriptionsProvider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+
+            // Build a swagger endpoint for each discovered API version
+            foreach (var description in descriptionsProvider.ApiVersionDescriptions)
+            {
+                var url = $"/swagger/{description.GroupName}/swagger.json";
+                var name = description.GroupName.ToUpperInvariant();
+                options.SwaggerEndpoint(url, name);
+                options.RoutePrefix = string.Empty;
+            }
         });
 
         app.UseSerilogRequestLogging(configure =>
