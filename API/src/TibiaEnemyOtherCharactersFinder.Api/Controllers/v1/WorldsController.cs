@@ -1,14 +1,16 @@
-﻿using MediatR;
+﻿using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TibiaEnemyOtherCharactersFinder.Application.Queries.World;
 
-namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.World;
+namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.v1;
 
-public class WorldController : WorldBaseController
+[ApiVersion("1.0")]
+public class WorldsController : TibiaBaseController
 {
     private readonly IMediator _mediator;
 
-    public WorldController(IMediator mediator)
+    public WorldsController(IMediator mediator)
     {
         _mediator = mediator;
     }

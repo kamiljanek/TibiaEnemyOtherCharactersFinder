@@ -35,4 +35,5 @@
     <ProjectReference Include="..\TibiaEnemyOtherCharactersFinder.Application\TibiaEnemyOtherCharactersFinder.Application.csproj" />
   </ItemGroup>
 
+
 </Project>
