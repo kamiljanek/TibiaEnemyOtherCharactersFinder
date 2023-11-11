@@ -7,7 +7,7 @@ namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;
 
 public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaApiFactory>
 {
-    private const string ControllerBase = "api/tibia/v1/characters";
+    private const string ControllerBase = "api/tibia-eocf/v1/characters";
     private const string DefaultName = "_defaultName";
     private const string NameInDatabase = "duzzerah";
     private readonly TibiaApiFactory _factory;

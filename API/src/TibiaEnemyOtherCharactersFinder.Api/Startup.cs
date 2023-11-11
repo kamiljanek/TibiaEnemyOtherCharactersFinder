@@ -5,14 +5,14 @@ using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using Serilog;
-using Shared.RabbitMQ;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using TibiaEnemyOtherCharactersFinder.Api.Filters;
 using TibiaEnemyOtherCharactersFinder.Api.Swagger;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Middlewares;
 
 namespace TibiaEnemyOtherCharactersFinder.Api;
 
@@ -36,15 +36,17 @@ public class Startup
     {
         services.AddInfrastructure(_configuration);
 
-        services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        });
+        services
+            .AddControllers(opt =>
+            {
+                opt.Filters.Add<ErrorHandlingFilterAttribute>();
+            })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
 
-        services.AddRouting(options =>
-        {
-            options.LowercaseUrls = true;
-        });
+        services.AddRouting(options => { options.LowercaseUrls = true; });
 
         services.AddMediatR(typeof(Startup));
 
@@ -64,7 +66,7 @@ public class Startup
             {
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.ReportApiVersions = true;
-                options.DefaultApiVersion = new ApiVersion( 1.0 );
+                options.DefaultApiVersion = new ApiVersion(1.0);
             })
             .AddApiExplorer(options =>
             {
@@ -103,10 +105,19 @@ public class Startup
             }
         });
 
+        app.UseMiddleware<UserIdMiddleware>();
+
         app.UseSerilogRequestLogging(configure =>
         {
             configure.MessageTemplate =
                 "HTTP {RequestMethod} {RequestPath} ({UserId}) responded {StatusCode} in {Elapsed:0.0000}ms";
+            configure.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+            {
+                if (httpContext.Items.TryGetValue("UserId", out var userId))
+                {
+                    diagnosticContext.Set("UserId", userId);
+                }
+            };
         });
         app.UseHttpsRedirection();
         app.UseRouting();

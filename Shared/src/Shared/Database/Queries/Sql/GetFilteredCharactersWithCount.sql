@@ -1,4 +1,4 @@
-SELECT c.name
+SELECT c.name, COUNT(*) OVER () AS TotalCount
 FROM characters c
 WHERE c.name LIKE '%' || @SearchText || '%'
 ORDER BY c.name
