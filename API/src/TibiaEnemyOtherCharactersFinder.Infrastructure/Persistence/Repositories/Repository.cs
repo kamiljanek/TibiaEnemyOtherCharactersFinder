@@ -42,20 +42,6 @@ public class Repository : IRepository
         return false;
     }
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            return await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-
-        return default;
-    }
-
     public async Task<List<World>> GetAvailableWorldsAsync(CancellationToken cancellationToken = default)
     {
         return await _dbContext.Worlds.Where(w => w.IsAvailable).ToListAsync(cancellationToken);
@@ -91,60 +77,68 @@ public class Repository : IRepository
         return _dbContext.WorldScans.Count(scan => !scan.IsDeleted);
     }
 
-    public async Task SoftDeleteWorldScanAsync(int worldScanId, CancellationToken cancellationToken = default)
+    public async Task SoftDeleteWorldScanAsync(int worldScanId)
     {
         await _dbContext.WorldScans
             .Where(ws => ws.WorldScanId == worldScanId)
-            .ExecuteUpdateAsync(update => update.SetProperty(ws => ws.IsDeleted, true), cancellationToken);
+            .ExecuteUpdateAsync(update => update.SetProperty(ws => ws.IsDeleted, true));
     }
 
-    public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class, IEntity
+    public async Task AddAsync<T>(T entity) where T : class, IEntity
     {
         _dbContext.Set<T>().Add(entity);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class, IEntity
+    public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class, IEntity
     {
         _dbContext.Set<T>().AddRange(entities);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateWorldAsync(World newWorld, CancellationToken cancellationToken = default)
+    public async Task UpdateWorldAsync(World newWorld)
     {   
-        var currentWorld = await _dbContext.Set<World>().FirstOrDefaultAsync(e => e.WorldId == newWorld.WorldId, cancellationToken);
+        var currentWorld = await _dbContext.Set<World>().FirstOrDefaultAsync(e => e.WorldId == newWorld.WorldId);
         _dbContext.Entry(currentWorld).CurrentValues.SetValues(newWorld);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateCharacterNameAsync(string oldName, string newName, CancellationToken cancellationToken = default)
+    public async Task UpdateCharacterNameAsync(string oldName, string newName)
     {
         await _dbContext.Characters
             .Where(c => c.Name == oldName.ToLower())
             .ExecuteUpdateAsync(update => update
-                .SetProperty(c => c.Name, newName.ToLower()), cancellationToken);
+                .SetProperty(c => c.Name, newName.ToLower()));
     }
 
-    public async Task UpdateCharacterVerifiedDate(int characterId, CancellationToken cancellationToken = default)
+    public async Task UpdateCharacterVerifiedDate(int characterId)
     {
         await _dbContext.Characters
             .Where(c => c.CharacterId == characterId)
             .ExecuteUpdateAsync(update => update
-                .SetProperty(c => c.VerifiedDate, DateOnly.FromDateTime(DateTime.Now)), cancellationToken);
+                .SetProperty(c => c.VerifiedDate, DateOnly.FromDateTime(DateTime.Now)));
     }
 
-    public async Task SetCharacterFoundInScanAsync(IReadOnlyList<string> charactersNames, bool foundInScan, CancellationToken cancellationToken = default)
+    public async Task UpdateCharacterTradedDate(int characterId)
+    {
+        await _dbContext.Characters
+            .Where(c => c.CharacterId == characterId)
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(c => c.TradedDate, DateOnly.FromDateTime(DateTime.Now)));
+    }
+
+    public async Task SetCharacterFoundInScanAsync(IReadOnlyList<string> charactersNames, bool foundInScan)
     {
         await _dbContext.Characters
            .Where(ch => charactersNames.Contains(ch.Name))
-           .ExecuteUpdateAsync(update => update.SetProperty(c => c.FoundInScan, c => foundInScan), cancellationToken);
+           .ExecuteUpdateAsync(update => update.SetProperty(c => c.FoundInScan, c => foundInScan));
     }
 
-    public async Task UpdateCharacterCorrelationsAsync(CancellationToken cancellationToken = default)
+    public async Task UpdateCharacterCorrelationsAsync()
     {
-        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync(cancellationToken)).LogoutOrLoginDate;
-        var loginCharactersIds = CharactersIds(true);
-        var logoutCharactersIds = CharactersIds(false);
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var loginCharactersIds = GetCharactersIdsBasedOnCharacterActions(isOnline: true);
+        var logoutCharactersIds = GetCharactersIdsBasedOnCharacterActions(isOnline: false);
 
         var characterCorrelationsIdsPart1 =  _dbContext.CharacterCorrelations
             .Where(c => loginCharactersIds.Contains(c.LoginCharacterId) && logoutCharactersIds.Contains(c.LogoutCharacterId))
@@ -158,7 +152,7 @@ public class Repository : IRepository
            .Where(cc => characterCorrelationsIdsPart1.Concat(characterCorrelationsIdsPart2).Contains(cc.CorrelationId))
            .ExecuteUpdateAsync(update => update
                .SetProperty(c => c.NumberOfMatches, c => c.NumberOfMatches + 1)
-               .SetProperty(c => c.LastMatchDate, lastMatchDate), cancellationToken);
+               .SetProperty(c => c.LastMatchDate, lastMatchDate));
     }
 
     /// <param name="rawSql">Sql command to execute</param>
@@ -174,7 +168,7 @@ public class Repository : IRepository
         await _dbContext.Database.ExecuteSqlRawAsync(rawSql, cancellationToken);
     }
 
-    public async Task DeleteIrrelevantCharacterCorrelationsAsync(int numberOfDays, int matchingNumber, CancellationToken cancellationToken = default)
+    public async Task DeleteIrrelevantCharacterCorrelationsAsync(int numberOfDays, int matchingNumber)
     {
         var thresholdDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-numberOfDays));
 
@@ -182,14 +176,14 @@ public class Repository : IRepository
 
         await _dbContext.CharacterCorrelations
             .Where(c => c.NumberOfMatches < matchingNumber && c.LastMatchDate < thresholdDate)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
     }
 
-    public async Task CreateCharacterCorrelationsIfNotExistAsync(CancellationToken cancellationToken = default)
+    public async Task CreateCharacterCorrelationsIfNotExistAsync()
     {
-        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync(cancellationToken)).LogoutOrLoginDate;
-        var loginCharactersIds = CharactersIds(true);
-        var logoutCharactersIds = CharactersIds(false);
+        var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
+        var loginCharactersIds = GetCharactersIdsBasedOnCharacterActions(isOnline: true);
+        var logoutCharactersIds = GetCharactersIdsBasedOnCharacterActions(isOnline: false);
         
         var correlationsDataToCreate = loginCharactersIds
             .SelectMany(login => logoutCharactersIds,
@@ -219,17 +213,16 @@ public class Repository : IRepository
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync(
-        CancellationToken cancellationToken = default)
+    public async Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync()
     {
         var charactersToRemove = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
 
         await _dbContext.CharacterCorrelations
             .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId))
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
     }
 
     public async Task ClearChangeTracker()
@@ -253,35 +246,35 @@ public class Repository : IRepository
         return await Task.Run(() => _dbContext.Database.SqlQueryRaw<T>(query, parameters).AsEnumerable());
     }
 
-    public async Task DeleteCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default)
+    public async Task DeleteCharacterByIdAsync(int characterId)
     {
         await _dbContext.Characters
             .Where(c => c.CharacterId == characterId)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
     }
 
-    public async Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId, CancellationToken cancellationToken = default)
+    public async Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId)
     {
         await _dbContext.CharacterCorrelations
             .Where(c => c.LoginCharacterId == characterId || c.LogoutCharacterId == characterId)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
     }
 
-    public async Task DeleteCharacterCorrelationsByIdsAsync(IReadOnlyList<int> characterCorrelationsIds, CancellationToken cancellationToken = default)
+    public async Task DeleteCharacterCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds)
     {
         await _dbContext.CharacterCorrelations
             .Where(c => characterCorrelationsIds.Contains(c.CorrelationId))
-            .ExecuteDeleteAsync(cancellationToken);
+            .ExecuteDeleteAsync();
     }
 
-    public async Task ReplaceCharacterIdInCorrelationsAsync(Character oldCharacter, Character newCharacter, CancellationToken cancellationToken = default)
+    public async Task ReplaceCharacterIdInCorrelationsAsync(Character oldCharacter, Character newCharacter)
     {
         await _dbContext.CharacterCorrelations
             .Where(cc => cc.LoginCharacterId == oldCharacter.CharacterId)
-            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LoginCharacterId, newCharacter.CharacterId), cancellationToken);
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LoginCharacterId, newCharacter.CharacterId));
         await _dbContext.CharacterCorrelations
             .Where(cc => cc.LogoutCharacterId == oldCharacter.CharacterId)
-            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LogoutCharacterId, newCharacter.CharacterId), cancellationToken);
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.LogoutCharacterId, newCharacter.CharacterId));
     }
 
     public async Task<Character> GetCharacterByNameAsync(string characterName, CancellationToken cancellationToken = default)
@@ -295,7 +288,7 @@ public class Repository : IRepository
     }
 
 
-    private IQueryable<int> CharactersIds(bool isOnline)
+    private IQueryable<int> GetCharactersIdsBasedOnCharacterActions(bool isOnline)
     {
         return _dbContext.Characters
             .Where(c =>

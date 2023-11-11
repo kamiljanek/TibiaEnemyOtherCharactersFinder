@@ -104,6 +104,7 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
             dbContextAfterSubscribe.CharacterCorrelations.AsNoTracking().ToList();
 
         charactersAfterSubscriber.Count.Should().Be(4);
+        charactersAfterSubscriber.Count(c => c.TradedDate is not null).Should().Be(1);
         characterCorrelationsAfterSubscriber.Count.Should().Be(3);
     }
 

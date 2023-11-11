@@ -40,7 +40,7 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
         await _repository.ExecuteInTransactionAsync(async () =>
         {
             var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken);
-            await _repository.DeleteCharacterByIdAsync(character.CharacterId, cancellationToken);
+            await _repository.DeleteCharacterByIdAsync(character.CharacterId);
         });
     }
 }
