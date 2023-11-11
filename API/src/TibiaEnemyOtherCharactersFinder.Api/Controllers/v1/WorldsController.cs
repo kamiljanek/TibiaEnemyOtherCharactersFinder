@@ -16,12 +16,14 @@ public class WorldsController : TibiaBaseController
     }
 
     /// <summary>
-    /// Get all active worlds
+    /// Get filtered worlds.
     /// </summary>
+    /// <param name="available">If "true" than return all active worlds at this moment in applocation.</param>
+    /// <returns>Worlds count, names, urls and availability.</returns>
     [HttpGet]
-    public async Task<IActionResult> GetActiveWorlds()
+    public async Task<IActionResult> GetActiveWorlds([FromQuery] bool? available)
     {
-        var result = await _mediator.Send(new GetActiveWorldsQuery());
+        var result = await _mediator.Send(new GetActiveWorldsQuery(available));
 
         return Ok(result);
     }

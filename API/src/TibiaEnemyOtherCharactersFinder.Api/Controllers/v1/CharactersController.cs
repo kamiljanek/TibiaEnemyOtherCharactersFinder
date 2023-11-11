@@ -20,16 +20,13 @@ public class CharactersController : TibiaBaseController
     /// Get character details with 10 most scores possible other character names.
     /// </summary>
     /// <param name="characterName">Name of searched character</param>
+    /// <returns>Searched character with details and 10 most scored possible other character names with number of matches.</returns>
     [HttpGet("{characterName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOtherCharacters([FromRoute] string characterName)
+    public async Task<IActionResult> GetOtherCharacters([FromRoute] [Required] string characterName)
     {
         var result = await _mediator.Send(new GetCharacterWithCorrelationsQuery(characterName));
-        if (result is null)
-        {
-            return NotFound("Character does not exist");
-        }
 
         return Ok(result);
     }
@@ -43,6 +40,7 @@ public class CharactersController : TibiaBaseController
     /// <returns>A list of character names with total count.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFilteredCharacters(
         [FromQuery] [Required] string searchText,
@@ -63,6 +61,7 @@ public class CharactersController : TibiaBaseController
     /// <returns>A list of character names.</returns>
     [HttpGet("prompt")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFilteredCharactersPrompt(
         [FromQuery] [Required] string searchText,

@@ -2,6 +2,6 @@
 
 public class GetActiveWorldsResult
 {
-    public int Count => ActiveWorlds.Count;
-    public IReadOnlyList<ActiveWorldResult> ActiveWorlds { get; set; }
+    public int Count => Worlds.Count;
+    public IReadOnlyList<ActiveWorldResult> Worlds { get; set; }
 }

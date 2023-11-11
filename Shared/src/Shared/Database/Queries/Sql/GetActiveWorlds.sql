@@ -1,1 +1,4 @@
-SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name
+SELECT name, url, is_available
+FROM worlds
+WHERE (@Available IS NULL OR is_available = @Available)
+ORDER BY name

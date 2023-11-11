@@ -76,7 +76,14 @@ WHERE logout_character_id IN
         (SELECT character_id
          FROM offline_characters)";
 
-        public const string GetActiveWorlds = @"SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name";
+        /// <summary>
+        /// Required parameters: 
+        ///    @Available
+        /// </summary>
+        public const string GetActiveWorlds = @"SELECT name, url, is_available
+FROM worlds
+WHERE (@Available IS NULL OR is_available = @Available)
+ORDER BY name";
 
         /// <summary>
         /// Required parameters: 

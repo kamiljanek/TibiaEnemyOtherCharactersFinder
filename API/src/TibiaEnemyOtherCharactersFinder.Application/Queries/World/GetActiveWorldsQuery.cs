@@ -6,9 +6,7 @@ using TibiaEnemyOtherCharactersFinder.Application.Dtos;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.World;
 
-public class GetActiveWorldsQuery : IRequest<GetActiveWorldsResult>
-{
-}
+public record GetActiveWorldsQuery(bool? Available) : IRequest<GetActiveWorldsResult>;
 
 public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery, GetActiveWorldsResult>
 {
@@ -22,9 +20,15 @@ public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery,
     public async Task<GetActiveWorldsResult> Handle(GetActiveWorldsQuery request, CancellationToken cancellationToken)
     {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
-        var activeWorlds = (await connection.QueryAsync<ActiveWorldResult>(GenerateQueries.GetActiveWorlds)).ToArray();
 
-        var result = new GetActiveWorldsResult() { ActiveWorlds = activeWorlds};
+        var parameters = new
+        {
+            Available = request.Available
+        };
+
+        var activeWorlds = (await connection.QueryAsync<ActiveWorldResult>(GenerateQueries.GetActiveWorlds, parameters)).ToArray();
+
+        var result = new GetActiveWorldsResult() { Worlds = activeWorlds};
 
         return result;
     }
