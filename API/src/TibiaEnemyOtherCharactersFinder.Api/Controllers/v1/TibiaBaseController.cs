@@ -3,7 +3,7 @@
 namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.v1;
 
 [ApiController]
-[Route("api/tibia/v{version:apiVersion}/[controller]")]
+[Route("api/tibia-eocf/v{version:apiVersion}/[controller]")]
 public class TibiaBaseController : ControllerBase
 {
 }

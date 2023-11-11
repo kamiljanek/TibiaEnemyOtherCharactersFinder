@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using FluentValidation.Results;
 using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
@@ -7,15 +8,13 @@ using TibiaEnemyOtherCharactersFinder.Application.Exceptions;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
 
-public record GetFilteredCharacterListByFragmentNameQuery(
+public record GetFilteredCharactersByFragmentNameQuery(
     string SearchText,
     int Page,
-    int PageSize,
-    bool SearchInMiddle) : IRequest<List<string>>;
+    int PageSize) : IRequest<FilteredCharactersDto>;
 
 public class
-    GetFilteredCharacterListByFragmentNameQueryHandler : IRequestHandler<GetFilteredCharacterListByFragmentNameQuery,
-        List<string>>
+    GetFilteredCharacterListByFragmentNameQueryHandler : IRequestHandler<GetFilteredCharactersByFragmentNameQuery, FilteredCharactersDto>
 {
     private readonly IDapperConnectionProvider _connectionProvider;
 
@@ -24,13 +23,14 @@ public class
         _connectionProvider = connectionProvider;
     }
 
-    public async Task<List<string>> Handle(GetFilteredCharacterListByFragmentNameQuery request,
+    public async Task<FilteredCharactersDto> Handle(GetFilteredCharactersByFragmentNameQuery request,
         CancellationToken cancellationToken)
     {
         var minLength = 2; // Minimum required length for a fragment name
         if (string.IsNullOrWhiteSpace(request.SearchText) || request.SearchText.Length < minLength)
         {
-            throw new NameTooShortException(nameof(request.SearchText), minLength);
+            throw new TibiaValidationException(new ValidationFailure(nameof(request.SearchText),
+                $"Input is too short. It must be at least {minLength} characters long."));
         }
 
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
@@ -41,8 +41,19 @@ public class
             PageSize = request.PageSize
         };
 
-        return request.SearchInMiddle
-            ? (await connection.QueryAsync<string>(GenerateQueries.GetFilteredCharactersSearchInMiddle, parameters)).ToList()
-            : (await connection.QueryAsync<string>(GenerateQueries.GetFilteredCharactersStartsAtSearchText, parameters)).ToList();
+        var result = (await connection.QueryAsync<(string name, int totalCount)>(GenerateQueries.GetFilteredCharactersWithCount, parameters)).ToList();
+
+        if (result.FirstOrDefault().totalCount == 0)
+        {
+            throw new NotFoundException(nameof(Character), request.SearchText);
+        }
+
+        var characterMatching = new FilteredCharactersDto()
+        {
+            TotalCount = result.FirstOrDefault().totalCount,
+            Names = result.Select(n => n.name).ToArray()
+        };
+
+        return characterMatching;
     }
 }

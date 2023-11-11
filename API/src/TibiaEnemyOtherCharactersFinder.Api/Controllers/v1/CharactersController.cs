@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
@@ -37,26 +38,38 @@ public class CharactersController : TibiaBaseController
     /// Get a list of character names based on a fragment of the name, sorted in ascending order.
     /// </summary>
     /// <param name="searchText">A fragment of the character name. Required minimum 2 chars length of a fragment name.</param>
-    /// <param name="page">The page number to view.</param>
-    /// <param name="pageSize">The capacity of a single page.</param>
-    /// <param name="searchInMiddle">An option that allows searching within the "CharacterName" property.
-    /// By default, it is set to "false," which means the function will return only names that start with the <paramref name="searchText"/>.
-    /// Set to "true" to search for names containing the <paramref name="searchText"/> in the middle.</param>
-    /// <returns>A list of character names.</returns>
+    /// <param name="page">The page number to view. Default value = 1</param>
+    /// <param name="pageSize">The capacity of a single page. Default value = 10</param>
+    /// <returns>A list of character names with total count.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFilteredCharacters(
-        [FromQuery] string searchText,
-        [FromQuery] int page,
-        [FromQuery] int pageSize,
-        [FromQuery] bool searchInMiddle = false)
+        [FromQuery] [Required] string searchText,
+        [FromQuery] [Required] int page = 1,
+        [FromQuery] [Required] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetFilteredCharacterListByFragmentNameQuery(searchText, page, pageSize, searchInMiddle));
-        if (result.Count == 0)
-        {
-            return NotFound("Character does not exist");
-        }
+        var result = await _mediator.Send(new GetFilteredCharactersByFragmentNameQuery(searchText, page, pageSize));
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get a list of character names starts at fragment of the name, sorted in ascending order.
+    /// </summary>
+    /// <param name="searchText">A fragment of the character name. Required minimum 2 chars length of a fragment name.</param>
+    /// <param name="page">The page number to view. Default value = 1</param>
+    /// <param name="pageSize">The capacity of a single page. Default value = 10</param>
+    /// <returns>A list of character names.</returns>
+    [HttpGet("prompt")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetFilteredCharactersPrompt(
+        [FromQuery] [Required] string searchText,
+        [FromQuery] [Required] int page = 1,
+        [FromQuery] [Required] int pageSize = 10)
+    {
+        var result = await _mediator.Send(new GetFilteredCharactersByFragmentNamePromptQuery(searchText, page, pageSize));
 
         return Ok(result);
     }
