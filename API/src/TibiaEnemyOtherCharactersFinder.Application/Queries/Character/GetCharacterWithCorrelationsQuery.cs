@@ -3,6 +3,7 @@ using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
+using TibiaEnemyOtherCharactersFinder.Application.Exceptions;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
@@ -25,7 +26,7 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
         var character = await _tibiaDataClient.FetchCharacter(request.Name);
         if (string.IsNullOrWhiteSpace(character.characters.character.name))
         {
-            return null;
+            throw new NotFoundException(nameof(Character), request.Name);
         }
 
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
