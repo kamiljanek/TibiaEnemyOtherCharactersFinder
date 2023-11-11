@@ -27,7 +27,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
         new ConfigurationBuilder()
         .SetBasePath(AppContext.BaseDirectory)
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true)
         .Build();
 
     private readonly PostgreSqlContainer _dbContainer =
