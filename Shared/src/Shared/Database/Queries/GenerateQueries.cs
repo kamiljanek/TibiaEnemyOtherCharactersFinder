@@ -117,9 +117,9 @@ OFFSET ((@Page - 1) * @PageSize) ROWS
         ///    @PageSize
         ///    @SearchText
         /// </summary>
-        public const string GetFilteredCharactersSearchInMiddle = @"SELECT c.name
+        public const string GetFilteredCharactersStartsAtSearchText = @"SELECT c.name
 FROM characters c
-WHERE c.name LIKE '%' || @SearchText || '%'
+WHERE c.name >= @SearchText
 ORDER BY c.name
 OFFSET ((@Page - 1) * @PageSize) ROWS
     LIMIT @PageSize;";
@@ -130,9 +130,9 @@ OFFSET ((@Page - 1) * @PageSize) ROWS
         ///    @PageSize
         ///    @SearchText
         /// </summary>
-        public const string GetFilteredCharactersStartsAtSearchText = @"SELECT c.name
+        public const string GetFilteredCharactersWithCount = @"SELECT c.name, COUNT(*) OVER () AS TotalCount
 FROM characters c
-WHERE c.name >= @SearchText
+WHERE c.name LIKE '%' || @SearchText || '%'
 ORDER BY c.name
 OFFSET ((@Page - 1) * @PageSize) ROWS
     LIMIT @PageSize;";
