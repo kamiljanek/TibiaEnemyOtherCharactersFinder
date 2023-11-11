@@ -41,8 +41,8 @@ public class DeleteCharacterCorrelationsEventSubscriber : IEventSubscriber
         await _repository.ExecuteInTransactionAsync(async () =>
         {
             var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken);
-            await _repository.DeleteCharacterCorrelationsByCharacterIdAsync(character.CharacterId, cancellationToken);
-            // UNDONE: update Traded_date
+            await _repository.DeleteCharacterCorrelationsByCharacterIdAsync(character.CharacterId);
+            await _repository.UpdateCharacterTradedDate(character.CharacterId);
         });
     }
 }
