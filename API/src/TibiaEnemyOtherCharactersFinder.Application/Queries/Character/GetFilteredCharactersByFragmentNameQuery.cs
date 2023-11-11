@@ -34,6 +34,18 @@ public class
         _validator.ValidNumberParameterRange(request.Page, nameof(request.Page), 1);
         _validator.ValidNumberParameterRange(request.PageSize, nameof(request.PageSize), 1, 100);
 
+        if (request.PageSize < 1)
+        {
+            throw new TibiaValidationException(new ValidationFailure(nameof(request.PageSize),
+                $"{nameof(request.PageSize)} must be greater than 0."));
+        }
+
+        if (request.Page < 1)
+        {
+            throw new TibiaValidationException(new ValidationFailure(nameof(request.Page),
+                $"{nameof(request.Page)} must be greater than 0."));
+        }
+
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
         var parameters = new
         {
