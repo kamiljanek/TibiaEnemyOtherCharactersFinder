@@ -32,4 +32,5 @@ public interface IRepository
     Task<Character> GetCharacterByNameAsync(string characterName, CancellationToken cancellationToken = default);
     Task<Character> GetCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default);
     Task DeleteCharacterCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds);
+    Task DeleteOldWorldScansAsync();
 }

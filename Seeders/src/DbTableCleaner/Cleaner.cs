@@ -12,9 +12,10 @@ public class Cleaner : ICleaner
         _repository = repository;
     }
 
-    public async Task ClearDeletedWorldScans()
+    public async Task ClearUnnecessaryWorldScans()
     {
         await _repository.ExecuteRawSqlAsync(GenerateQueries.ClearDeletedWorldScans, timeOut: 60);
+        await _repository.DeleteOldWorldScansAsync();
     }
 
     public async Task TruncateCharacterActions()

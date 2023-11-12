@@ -17,7 +17,7 @@ public class CleanerDecorator : ILoggerDecorator
 
     public async Task ClearTables()
     {
-        await Decorate(_cleaner.ClearDeletedWorldScans);
+        await Decorate(_cleaner.ClearUnnecessaryWorldScans);
         await Decorate(_cleaner.TruncateCharacterActions);
         await Decorate(_cleaner.DeleteIrrelevantCharacterCorrelations);
         await Decorate(_cleaner.VacuumCharacterActions);
