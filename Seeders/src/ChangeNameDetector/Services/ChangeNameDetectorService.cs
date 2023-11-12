@@ -50,6 +50,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
                 _logger.LogInformation("Character '{characterName}' was not traded, was not changed name", character.Name);
             }
 
+
             // If TibiaData cannot find character just delete with all correlations.
             else if (!_validator.IsCharacterExist(fechedCharacter))
             {
@@ -73,7 +74,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
 
                 if (newCharacter is null)
                 {
-                    // If new character name is not yet in the databese just change old name to now one.
+                    // If new character name is not yet in the databese just change old name to new one.
                     await _repository.UpdateCharacterNameAsync(character.Name, fechedCharacter.characters.character.name);
                     _logger.LogInformation("Character name '{character}' updated to '{newCharacter}'", character.Name, fechedCharacter.characters.character.name.ToLower());
                 }

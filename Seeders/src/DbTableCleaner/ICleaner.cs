@@ -2,7 +2,7 @@
 
 public interface ICleaner
 {
-    Task ClearDeletedWorldScans();
+    Task ClearUnnecessaryWorldScans();
     Task TruncateCharacterActions();
     Task DeleteIrrelevantCharacterCorrelations();
     Task VacuumCharacterActions();

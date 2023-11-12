@@ -287,6 +287,13 @@ public class Repository : IRepository
         return await _dbContext.Characters.Where(c => c.CharacterId == characterId).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task DeleteOldWorldScansAsync()
+    {
+        await _dbContext.WorldScans
+            .Where(ws => !ws.World.IsAvailable)
+            .ExecuteDeleteAsync();
+    }
+
 
     private IQueryable<int> GetCharactersIdsBasedOnCharacterActions(bool isOnline)
     {
