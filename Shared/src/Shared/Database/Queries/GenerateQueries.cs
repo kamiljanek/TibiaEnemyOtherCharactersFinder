@@ -76,7 +76,40 @@ WHERE logout_character_id IN
         (SELECT character_id
          FROM offline_characters)";
 
-        public const string GetActiveWorlds = @"SELECT name, url  FROM worlds WHERE is_available = TRUE ORDER BY name";
+        /// <summary>
+        /// Required parameters: 
+        ///    @Available
+        /// </summary>
+        public const string GetActiveWorlds = @"SELECT name, url, is_available
+FROM worlds
+WHERE (@Available IS NULL OR is_available = @Available)
+ORDER BY name";
+
+        /// <summary>
+        /// Required parameters: 
+        ///    @Page
+        ///    @PageSize
+        ///    @SearchText
+        /// </summary>
+        public const string GetFilteredCharactersStartsAtSearchText = @"SELECT c.name
+FROM characters c
+WHERE c.name >= @SearchText
+ORDER BY c.name
+OFFSET ((@Page - 1) * @PageSize) ROWS
+    LIMIT @PageSize;";
+
+        /// <summary>
+        /// Required parameters: 
+        ///    @Page
+        ///    @PageSize
+        ///    @SearchText
+        /// </summary>
+        public const string GetFilteredCharactersWithCount = @"SELECT c.name, COUNT(*) OVER () AS TotalCount
+FROM characters c
+WHERE c.name LIKE '%' || @SearchText || '%'
+ORDER BY c.name
+OFFSET ((@Page - 1) * @PageSize) ROWS
+    LIMIT @PageSize;";
 
         /// <summary>
         /// Required parameters: 

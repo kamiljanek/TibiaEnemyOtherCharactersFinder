@@ -32,7 +32,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
 
     private readonly PostgreSqlContainer _dbContainer =
         new PostgreSqlBuilder()
-            .WithImage("postgres:14.2")
+            .WithImage("postgres:14-alpine")
             .WithDatabase("postgres")
             .WithUsername("username")
             .WithPassword("password")

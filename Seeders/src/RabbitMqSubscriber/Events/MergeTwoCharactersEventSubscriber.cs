@@ -49,10 +49,10 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
 
         await _repository.ExecuteInTransactionAsync(async () =>
         {
-            await _repository.ReplaceCharacterIdInCorrelationsAsync(oldCharacter, newCharacter, cancellationToken);
+            await _repository.ReplaceCharacterIdInCorrelationsAsync(oldCharacter, newCharacter);
             List<CharacterCorrelation> correlations = new();
             List<string> combinedCharacterCorrelations = new();
-            List<int> correlationIdsToDelete = new();
+            List<long> correlationIdsToDelete = new();
 
             var sameCharacterCorrelations =
                 (await _repository.SqlQueryRaw<string>(GenerateQueries.GetSameCharacterCorrelations,
@@ -74,13 +74,13 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
                 correlations.Add(characterCorrelation);
             }
 
-            await _repository.AddRangeAsync(correlations, cancellationToken);
+            await _repository.AddRangeAsync(correlations);
 
             // Delete already merged CharacterCorrelations
-            await _repository.DeleteCharacterCorrelationsByIdsAsync(correlationIdsToDelete, cancellationToken);
+            await _repository.DeleteCharacterCorrelationsByIdsAsync(correlationIdsToDelete);
         });
 
-        await _repository.DeleteCharacterByIdAsync(oldCharacter.CharacterId, cancellationToken);
+        await _repository.DeleteCharacterByIdAsync(oldCharacter.CharacterId);
     }
 
     private CharacterCorrelation PrepareCharacterCorrelation(CombinedCharacterCorrelation combinedCorrelation)

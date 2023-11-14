@@ -5,7 +5,7 @@ public class CharacterCorrelation : IEntity
     /// <summary>
     /// Id of specific correlation between two characters
     /// </summary>
-    public int CorrelationId { get; set; }
+    public long CorrelationId { get; set; }
 
     /// <summary>
     /// Id of specific character that logout
