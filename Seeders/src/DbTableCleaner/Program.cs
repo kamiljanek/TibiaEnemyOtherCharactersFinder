@@ -1,4 +1,5 @@
-﻿using DbCleaner.Configuration;
+﻿using System.Reflection;
+using DbCleaner.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
@@ -11,10 +12,11 @@ public class Program
     {
         try
         {
-            var host = CustomHostBuilder.Create((_, services) =>
-            {
-                services.AddDbCleaner();
-            });
+            var projectName = Assembly.GetExecutingAssembly().GetName().Name;
+
+            var host = CustomHostBuilder.Create(
+                projectName,
+                (_, services) => { services.AddDbCleaner(); });
 
             Log.Information("Starting application");
 

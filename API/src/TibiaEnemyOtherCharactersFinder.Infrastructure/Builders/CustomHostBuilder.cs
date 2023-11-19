@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +10,7 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
 
 public static class CustomHostBuilder
 {
-    public static IHost Create(
+    public static IHost Create(string projectName,
         Action<HostBuilderContext, IServiceCollection> configureServices,
         Action<ContainerBuilder> configureContainer = null)
     {
@@ -29,7 +28,7 @@ public static class CustomHostBuilder
             .ConfigureServices((context, services) =>
             {
                 services
-                    .AddSerilog(context.Configuration, Assembly.GetExecutingAssembly().GetName().Name)
+                    .AddSerilog(context.Configuration, projectName)
                     .AddTibiaDbContext(context.Configuration);
                 configureServices?.Invoke(context, services);
             })

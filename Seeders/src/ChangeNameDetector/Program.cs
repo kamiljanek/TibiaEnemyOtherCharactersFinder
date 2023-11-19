@@ -1,4 +1,5 @@
-﻿using ChangeNameDetector.Configuration;
+﻿using System.Reflection;
+using ChangeNameDetector.Configuration;
 using ChangeNameDetector.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -13,11 +14,15 @@ public class Program
     {
         try
         {
-            var host = CustomHostBuilder.Create((context, services) =>
-            {
-                services.AddNameDetector();
-                services.AddRabbitMqPublisher(context.Configuration);
-            });
+            var projectName = Assembly.GetExecutingAssembly().GetName().Name;
+
+            var host = CustomHostBuilder.Create(
+                projectName,
+                (context, services) =>
+                {
+                    services.AddNameDetector();
+                    services.AddRabbitMqPublisher(context.Configuration);
+                });
 
             Log.Information("Starting application");
 

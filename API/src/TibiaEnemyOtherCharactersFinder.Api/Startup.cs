@@ -7,9 +7,9 @@ using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using TibiaEnemyOtherCharactersFinder.Api.Configurations;
 using TibiaEnemyOtherCharactersFinder.Api.Filters;
 using TibiaEnemyOtherCharactersFinder.Api.Swagger;
-using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Middlewares;
@@ -36,19 +36,21 @@ public class Startup
     {
         services.AddInfrastructure(_configuration);
 
-        services
-            .AddControllers(opt =>
-            {
-                opt.Filters.Add<ErrorHandlingFilterAttribute>();
-            })
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            });
+        services.AddControllers(opt => { opt.Filters.Add<ErrorHandlingFilterAttribute>(); })
+            .AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
 
+        services.AddRateLimiter(StartupConfigurations.RateLimitedConfiguration);
         services.AddRouting(options => { options.LowercaseUrls = true; });
-
         services.AddMediatR(typeof(Startup));
+
+        services.AddDistributedMemoryCache();
+        services.AddSession(options =>
+        {
+            options.Cookie.Name = "sessionId";
+            options.Cookie.HttpOnly = true;
+            options.IdleTimeout = TimeSpan.FromMinutes(20);
+            options.Cookie.IsEssential = true;
+        });
 
         services.AddCors(options =>
         {
@@ -74,6 +76,7 @@ public class Startup
                 options.SubstituteApiVersionInUrl = true;
             });
 
+        services.AddTransient<GlobalExceptionHandlingMiddleware>();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
         services.AddSwaggerGen(options =>
         {
@@ -85,7 +88,7 @@ public class Startup
             options.IncludeXmlComments(xmlPath);
         });
 
-        ConfigureOptions(services);
+        StartupConfigurations.ConfigureOptions(services);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -105,36 +108,19 @@ public class Startup
             }
         });
 
-        app.UseMiddleware<UserIdMiddleware>();
-
-        app.UseSerilogRequestLogging(configure =>
-        {
-            configure.MessageTemplate =
-                "HTTP {RequestMethod} {RequestPath} ({UserId}) responded {StatusCode} in {Elapsed:0.0000}ms";
-            configure.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
-            {
-                if (httpContext.Items.TryGetValue("UserId", out var userId))
-                {
-                    diagnosticContext.Set("UserId", userId);
-                }
-            };
-        });
         app.UseHttpsRedirection();
         app.UseRouting();
+        app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+        app.UseSession();
+        app.UseCookiePolicy(new CookiePolicyOptions
+        {
+            MinimumSameSitePolicy = SameSiteMode.None,
+            Secure = CookieSecurePolicy.None
+        });
+        app.UseMiddleware<RequestLoggerMiddleware>();
+        app.UseRateLimiter();
+        app.UseSerilogRequestLogging(StartupConfigurations.SerilogRequestLoggingConfiguration);
         app.UseCors("TibiaEnemyOtherCharacterFinderApi");
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-    }
-
-    private static void ConfigureOptions(IServiceCollection services)
-    {
-        services.AddOptions<ConnectionStringsSection>()
-            .BindConfiguration(ConnectionStringsSection.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddOptions<DapperConfigurationSection>()
-            .BindConfiguration(DapperConfigurationSection.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
     }
 }

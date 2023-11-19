@@ -1,4 +1,5 @@
-﻿using CharacterAnalyser.Configuration;
+﻿using System.Reflection;
+using CharacterAnalyser.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
@@ -11,10 +12,11 @@ public class Program
     {
         try
         {
-            var host = CustomHostBuilder.Create((_, services) =>
-            {
-                services.AddCharacterAnalyser();
-            });
+            var projectName = Assembly.GetExecutingAssembly().GetName().Name;
+
+            var host = CustomHostBuilder.Create(
+                projectName,
+                (_, services) => { services.AddCharacterAnalyser(); });
 
             Log.Information("Starting application");
 

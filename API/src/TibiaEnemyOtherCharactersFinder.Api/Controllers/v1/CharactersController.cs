@@ -2,7 +2,9 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.v1;
 
@@ -27,7 +29,6 @@ public class CharactersController : TibiaBaseController
     public async Task<IActionResult> GetOtherCharacters([FromRoute] [Required] string characterName)
     {
         var result = await _mediator.Send(new GetCharacterWithCorrelationsQuery(characterName));
-
         return Ok(result);
     }
 
@@ -48,7 +49,6 @@ public class CharactersController : TibiaBaseController
         [FromQuery] [Required] int pageSize = 10)
     {
         var result = await _mediator.Send(new GetFilteredCharactersByFragmentNameQuery(searchText, page, pageSize));
-
         return Ok(result);
     }
 
@@ -63,13 +63,13 @@ public class CharactersController : TibiaBaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EnableRateLimiting(ConfigurationConstants.PromptRateLimiting)]
     public async Task<IActionResult> GetFilteredCharactersPrompt(
         [FromQuery] [Required] string searchText,
         [FromQuery] [Required] int page = 1,
         [FromQuery] [Required] int pageSize = 10)
     {
         var result = await _mediator.Send(new GetFilteredCharactersByFragmentNamePromptQuery(searchText, page, pageSize));
-
         return Ok(result);
     }
 }

@@ -8,7 +8,6 @@ public class TibiaValidationException : TibiaEnemyOtherCharacterFinderException
 
     public TibiaValidationException(string message) : base(message)
     {
-
     }
     public TibiaValidationException(params ValidationFailure[] errors) : base(BuildErrorMessage(errors))
     {
