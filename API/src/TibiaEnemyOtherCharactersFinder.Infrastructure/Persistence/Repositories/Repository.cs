@@ -232,7 +232,7 @@ public class Repository : IRepository
 
     public async Task<Character> GetFirstCharacterByVerifiedDateAsync(CancellationToken cancellationToken = default)
     {
-        var thirtyDaysAgo = DateOnly.FromDateTime(DateTime.Now.AddDays(-30));
+        var thirtyDaysAgo = DateOnly.FromDateTime(DateTime.Now.AddDays(-15));
 
         return await _dbContext.Characters
             .Where(c => (!c.TradedDate.HasValue || c.TradedDate < thirtyDaysAgo) && (!c.VerifiedDate.HasValue || c.VerifiedDate < thirtyDaysAgo))

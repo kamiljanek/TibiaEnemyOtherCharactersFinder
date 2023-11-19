@@ -4,6 +4,7 @@ using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Exceptions;
+using TibiaEnemyOtherCharactersFinder.Application.Validations;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
 
@@ -16,32 +17,20 @@ public class
     GetFilteredCharacterListByFragmentNameQueryNewHandler : IRequestHandler<GetFilteredCharactersByFragmentNamePromptQuery, List<string>>
 {
     private readonly IDapperConnectionProvider _connectionProvider;
+    private readonly IRequestValidator _validator;
 
-    public GetFilteredCharacterListByFragmentNameQueryNewHandler(IDapperConnectionProvider connectionProvider)
+    public GetFilteredCharacterListByFragmentNameQueryNewHandler(IDapperConnectionProvider connectionProvider, IRequestValidator validator)
     {
         _connectionProvider = connectionProvider;
+        _validator = validator;
     }
 
     public async Task<List<string>> Handle(GetFilteredCharactersByFragmentNamePromptQuery request, CancellationToken cancellationToken)
     {
-        var minLength = 2; // Minimum required length for a fragment name
-        if (string.IsNullOrWhiteSpace(request.SearchText) || request.SearchText.Length < minLength)
-        {
-            throw new TibiaValidationException(new ValidationFailure(nameof(request.SearchText),
-                $"Input is too short. It must be at least {minLength} characters long."));
-        }
-
-        if (request.PageSize < 1)
-        {
-            throw new TibiaValidationException(new ValidationFailure(nameof(request.PageSize),
-                $"{nameof(request.PageSize)} must be greater than 0."));
-        }
-
-        if (request.Page < 1)
-        {
-            throw new TibiaValidationException(new ValidationFailure(nameof(request.Page),
-                $"{nameof(request.Page)} must be greater than 0."));
-        }
+        _validator.ValidSearchTextLenght(request.SearchText);
+        _validator.ValidSearchTextCharacters(request.SearchText);
+        _validator.ValidNumberParameterRange(request.Page, nameof(request.Page), 1);
+        _validator.ValidNumberParameterRange(request.PageSize, nameof(request.PageSize), 1, 100);
 
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
         var parameters = new

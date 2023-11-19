@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMqSubscriber.Configurations;
 using RabbitMqSubscriber.Subscribers;
@@ -14,11 +15,16 @@ public class Program
     {
         try
         {
-            var host = CustomHostBuilder.Create((context, services) =>
-            {
-                services.AddSingleton<TibiaSubscriber>();
-                services.AddRabbitMqSubscriber(context.Configuration);
-            }, builder => builder.RegisterEventSubscribers());
+            var projectName = Assembly.GetExecutingAssembly().GetName().Name;
+
+            var host = CustomHostBuilder.Create(
+                projectName,
+                (context, services) =>
+                {
+                    services.AddSingleton<TibiaSubscriber>();
+                    services.AddRabbitMqSubscriber(context.Configuration);
+                },
+                builder => builder.RegisterEventSubscribers());
 
             Log.Information("Starting application");
 

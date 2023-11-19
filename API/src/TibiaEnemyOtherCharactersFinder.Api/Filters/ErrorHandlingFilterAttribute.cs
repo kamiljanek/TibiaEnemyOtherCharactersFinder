@@ -6,18 +6,15 @@ namespace TibiaEnemyOtherCharactersFinder.Api.Filters;
 
 public class ErrorHandlingFilterAttribute : ExceptionFilterAttribute
 {
-    private readonly IDictionary<Type, Action<ExceptionContext>> _exceptionHandlers;
-
-    public ErrorHandlingFilterAttribute()
+    // Register known exception types and handlers.
+    private readonly IDictionary<Type, Action<ExceptionContext>> _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
     {
-        // Register known exception types and handlers.
-        _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
-        {
-            { typeof(ArgumentNullException), HandleArgumentNullException },
-            { typeof(NotFoundException), HandleNotFoundException },
-            { typeof(TibiaValidationException), HandleBadRequestException },
-        };
-    }
+        { typeof(ArgumentNullException), HandleArgumentNullException },
+        { typeof(NotFoundException), HandleNotFoundException },
+        { typeof(TibiaValidationException), HandleBadRequestException },
+        { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
+    };
+
 
     public override void OnException(ExceptionContext context)
     {
@@ -71,7 +68,7 @@ public class ErrorHandlingFilterAttribute : ExceptionFilterAttribute
 
     private static void HandleUnknownException(ExceptionContext context)
     {
-        var problemDetails = new ProblemDetails()
+        var details = new ProblemDetails()
         {
             Status = StatusCodes.Status500InternalServerError,
             Title = "An error occurred while processing your request.",
@@ -80,7 +77,7 @@ public class ErrorHandlingFilterAttribute : ExceptionFilterAttribute
             Instance = context.HttpContext.Request.Path
         };
 
-        context.Result = new ObjectResult(problemDetails);
+        context.Result = new ObjectResult(details);
 
         context.ExceptionHandled = true;
     }
