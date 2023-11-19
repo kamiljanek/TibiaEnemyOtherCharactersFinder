@@ -1,10 +1,12 @@
 ﻿using Dapper;
+using FluentValidation.Results;
 using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
 using TibiaEnemyOtherCharactersFinder.Application.Exceptions;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
+using TibiaEnemyOtherCharactersFinder.Application.Validations;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
 
@@ -14,16 +16,25 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
 {
     private readonly IDapperConnectionProvider _connectionProvider;
     private readonly ITibiaDataClient _tibiaDataClient;
+    private readonly IRequestValidator _validator;
 
-    public GetCharacterWithCorrelationsQueryHandler(IDapperConnectionProvider connectionProvider, ITibiaDataClient tibiaDataClient)
+    public GetCharacterWithCorrelationsQueryHandler(IDapperConnectionProvider connectionProvider, ITibiaDataClient tibiaDataClient, IRequestValidator validator)
     {
         _connectionProvider = connectionProvider;
         _tibiaDataClient = tibiaDataClient;
+        _validator = validator;
     }
 
     public async Task<CharacterWithCorrelationsResult> Handle(GetCharacterWithCorrelationsQuery request, CancellationToken cancellationToken)
     {
+        _validator.ValidSearchTextLenght(request.Name);
+        _validator.ValidSearchTextCharacters(request.Name);
+
         var character = await _tibiaDataClient.FetchCharacter(request.Name);
+        if (character is null)
+        {
+            throw new TibiaDataApiConnectionException();
+        }
         if (string.IsNullOrWhiteSpace(character.characters.character.name))
         {
             throw new NotFoundException(nameof(Character), request.Name);

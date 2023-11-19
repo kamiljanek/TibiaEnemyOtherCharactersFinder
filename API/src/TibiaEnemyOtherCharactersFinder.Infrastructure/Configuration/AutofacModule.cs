@@ -13,7 +13,8 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration
             builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().PreserveExistingDefaults();
             builder.RegisterAssemblyTypes(Assemblies.ApplicationAssembly).AsImplementedInterfaces().PreserveExistingDefaults();
 
-            builder.RegisterGeneric(typeof(LoggingPipelineBehavior<,>)).As(typeof(IPipelineBehavior<,>)).InstancePerLifetimeScope();
+            // builder.RegisterGeneric(typeof(LoggingPipelineBehavior<,>)).As(typeof(IPipelineBehavior<,>)).InstancePerLifetimeScope();
+            // UNDONE: probably to delete /\
 
             builder.RegisterType<HttpClientDecompressionHandler>().AsSelf().InstancePerDependency();
         }
