@@ -69,11 +69,6 @@ public class Analyser : ActionRule, IAnalyser
         await _repository.ClearChangeTracker();
     }
 
-    public async Task ClearChangeTracker()
-    {
-        await _repository.ClearChangeTracker();
-    }
-
     private async Task SeedAndAnalyseCharacters(List<WorldScan> twoWorldScans)
     {
             await Decorate(SeedCharacterActions, twoWorldScans);
@@ -97,8 +92,8 @@ public class Analyser : ActionRule, IAnalyser
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "WorldScan({worldScanId}) - World({WorldId}) - Execution {methodName} couse error",
-                (parameter as List<WorldScan>)![0].WorldScanId, (parameter as World)!.WorldId, function.Method.Name);
+            _logger.LogError("WorldScan({worldScanId}) - World({WorldId}) - Execution {methodName} couse error. Exception {exception}",
+                (parameter as List<WorldScan>)![0].WorldScanId, (parameter as World)!.WorldId, function.Method.Name, exception);
         }
     }
 

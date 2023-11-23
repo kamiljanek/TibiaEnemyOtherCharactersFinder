@@ -16,7 +16,7 @@ public class Program
 
             var host = CustomHostBuilder.Create(
                 projectName,
-                (_, services) => { services.AddWorldScanSeeder(); });
+                (_, services) => { services.AddWorldScanSeederServices(); });
 
             Log.Information("Starting application");
 

@@ -5,20 +5,20 @@ using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;
 
-public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaApiFactory>
+public class GetOtherCharactersTests : CharactersControllerTestTemplate, IClassFixture<TibiaApiFactory>
 {
     private const string ControllerBase = "api/tibia-eocf/v1/characters";
     private const string DefaultName = "Default Name";
     private const string NameInDatabase = "duzzerah";
     private readonly TibiaApiFactory _factory;
 
-    public GetOtherCharactersInCharacterControllerTests(TibiaApiFactory factory)
+    public GetOtherCharactersTests(TibiaApiFactory factory)
     {
         _factory = factory;
     }
 
     [Fact]
-    public async Task GetOtherCharactersEndpoint_WithRouteParametersThatFoundInDatabase_ReturnsCorrectData()
+    public async Task GetOtherCharactersEndpoint_WithRouteParametersThatFoundInDatabase_ShouldReturnsCorrectData()
     {
         // Arrange
         var client = _factory.CreateClient();
@@ -34,7 +34,7 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
     }
     
     [Fact]
-    public async Task GetOtherCharactersEndpoint_WithRouteParametersThatNotFoundInDatabase_ReturnsEmptyList()
+    public async Task GetOtherCharactersEndpoint_WithRouteParametersThatNotFoundInDatabase_ShouldReturnStatusNotFound()
     {
         // Arrange
         var client = _factory.CreateClient();
@@ -46,21 +46,31 @@ public class GetOtherCharactersInCharacterControllerTests : IClassFixture<TibiaA
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
-    public void NumberOfElementsInDatabaseShouldBeCorrect()
+    [Theory]
+    [MemberData(nameof(GetInvalidLengthRouteParameters))]
+    public async Task GetOtherCharactersEndpoint_WithInvalidLenghtRouteParameters_ShouldReturnsStatusBadRequest(string parameter)
     {
         // Arrange
-        using var scope = _factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
+        var client = _factory.CreateClient();
 
         // Act
-        var worlds = dbContext.Worlds.ToList();
-        var characters = dbContext.Characters.ToList();
-        var characterCorrelations = dbContext.CharacterCorrelations.ToList();
+        var result = await client.GetAsync($"{ControllerBase}/{parameter}");
 
         // Assert
-        worlds.Count.Should().Be(2);
-        characters.Count.Should().Be(6);
-        characterCorrelations.Count.Should().Be(6);
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetUnacceptableRouteParameters))]
+    public async Task GetOtherCharactersEndpoint_WithUnacceptableCharactersInRouteParameters_ShouldReturnsStatusBadRequest(string parameter)
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Act
+        var result = await client.GetAsync($"{ControllerBase}/{parameter}");
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

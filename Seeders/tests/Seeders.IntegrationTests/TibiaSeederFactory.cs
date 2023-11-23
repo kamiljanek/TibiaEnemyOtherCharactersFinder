@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMqSubscriber.Events;
+using RabbitMqSubscriber.Handlers;
 using RabbitMqSubscriber.Subscribers;
 using Shared.RabbitMQ.Extensions;
 using Testcontainers.PostgreSql;
@@ -112,6 +113,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             services.AddSingleton<IEventSubscriber, DeleteCharacterWithCorrelationsEventSubscriber>();
             services.AddSingleton<IEventSubscriber, DeleteCharacterCorrelationsEventSubscriber>();
             services.AddSingleton<IEventSubscriber, MergeTwoCharactersEventSubscriber>();
+            services.AddSingleton<IEventResultHandler, EventResultHandler>();
             services.AddRabbitMqPublisher(Configuration);
             services.AddRabbitMqSubscriber(Configuration);
         });

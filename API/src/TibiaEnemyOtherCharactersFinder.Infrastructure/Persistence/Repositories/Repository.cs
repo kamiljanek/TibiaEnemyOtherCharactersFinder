@@ -29,13 +29,13 @@ public class Repository : IRepository
             {
                 await action.Invoke();
                 await transaction.CommitAsync();
-                _logger.LogInformation("Transaction '{action}' commited properly", action.Target?.GetType().ReflectedType?.FullName);
                 return true;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                _logger.LogError("Transaction failed: {ErrorMessage}", ex.Message);
+                _logger.LogError("Method {method} during {action} failed, attempt {retryCount}. Error message: {ErrorMessage}",
+                    nameof(ExecuteInTransactionAsync), action.Target?.GetType().ReflectedType?.FullName, retryCount + 1, ex.Message);
             }
         }
 
@@ -230,15 +230,17 @@ public class Repository : IRepository
         await Task.Run(() => _dbContext.ChangeTracker.Clear());
     }
 
-    public async Task<Character> GetFirstCharacterByVerifiedDateAsync(CancellationToken cancellationToken = default)
+    public async Task<Character> GetFirstCharacterByVerifiedDateAsync()
     {
-        var thirtyDaysAgo = DateOnly.FromDateTime(DateTime.Now.AddDays(-15));
+        var visibilityOfTradeProperty = DateOnly.FromDateTime(DateTime.Now.AddDays(-31));
+        var scanPeriod = DateOnly.FromDateTime(DateTime.Now.AddDays(-15));
 
         return await _dbContext.Characters
-            .Where(c => (!c.TradedDate.HasValue || c.TradedDate < thirtyDaysAgo) && (!c.VerifiedDate.HasValue || c.VerifiedDate < thirtyDaysAgo))
+            .Where(c => (!c.TradedDate.HasValue || c.TradedDate < visibilityOfTradeProperty)
+                        && (!c.VerifiedDate.HasValue || c.VerifiedDate < scanPeriod))
             .OrderByDescending(c => c.VerifiedDate == null)
             .ThenBy(c => c.VerifiedDate)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<T>> SqlQueryRaw<T>(string query, params object[] parameters) where T : class
@@ -282,9 +284,13 @@ public class Repository : IRepository
         return await _dbContext.Characters.Where(c => c.Name == characterName.ToLower()).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Character> GetCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default)
+    public async Task<Character> GetCharacterByIdAsync(int characterId, bool withTracking = false, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Characters.Where(c => c.CharacterId == characterId).FirstOrDefaultAsync(cancellationToken);
+        return withTracking switch
+        {
+            true => await _dbContext.Characters.Where(c => c.CharacterId == characterId).FirstOrDefaultAsync(cancellationToken),
+            false => await _dbContext.Characters.Where(c => c.CharacterId == characterId).AsNoTracking().FirstOrDefaultAsync(cancellationToken)
+        };
     }
 
     public async Task DeleteOldWorldScansAsync()

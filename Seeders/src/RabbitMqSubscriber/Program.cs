@@ -21,7 +21,7 @@ public class Program
                 projectName,
                 (context, services) =>
                 {
-                    services.AddSingleton<TibiaSubscriber>();
+                    services.AddRabbitMqSubscriberServices();
                     services.AddRabbitMqSubscriber(context.Configuration);
                 },
                 builder => builder.RegisterEventSubscribers());

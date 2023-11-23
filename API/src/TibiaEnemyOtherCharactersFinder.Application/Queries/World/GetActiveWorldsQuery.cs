@@ -6,9 +6,9 @@ using TibiaEnemyOtherCharactersFinder.Application.Dtos;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.World;
 
-public record GetActiveWorldsQuery(bool? Available) : IRequest<GetActiveWorldsResult>;
+public record GetActiveWorldsQuery(bool? Available) : IRequest<GetWorldsResult>;
 
-public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery, GetActiveWorldsResult>
+public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery, GetWorldsResult>
 {
     private readonly IDapperConnectionProvider _connectionProvider;
 
@@ -17,7 +17,7 @@ public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery,
         _connectionProvider = connectionProvider;
     }
 
-    public async Task<GetActiveWorldsResult> Handle(GetActiveWorldsQuery request, CancellationToken cancellationToken)
+    public async Task<GetWorldsResult> Handle(GetActiveWorldsQuery request, CancellationToken cancellationToken)
     {
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
 
@@ -26,9 +26,9 @@ public class GetActiveWorldsQueryHandler : IRequestHandler<GetActiveWorldsQuery,
             Available = request.Available
         };
 
-        var activeWorlds = (await connection.QueryAsync<ActiveWorldResult>(GenerateQueries.GetActiveWorlds, parameters)).ToArray();
+        var activeWorlds = (await connection.QueryAsync<WorldResult>(GenerateQueries.GetActiveWorlds, parameters)).ToArray();
 
-        var result = new GetActiveWorldsResult() { Worlds = activeWorlds};
+        var result = new GetWorldsResult() { Worlds = activeWorlds};
 
         return result;
     }

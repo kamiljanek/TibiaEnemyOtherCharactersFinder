@@ -57,8 +57,9 @@ public class TibiaApiFactory : WebApplicationFactory<Startup>, IAsyncLifetime
     {
         return new List<World>()
         {
-            new() { WorldId = 111, Name = "Premia", Url = "urlPremia" },
-            new() { WorldId = 112, Name = "Vunira", Url = "urlVunira" }
+            new() { WorldId = 111, Name = "Premia", Url = "urlPremia", IsAvailable = true },
+            new() { WorldId = 112, Name = "Vunira", Url = "urlVunira", IsAvailable = true },
+            new() { WorldId = 113, Name = "Antica", Url = "urlAntica", IsAvailable = false }
         };
     }
     
