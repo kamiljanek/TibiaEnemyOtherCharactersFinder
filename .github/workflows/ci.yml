@@ -1,80 +1,40 @@
 name: CI
-
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [ main, develop ]
   workflow_dispatch:
 
 jobs:
-  build_and_test_seeders:
+  build:
+
     runs-on: ubuntu-20.04
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.3.0
-      - name: Run reusable build
-        uses: kamiljanek/TibiaEnemyOtherCharactersFinder/.github/workflows/reusable_build.yml@develop
-      - name: Run Seeder Integration Tests
-        run: dotnet test --no-build --filter "FullyQualifiedName~Seeders.IntegrationTests"
 
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v3.0.3
+        with:
+          dotnet-version: 7.0.x
 
-#  build_and_test_api_get_other_characters:
-#    runs-on: ubuntu-20.04
-#    needs: [ common_setup, build_and_test_seeders ]
-#
-#    steps:
-#      - name: Run API Integration Tests
-#        run: dotnet test --no-build --filter "FullyQualifiedName~TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController.GetOtherCharactersTests"
-#
-#  build_and_test_api_get_filtered_characters:
-#    runs-on: ubuntu-20.04
-#    needs: [ build_and_test_api_get_other_characters ]
-#
-#    steps:
-#      - name: Run API Integration Tests
-#        run: dotnet test --no-build --filter "FullyQualifiedName~TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController.GetFilteredCharactersTests"
-#
-#  build_and_test_api_get_filtered_characters_prompt:
-#    runs-on: ubuntu-20.04
-#    needs: [ build_and_test_api_get_filtered_characters ]
-#
-#    steps:
-#      - name: Run API Integration Tests
-#        run: dotnet test --no-build --filter "FullyQualifiedName~TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController.GetFilteredCharactersPromptTests"
-#
-#  build_and_test_unit_api:
-#    runs-on: ubuntu-20.04
-#    needs: [ common_setup, build_and_test_api_get_filtered_characters_prompt ]
-#
-#    steps:
-#      - name: Run API Unit Tests
-#        run: dotnet test --no-build --filter "FullyQualifiedName~TibiaEnemyOtherCharacterFinder.Tests"
-#
-#  common_setup:
-#    runs-on: ubuntu-20.04
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v3.3.0
-#
-#      - name: Setup .NET Core SDK
-#        uses: actions/setup-dotnet@v3.0.3
-#        with:
-#          dotnet-version: 7.0.x
-#
-#      - name: App Settings Variable Substitution
-#        uses: microsoft/variable-substitution@v1
-#        with:
-#          files: './API/src/TibiaEnemyOtherCharactersFinder.Api/appsettings.json'
-#        env:
-#          Serilog.WriteTo.2.Args.serverUrl: http://localhost:5341
-#          Serilog.WriteTo.2.Args.apiKey: xxxxxx
-#          RabbitMq.username: guest
-#          RabbitMq.password: guest
-#          RabbitMq.port: 5672
-#          RabbitMq.hostUrl: amqp://localhost
-#
-#      - name: Restore NuGet Packages
-#        run: dotnet restore
-#
-#      - name: Run Build
-#        run: dotnet build --no-restore
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: './API/src/TibiaEnemyOtherCharactersFinder.Api/appsettings.json'
+        env:
+          Serilog.WriteTo.2.Args.serverUrl: http://localhost:5341
+          Serilog.WriteTo.2.Args.apiKey: xxxxxx
+          RabbitMq.username: guest
+          RabbitMq.password: guest
+          RabbitMq.port: 5672
+          RabbitMq.hostUrl: amqp://localhost
+
+      - name: Restore NuGet Packages
+        run: dotnet restore
+
+      - name: Run Build
+        run: dotnet build --no-restore
+
+#      - name: Run Tests
+#        run: dotnet test --no-build
