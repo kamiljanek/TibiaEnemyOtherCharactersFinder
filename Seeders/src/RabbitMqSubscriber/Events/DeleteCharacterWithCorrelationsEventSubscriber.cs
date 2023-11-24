@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
+using RabbitMqSubscriber.Handlers;
 using RabbitMqSubscriber.Subscribers;
 using Shared.RabbitMQ.Conventions;
 using Shared.RabbitMQ.Events;
@@ -12,15 +13,18 @@ namespace RabbitMqSubscriber.Events;
 public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
 {
     private readonly ILogger<DeleteCharacterWithCorrelationsEventSubscriber> _logger;
+    private readonly IEventResultHandler _eventResultHandler;
     private readonly IRabbitMqConventionProvider _conventionProvider;
     private readonly IRepository _repository;
 
     public DeleteCharacterWithCorrelationsEventSubscriber(
         ILogger<DeleteCharacterWithCorrelationsEventSubscriber> logger,
+        IEventResultHandler eventResultHandler,
         IRabbitMqConventionProvider conventionProvider,
         IRepository repository)
     {
         _logger = logger;
+        _eventResultHandler = eventResultHandler;
         _conventionProvider = conventionProvider;
         _repository = repository;
     }
@@ -37,10 +41,12 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<DeleteCharacterWithCorrelationsEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
-        await _repository.ExecuteInTransactionAsync(async () =>
+        var isCommitedProperly = await _repository.ExecuteInTransactionAsync(async () =>
         {
-            var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken);
+            var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken: cancellationToken);
             await _repository.DeleteCharacterByIdAsync(character.CharacterId);
         });
+
+        _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(DeleteCharacterWithCorrelationsEvent), payload);
     }
 }

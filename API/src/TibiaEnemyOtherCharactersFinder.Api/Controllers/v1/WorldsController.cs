@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using TibiaEnemyOtherCharactersFinder.Application.Queries.World;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Controllers.v1;
@@ -22,7 +21,7 @@ public class WorldsController : TibiaBaseController
     /// <param name="available">If "true" than return all active worlds at this moment in applocation.</param>
     /// <returns>Worlds count, names, urls and availability.</returns>
     [HttpGet]
-    public async Task<IActionResult> GetActiveWorlds([FromQuery] bool? available)
+    public async Task<IActionResult> GetWorlds([FromQuery] bool? available)
     {
         var result = await _mediator.Send(new GetActiveWorldsQuery(available));
         return Ok(result);

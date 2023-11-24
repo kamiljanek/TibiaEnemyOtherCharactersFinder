@@ -39,12 +39,12 @@ public class AnalyserService : IAnalyserService
 
                 stopwatch.Stop();
                 _logger.LogInformation("{methodName} execution time - WorldScan({worldScanId}) - World({worldId}): {time} ms.",
-                    "Analyse", worldScans[0].WorldScanId, worldId, stopwatch.ElapsedMilliseconds);
+                    nameof(Analyse), worldScans[0].WorldScanId, worldId, stopwatch.ElapsedMilliseconds);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Execution of {methodName} failed", "Analyse");
+            _logger.LogError(e, "Execution of {methodName} failed", nameof(Analyse));
         }
     }
 }

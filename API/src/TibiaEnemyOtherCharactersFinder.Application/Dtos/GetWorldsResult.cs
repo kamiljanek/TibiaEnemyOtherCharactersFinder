@@ -1,7 +1,7 @@
 ﻿namespace TibiaEnemyOtherCharactersFinder.Application.Dtos;
 
-public class GetActiveWorldsResult
+public class GetWorldsResult
 {
     public int Count => Worlds.Count;
-    public IReadOnlyList<ActiveWorldResult> Worlds { get; set; }
+    public IReadOnlyList<WorldResult> Worlds { get; set; }
 }
