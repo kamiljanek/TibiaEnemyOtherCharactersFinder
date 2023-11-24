@@ -17,11 +17,11 @@ public class EventResultHandler : IEventResultHandler
         {
             case true:
                 _logger.LogInformation("Transaction '{event}' commited properly. Payload {payload}",
-                    nameof(eventName), payload);
+                    eventName, payload);
                 break;
             case false:
                 _logger.LogError("Transaction '{event}' failed. Check dead letter for analyse problem. Payload {payload}",
-                    nameof(eventName), payload);
+                    eventName, payload);
                 throw new TransactionException($"Transaction commited inproperly during event '{eventName}'. Payload: {payload}.");
         }
     }
