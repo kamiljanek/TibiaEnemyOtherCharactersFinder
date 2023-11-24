@@ -66,21 +66,32 @@ public class TibiaDataClient : ITibiaDataClient
                 if (response.IsSuccessStatusCode)
                 {
                     string content = await response.Content.ReadAsStringAsync();
-                    var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldInformationResult>(content);
-                    var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        _logger.LogInformation("Server '{serverName}' is off.", worldName);
+                        return string.Empty;
+                    }
 
+                    var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldInformationResult>(content);
+                    if (contentDeserialized.worlds.world.online_players is null || !contentDeserialized.worlds.world.online_players.Any())
+                    {
+                        _logger.LogInformation("Server '{serverName}' is out of players at that moment.", worldName);
+                        return string.Empty;
+                    }
+
+                    var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
                     return string.Join("|", onlinePlayers);
                 }
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException exception)
             {
-                _logger.LogError("TaskCanceledException during invoke method {method}, world: '{worldName}', attempt {retryCount}.",
-                    nameof(FetchCharactersOnline), worldName, retryCount + 1);
+                _logger.LogError("TaskCanceledException during invoke method {method}, world: '{worldName}', attempt {retryCount}. Exception {exception}",
+                    nameof(FetchCharactersOnline), worldName, retryCount + 1, exception);
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method {method} problem. Exception {exception}",
-                    nameof(FetchCharactersOnline), exception);
+                _logger.LogError("Method {method} problem, world: '{worldName}', attempt {retryCount}. Exception {exception}",
+                    nameof(FetchCharactersOnline), worldName, retryCount + 1, exception);
             }
         }
 

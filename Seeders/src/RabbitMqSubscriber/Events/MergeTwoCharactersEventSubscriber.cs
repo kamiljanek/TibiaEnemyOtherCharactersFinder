@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
 using RabbitMqSubscriber.Dtos;
+using RabbitMqSubscriber.Handlers;
 using RabbitMqSubscriber.Subscribers;
 using Shared.Database.Queries.Sql;
 using Shared.RabbitMQ.Conventions;
@@ -15,12 +16,18 @@ namespace RabbitMqSubscriber.Events;
 public class MergeTwoCharactersEventSubscriber : IEventSubscriber
 {
     private readonly ILogger<MergeTwoCharactersEventSubscriber> _logger;
+    private readonly IEventResultHandler _eventResultHandler;
     private readonly IRabbitMqConventionProvider _conventionProvider;
     private readonly IRepository _repository;
 
-    public MergeTwoCharactersEventSubscriber(ILogger<MergeTwoCharactersEventSubscriber> logger, IRabbitMqConventionProvider conventionProvider, IRepository repository)
+    public MergeTwoCharactersEventSubscriber(
+        ILogger<MergeTwoCharactersEventSubscriber> logger,
+        IEventResultHandler eventResultHandler,
+        IRabbitMqConventionProvider conventionProvider,
+        IRepository repository)
     {
         _logger = logger;
+        _eventResultHandler = eventResultHandler;
         _conventionProvider = conventionProvider;
         _repository = repository;
     }
@@ -37,8 +44,8 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<MergeTwoCharactersEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
-        var oldCharacter = await _repository.GetCharacterByIdAsync(eventObject.OldCharacterId, cancellationToken);
-        var newCharacter = await _repository.GetCharacterByIdAsync(eventObject.NewCharacterId, cancellationToken);
+        var oldCharacter = await _repository.GetCharacterByIdAsync(eventObject.OldCharacterId, cancellationToken: cancellationToken);
+        var newCharacter = await _repository.GetCharacterByIdAsync(eventObject.NewCharacterId, cancellationToken: cancellationToken);
         if (oldCharacter is null || newCharacter is null)
         {
             _logger.LogInformation(
@@ -47,7 +54,7 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
             return;
         }
 
-        await _repository.ExecuteInTransactionAsync(async () =>
+        var isCommitedProperly = await _repository.ExecuteInTransactionAsync(async () =>
         {
             await _repository.ReplaceCharacterIdInCorrelationsAsync(oldCharacter, newCharacter);
             List<CharacterCorrelation> correlations = new();
@@ -79,6 +86,8 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
             // Delete already merged CharacterCorrelations
             await _repository.DeleteCharacterCorrelationsByIdsAsync(correlationIdsToDelete);
         });
+
+        _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(MergeTwoCharactersEvent), payload);
 
         await _repository.DeleteCharacterByIdAsync(oldCharacter.CharacterId);
     }

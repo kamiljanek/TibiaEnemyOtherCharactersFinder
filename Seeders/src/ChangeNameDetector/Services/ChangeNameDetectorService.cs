@@ -35,7 +35,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             var character = await _repository.GetFirstCharacterByVerifiedDateAsync();
             if (character is null)
             {
-                return;
+                break;
             }
 
             var fechedCharacter = await _tibiaDataClient.FetchCharacter(character.Name);

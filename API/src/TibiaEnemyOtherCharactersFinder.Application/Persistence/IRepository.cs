@@ -24,13 +24,13 @@ public interface IRepository
     Task DeleteIrrelevantCharacterCorrelationsAsync(int numberOfDays, int matchingNumber);
     Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync();
     Task ClearChangeTracker();
-    Task<Character> GetFirstCharacterByVerifiedDateAsync(CancellationToken cancellationToken = default);
+    Task<Character> GetFirstCharacterByVerifiedDateAsync();
     Task<IEnumerable<T>> SqlQueryRaw<T>(string query, params object[] parameters) where T : class;
     Task DeleteCharacterByIdAsync(int characterId);
     Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId);
     Task ReplaceCharacterIdInCorrelationsAsync(Character oldCharacter, Character newCharacter);
     Task<Character> GetCharacterByNameAsync(string characterName, CancellationToken cancellationToken = default);
-    Task<Character> GetCharacterByIdAsync(int characterId, CancellationToken cancellationToken = default);
+    Task<Character> GetCharacterByIdAsync(int characterId, bool withTracking = false, CancellationToken cancellationToken = default);
     Task DeleteCharacterCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds);
     Task DeleteOldWorldScansAsync();
 }
