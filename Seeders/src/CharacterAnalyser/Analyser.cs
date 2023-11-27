@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using CharacterAnalyser.ActionRules;
+﻿using CharacterAnalyser.ActionRules;
 using CharacterAnalyser.ActionRules.Rules;
-using CharacterAnalyser.Modules;
-using Microsoft.Extensions.Logging;
+using CharacterAnalyser.Decorators;
+using CharacterAnalyser.Managers;
+using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
@@ -13,27 +13,16 @@ public class Analyser : ActionRule, IAnalyser
     private List<short> _uniqueWorldIds = new();
 
     private readonly IRepository _repository;
-    private readonly ILogger<Analyser> _logger;
-    private readonly CharacterManager _characterManager;
-    private readonly CharacterActionsCleaner _characterActionsCleaner;
-    private readonly CharacterSeederService _characterSeederService;
-    private readonly CharacterCorrelationUpdater _characterCorrelationUpdater;
-    private readonly CharacterCorrelationSeederService _characterCorrelationSeederService;
-    private readonly CharacterCorrelationDeleter _characterCorrelationDeleter;
+    private readonly IAnalyserLogDecorator _logDecorator;
+    private readonly CharacterActionsManager _characterActionsManager;
 
     public List<short> UniqueWorldIds => _uniqueWorldIds;
 
-    public Analyser(IRepository repository,
-        ILogger<Analyser> logger)
+    public Analyser(IRepository repository, IAnalyserLogDecorator logDecorator)
     {
         _repository = repository;
-        _logger = logger;
-        _characterManager = new CharacterManager(repository);
-        _characterActionsCleaner = new CharacterActionsCleaner(repository);
-        _characterSeederService = new CharacterSeederService(repository);
-        _characterCorrelationUpdater = new CharacterCorrelationUpdater(repository);
-        _characterCorrelationSeederService = new CharacterCorrelationSeederService(repository);
-        _characterCorrelationDeleter = new CharacterCorrelationDeleter(repository);
+        _logDecorator = logDecorator;
+        _characterActionsManager = new CharacterActionsManager(repository);
     }
 
     public async Task<bool> HasDataToAnalyse()
@@ -55,75 +44,49 @@ public class Analyser : ActionRule, IAnalyser
             return;
 
         if (IsBroken(new TimeBetweenWorldScansCannotBeLongerThanMaxDurationRule(twoWorldScans)) ||
-            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterManager.GetAndSetLogoutNames(twoWorldScans))) ||
-            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterManager.GetAndSetLoginNames(twoWorldScans))))
+            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionsManager.GetAndSetLogoutNames(twoWorldScans))) ||
+            IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionsManager.GetAndSetLoginNames(twoWorldScans))))
         {
             await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
             return;
         }
 
-        await _characterActionsCleaner.ClearAsync();
-        await _characterActionsCleaner.ResetFoundInScanOnCharactersAsync();
+        await ClearCharacterActionsAsync();
+        await ResetFoundInScanOnCharactersAsync();
 
-        await SeedAndAnalyseCharacters(twoWorldScans);
-        await _repository.ClearChangeTracker();
+        try
+        {
+            await SeedAndAnalyseCharacters(twoWorldScans);
+        }
+        finally
+        {
+            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
+            await _repository.ClearChangeTracker();
+        }
     }
+
 
     private async Task SeedAndAnalyseCharacters(List<WorldScan> twoWorldScans)
     {
-            await Decorate(SeedCharacterActions, twoWorldScans);
-            await Decorate(SeedCharacters, twoWorldScans);
-            await Decorate(UpdateCharacterCorrelations, twoWorldScans);
-            await Decorate(CreateCharacterCorrelations, twoWorldScans);
-            await Decorate(SoftDeleteWorldScan, twoWorldScans);
-            await Decorate(DeleteCharacterCorrelations, twoWorldScans);
+        await _logDecorator.Decorate(_characterActionsManager.SeedCharacterActions, twoWorldScans);
+        await _logDecorator.Decorate(SeedCharacters, twoWorldScans);
+        await _logDecorator.Decorate(_repository.UpdateCorrelationsIfExistAsync, twoWorldScans);
+        await _logDecorator.Decorate(_repository.CreateCorrelationsIfNotExistAsync, twoWorldScans);
+        await _logDecorator.Decorate(_repository.RemoveImposibleCorrelationsAsync, twoWorldScans);
     }
 
-    private async Task Decorate<T>(Func<T, Task> function, T parameter)
+    private async Task SeedCharacters()
     {
-        try
-        {
-            var stopwatch = Stopwatch.StartNew();
-            await function.Invoke(parameter);
-            stopwatch.Stop();
-            _logger.LogInformation("WorldScan({worldScanId}) - World({worldId}) Execution time {methodName}: {time} ms.",
-                (parameter as List<WorldScan>)![0].WorldScanId, (parameter as List<WorldScan>)![0].WorldId, function.Method.Name,
-                stopwatch.ElapsedMilliseconds);
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError("WorldScan({worldScanId}) - World({WorldId}) - Execution {methodName} couse error. Exception {exception}",
-                (parameter as List<WorldScan>)![0].WorldScanId, (parameter as World)!.WorldId, function.Method.Name, exception);
-        }
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.CreateCharactersIfNotExists);
     }
 
-    private async Task SoftDeleteWorldScan(List<WorldScan> twoWorldScans)
+    private async Task ClearCharacterActionsAsync()
     {
-        await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.ClearCharacterActions);
     }
 
-    private async Task DeleteCharacterCorrelations(List<WorldScan> twoWorldScans)
+    private async Task ResetFoundInScanOnCharactersAsync()
     {
-        await _characterCorrelationDeleter.Delete();
-    }
-
-    private async Task CreateCharacterCorrelations(List<WorldScan> twoWorldScans)
-    {
-        await _characterCorrelationSeederService.Seed();
-    }
-
-    private async Task UpdateCharacterCorrelations(List<WorldScan> twoWorldScans)
-    {
-        await _characterCorrelationUpdater.Seed();
-    }
-
-    private async Task SeedCharacters(List<WorldScan> twoWorldScans)
-    {
-        await _characterSeederService.Seed();
-    }
-
-    private async Task SeedCharacterActions(List<WorldScan> twoWorldScans)
-    {
-        await _characterManager.Seed(twoWorldScans);
+        await _repository.ExecuteRawSqlAsync(GenerateQueries.UpdateCharactersSetFoundInScanFalse);
     }
 }

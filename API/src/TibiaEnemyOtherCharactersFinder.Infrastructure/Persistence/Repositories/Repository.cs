@@ -134,7 +134,7 @@ public class Repository : IRepository
            .ExecuteUpdateAsync(update => update.SetProperty(c => c.FoundInScan, c => foundInScan));
     }
 
-    public async Task UpdateCharacterCorrelationsAsync()
+    public async Task UpdateCorrelationsIfExistAsync()
     {
         var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
         var loginCharactersIds = GetCharactersIdsBasedOnCharacterActions(isOnline: true);
@@ -179,7 +179,7 @@ public class Repository : IRepository
             .ExecuteDeleteAsync();
     }
 
-    public async Task CreateCharacterCorrelationsIfNotExistAsync()
+    public async Task CreateCorrelationsIfNotExistAsync()
     {
         var lastMatchDate = (await _dbContext.CharacterActions.FirstOrDefaultAsync()).LogoutOrLoginDate;
         var loginCharactersIds = GetCharactersIdsBasedOnCharacterActions(isOnline: true);
@@ -209,14 +209,14 @@ public class Repository : IRepository
                 NumberOfMatches = 1,
                 CreateDate = lastMatchDate,
                 LastMatchDate = lastMatchDate
-            }).ToList();
+            });
 
         _dbContext.CharacterCorrelations.AddRange(newCorrelations);
 
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync()
+    public async Task RemoveImposibleCorrelationsAsync()
     {
         var charactersToRemove = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
 
@@ -240,6 +240,7 @@ public class Repository : IRepository
                         && (!c.VerifiedDate.HasValue || c.VerifiedDate < scanPeriod))
             .OrderByDescending(c => c.VerifiedDate == null)
             .ThenBy(c => c.VerifiedDate)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
     }
 
@@ -255,14 +256,14 @@ public class Repository : IRepository
             .ExecuteDeleteAsync();
     }
 
-    public async Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId)
+    public async Task DeleteCorrelationsByCharacterIdAsync(int characterId)
     {
         await _dbContext.CharacterCorrelations
             .Where(c => c.LoginCharacterId == characterId || c.LogoutCharacterId == characterId)
             .ExecuteDeleteAsync();
     }
 
-    public async Task DeleteCharacterCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds)
+    public async Task DeleteCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds)
     {
         await _dbContext.CharacterCorrelations
             .Where(c => characterCorrelationsIds.Contains(c.CorrelationId))

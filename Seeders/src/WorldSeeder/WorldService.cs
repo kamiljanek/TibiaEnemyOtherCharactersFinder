@@ -1,18 +1,22 @@
-﻿namespace WorldSeeder;
+﻿using WorldSeeder.Decorators;
+
+namespace WorldSeeder;
 
 public class WorldService : IWorldService
 {
     private readonly IWorldSeederService _worldSeederService;
+    private readonly IWorldSeederLogDecorator _logDecorator;
 
-    public WorldService(WorldSeederServiceDecorator worldSeederService)
+    public WorldService(IWorldSeederService worldSeederService, IWorldSeederLogDecorator logDecorator)
     {
         _worldSeederService = worldSeederService;
+        _logDecorator = logDecorator;
     }
 
     public async Task Run()
     {
-        await _worldSeederService.SetProperties();
-        await _worldSeederService.Seed();
-        await _worldSeederService.TurnOffIfWorldIsUnavailable();
+        await _logDecorator.Decorate(_worldSeederService.SetProperties);
+        await _logDecorator.Decorate(_worldSeederService.Seed);
+        await _logDecorator.Decorate(_worldSeederService.TurnOffIfWorldIsUnavailable);
     }
 }

@@ -22,13 +22,14 @@ public class CharactersController : TibiaBaseController
     /// Get character details with 10 most scores possible other character names.
     /// </summary>
     /// <param name="characterName">Name of searched character</param>
+    /// <param name="ct">Cancellation token</param>
     /// <returns>Searched character with details and 10 most scored possible other character names with number of matches.</returns>
     [HttpGet("{characterName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOtherCharacters([FromRoute] [Required] string characterName)
+    public async Task<IActionResult> GetOtherCharacters([FromRoute] [Required] string characterName, CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetCharacterWithCorrelationsQuery(characterName));
+        var result = await _mediator.Send(new GetCharacterWithCorrelationsQuery(characterName), ct);
         return Ok(result);
     }
 
@@ -38,6 +39,7 @@ public class CharactersController : TibiaBaseController
     /// <param name="searchText">A fragment of the character name. Required minimum 2 chars length of a fragment name.</param>
     /// <param name="page">The page number to view. Default value = 1</param>
     /// <param name="pageSize">The capacity of a single page. Default value = 10</param>
+    /// <param name="ct">Cancellation token</param>
     /// <returns>A list of character names with total count.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -46,9 +48,10 @@ public class CharactersController : TibiaBaseController
     public async Task<IActionResult> GetFilteredCharacters(
         [FromQuery] [Required] string searchText,
         [FromQuery] [Required] int page = 1,
-        [FromQuery] [Required] int pageSize = 10)
+        [FromQuery] [Required] int pageSize = 10,
+        CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetFilteredCharactersByFragmentNameQuery(searchText, page, pageSize));
+        var result = await _mediator.Send(new GetFilteredCharactersByFragmentNameQuery(searchText, page, pageSize), ct);
         return Ok(result);
     }
 
@@ -58,6 +61,7 @@ public class CharactersController : TibiaBaseController
     /// <param name="searchText">A fragment of the character name. Required minimum 2 chars length of a fragment name.</param>
     /// <param name="page">The page number to view. Default value = 1</param>
     /// <param name="pageSize">The capacity of a single page. Default value = 10</param>
+    /// <param name="ct">Cancellation token</param>
     /// <returns>A list of character names.</returns>
     [HttpGet("prompt")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -67,9 +71,11 @@ public class CharactersController : TibiaBaseController
     public async Task<IActionResult> GetFilteredCharactersPrompt(
         [FromQuery] [Required] string searchText,
         [FromQuery] [Required] int page = 1,
-        [FromQuery] [Required] int pageSize = 10)
+        [FromQuery] [Required] int pageSize = 10,
+        CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetFilteredCharactersByFragmentNamePromptQuery(searchText, page, pageSize));
+        var result =
+            await _mediator.Send(new GetFilteredCharactersByFragmentNamePromptQuery(searchText, page, pageSize), ct);
         return Ok(result);
     }
 }

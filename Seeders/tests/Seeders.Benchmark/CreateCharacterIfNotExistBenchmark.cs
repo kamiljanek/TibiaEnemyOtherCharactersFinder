@@ -19,7 +19,7 @@ public class CreateCharacterIfNotExistBenchmark
     [Benchmark(Baseline = true)]
     public async Task CreateCharacterIfNotExistSql()
     {
-        await _dbContext.Database.ExecuteSqlRawAsync(GenerateQueries.CreateCharacterIfNotExist);
+        await _dbContext.Database.ExecuteSqlRawAsync(GenerateQueries.CreateCharactersIfNotExists);
     }
 
     private IQueryable<string> CharactersNames()

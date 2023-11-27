@@ -23,7 +23,7 @@ public class ClearSoftDeletedWorldScansOnCleanerTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var cleaner = scope.ServiceProvider.GetRequiredService<Cleaner>();
+        var cleaner = scope.ServiceProvider.GetRequiredService<ICleaner>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var toDelete = dbContext.WorldScans.OrderBy(ws => ws.ScanCreateDateTime).Skip(2).ToList();
         toDelete.ForEach(ws => ws.IsDeleted = true);

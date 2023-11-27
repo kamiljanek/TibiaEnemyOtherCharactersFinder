@@ -22,7 +22,7 @@ public class EventResultHandler : IEventResultHandler
             case false:
                 _logger.LogError("Transaction '{event}' failed. Check dead letter for analyse problem. Payload {payload}",
                     eventName, payload);
-                throw new TransactionException($"Transaction commited inproperly during event '{eventName}'. Payload: {payload}.");
+                throw new TransactionException($"Transaction commited improperly during event '{eventName}'. Payload: {payload}.");
         }
     }
 }

@@ -17,20 +17,20 @@ public interface IRepository
     Task UpdateCharacterNameAsync(string oldName, string newName);
     Task UpdateCharacterVerifiedDate(int characterId);
     Task UpdateCharacterTradedDate(int characterId);
-    Task UpdateCharacterCorrelationsAsync();
+    Task UpdateCorrelationsIfExistAsync();
     Task ExecuteRawSqlAsync(string rawSql, int? timeOut = null, CancellationToken cancellationToken = default);
-    Task CreateCharacterCorrelationsIfNotExistAsync();
+    Task CreateCorrelationsIfNotExistAsync();
     Task SetCharacterFoundInScanAsync(IReadOnlyList<string> charactersNames, bool foundInScan);
     Task DeleteIrrelevantCharacterCorrelationsAsync(int numberOfDays, int matchingNumber);
-    Task DeleteCharacterCorrelationIfCorrelationExistInScanAsync();
+    Task RemoveImposibleCorrelationsAsync();
     Task ClearChangeTracker();
     Task<Character> GetFirstCharacterByVerifiedDateAsync();
     Task<IEnumerable<T>> SqlQueryRaw<T>(string query, params object[] parameters) where T : class;
     Task DeleteCharacterByIdAsync(int characterId);
-    Task DeleteCharacterCorrelationsByCharacterIdAsync(int characterId);
+    Task DeleteCorrelationsByCharacterIdAsync(int characterId);
     Task ReplaceCharacterIdInCorrelationsAsync(Character oldCharacter, Character newCharacter);
     Task<Character> GetCharacterByNameAsync(string characterName, CancellationToken cancellationToken = default);
     Task<Character> GetCharacterByIdAsync(int characterId, bool withTracking = false, CancellationToken cancellationToken = default);
-    Task DeleteCharacterCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds);
+    Task DeleteCorrelationsByIdsAsync(IReadOnlyList<long> characterCorrelationsIds);
     Task DeleteOldWorldScansAsync();
 }
