@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using WorldScanSeeder.Decorators;
 
 namespace WorldScanSeeder.Configuration;
 
@@ -8,7 +9,7 @@ public static class WorldScanSeederService
     {
         services.AddScoped<IScanSeeder, ScanSeeder>();
         services.AddScoped<IWorldScanService, WorldScanService>();
-        services.AddScoped<WorldScanSeederDecorator>();
+        services.AddScoped<IScanSeederLogDecorator, ScanSeederLogDecorator>();
 
         return services;
     }

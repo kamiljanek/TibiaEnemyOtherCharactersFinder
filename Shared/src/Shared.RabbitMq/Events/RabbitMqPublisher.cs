@@ -44,8 +44,7 @@ public class RabbitMqPublisher : IEventPublisher
         var policy = GetRetryPolicy(
             (ex, time) =>
             {
-                _logger.LogWarning(ex,
-                    "Could not publish message: {MessageName} after {TotalSeconds:n1}s {ExceptionMessage}",
+                _logger.LogWarning(ex, "Could not publish message: {MessageName} after {TotalSeconds:n1}s {ExceptionMessage}",
                     messageId, time.TotalSeconds, ex.Message);
             });
 

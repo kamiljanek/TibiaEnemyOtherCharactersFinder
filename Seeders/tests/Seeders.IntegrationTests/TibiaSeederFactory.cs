@@ -1,7 +1,9 @@
 ﻿using ChangeNameDetector.Validators;
 using CharacterAnalyser;
-using CharacterAnalyser.Modules;
+using CharacterAnalyser.Decorators;
+using CharacterAnalyser.Managers;
 using DbCleaner;
+using DbCleaner.Decorators;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -19,6 +21,8 @@ using TibiaEnemyOtherCharactersFinder.Api;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
+using WorldScanSeeder.Decorators;
+using WorldSeeder.Decorators;
 
 namespace Seeders.IntegrationTests;
 
@@ -101,14 +105,13 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
 
             services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.GetConnectionString() }));
             services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.GetConnectionString()).UseSnakeCaseNamingConvention());
-            services.AddSingleton<CharacterManager>();
-            services.AddSingleton<CharacterActionsCleaner>();
-            services.AddSingleton<Analyser>();
-            services.AddSingleton<CharacterSeederService>();
-            services.AddSingleton<CharacterCorrelationSeederService>();
-            services.AddSingleton<CharacterCorrelationUpdater>();
-            services.AddSingleton<CharacterCorrelationDeleter>();
-            services.AddSingleton<Cleaner>();
+            services.AddSingleton<CharacterActionsManager>();
+            services.AddSingleton<IAnalyser, Analyser>();
+            services.AddSingleton<ICleaner, Cleaner>();
+            services.AddSingleton<IAnalyserLogDecorator, AnalyserLogDecorator>();
+            services.AddSingleton<IDbCleanerLogDecorator, DbCleanerLogDecorator>();
+            services.AddSingleton<IScanSeederLogDecorator, ScanSeederLogDecorator>();
+            services.AddSingleton<IWorldSeederLogDecorator, WorldSeederLogDecorator>();
             services.AddSingleton<INameDetectorValidator, NameDetectorValidator>();
             services.AddSingleton<IEventSubscriber, DeleteCharacterWithCorrelationsEventSubscriber>();
             services.AddSingleton<IEventSubscriber, DeleteCharacterCorrelationsEventSubscriber>();

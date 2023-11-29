@@ -19,11 +19,12 @@ public class WorldsController : TibiaBaseController
     /// Get filtered worlds.
     /// </summary>
     /// <param name="available">If "true" than return all active worlds at this moment in applocation.</param>
+    /// <param name="ct">Cancellation token</param>
     /// <returns>Worlds count, names, urls and availability.</returns>
     [HttpGet]
-    public async Task<IActionResult> GetWorlds([FromQuery] bool? available)
+    public async Task<IActionResult> GetWorlds([FromQuery] bool? available, CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetActiveWorldsQuery(available));
+        var result = await _mediator.Send(new GetActiveWorldsQuery(available), ct);
         return Ok(result);
     }
 }

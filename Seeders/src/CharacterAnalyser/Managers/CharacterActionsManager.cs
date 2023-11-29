@@ -1,10 +1,9 @@
-﻿using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+﻿using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 
-namespace CharacterAnalyser.Modules;
+namespace CharacterAnalyser.Managers;
 
-public class CharacterManager : ISeeder<List<WorldScan>>
+public class CharacterActionsManager
 {
     private IReadOnlyList<string> _loginNames;
     private IReadOnlyList<string> _logoutNames;
@@ -12,12 +11,12 @@ public class CharacterManager : ISeeder<List<WorldScan>>
 
     private readonly IRepository _repository;
 
-    public CharacterManager(IRepository repository)
+    public CharacterActionsManager(IRepository repository)
     {
         _repository = repository;
     }
 
-    public async Task Seed(List<WorldScan> twoWorldScans)
+    public async Task SeedCharacterActions(List<WorldScan> twoWorldScans)
     {
         var logoutCharacters = CreateCharactersActionsAsync(_logoutNames, twoWorldScans[0], isOnline: false);
         var loginCharacters = CreateCharactersActionsAsync(_loginNames, twoWorldScans[1], isOnline: true);
