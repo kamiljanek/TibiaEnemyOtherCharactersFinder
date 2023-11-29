@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DbCleaner.Decorators;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DbCleaner.Configuration;
 
@@ -8,7 +9,7 @@ public static class DbCleanerService
     {
         services.AddScoped<ICleaner, Cleaner>();
         services.AddScoped<ICleanerService, CleanerService>();
-        services.AddScoped<CleanerDecorator>();
+        services.AddScoped<IDbCleanerLogDecorator, DbCleanerLogDecorator>();
 
         return services;
     }

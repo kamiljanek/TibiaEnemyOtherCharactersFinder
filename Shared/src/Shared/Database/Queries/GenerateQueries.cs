@@ -40,7 +40,7 @@ ON (cc.logout_character_id = logout AND cc.login_character_id = login)
     OR (cc.logout_character_id = login AND cc.login_character_id = logout)
 WHERE cc.logout_character_id IS NULL;";
 
-        public const string CreateCharacterIfNotExist = @"INSERT INTO characters (name, world_id)
+        public const string CreateCharactersIfNotExists = @"INSERT INTO characters (name, world_id)
 SELECT DISTINCT ca.character_name, ca.world_id
 FROM character_actions ca
 LEFT JOIN characters c ON ca.character_name = c.name

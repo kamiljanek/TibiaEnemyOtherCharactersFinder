@@ -24,7 +24,7 @@ public class AnalyserFullTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var analyser = scope.ServiceProvider.GetRequiredService<Analyser>();
+        var analyser = scope.ServiceProvider.GetRequiredService<IAnalyser>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         
         await _factory.ClearDatabaseAsync(dbContext);

@@ -84,7 +84,7 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
             await _repository.AddRangeAsync(correlations);
 
             // Delete already merged CharacterCorrelations
-            await _repository.DeleteCharacterCorrelationsByIdsAsync(correlationIdsToDelete);
+            await _repository.DeleteCorrelationsByIdsAsync(correlationIdsToDelete);
         });
 
         _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(MergeTwoCharactersEvent), payload);
