@@ -26,11 +26,12 @@ public class SeedOnWorldScanSeederTests : IAsyncLifetime
     public async Task WorldScanSeeder_Seed_ShouldCreateNewRecordInDatabase()
     {
         // Arrange
+        var listOfNames = new List<string>() { "aphov", "armystrong", "asiier", "braws" };
         using var scope = _factory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         var worlds = dbContext.Worlds.AsNoTracking().ToList();
-        _tibiaDataClientMock.Setup(r => r.FetchCharactersOnline(worlds[0].Name)).ReturnsAsync("aphov|armystrong|asiier|braws");
+        _tibiaDataClientMock.Setup(r => r.FetchCharactersOnline(worlds[0].Name)).ReturnsAsync(listOfNames);
         var worldScanSeeder = new ScanSeeder(repository, _tibiaDataClientMock.Object);
         await worldScanSeeder.SetProperties();
         

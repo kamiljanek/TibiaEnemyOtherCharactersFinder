@@ -11,7 +11,7 @@ public class WorldSeederService : IWorldSeederService
     private readonly IRepository _repository;
     private readonly ITibiaDataClient _tibiaDataClient;
 
-    private List<string> _worldsNamesFromTibiaDataProvider;
+    private IReadOnlyList<string> _worldsNamesFromTibiaDataProvider;
     private List<World> _worldsFromDb;
 
     public WorldSeederService(IRepository repository, ITibiaDataClient tibiaDataClient)

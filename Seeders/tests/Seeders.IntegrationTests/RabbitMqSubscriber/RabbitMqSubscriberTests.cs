@@ -10,6 +10,7 @@ using Shared.RabbitMQ.Configuration;
 using Shared.RabbitMq.Conventions;
 using Shared.RabbitMQ.Conventions;
 using Shared.RabbitMQ.Events;
+using Shared.RabbitMQ.Initializers;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
@@ -150,7 +151,12 @@ public class RabbitMqSubscriberTests : IAsyncLifetime
         characterCorrelationsAfterSubscriber.First(cc => cc is { LoginCharacterId: 123, LogoutCharacterId: 122 }).NumberOfMatches.Should().Be(5);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public async Task InitializeAsync()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var initialization = scope.ServiceProvider.GetRequiredService<InitializationRabbitMqTaskRunner>();
+        await initialization.StartAsync();
+    }
 
     public Task DisposeAsync() => _resetDatabase();
 

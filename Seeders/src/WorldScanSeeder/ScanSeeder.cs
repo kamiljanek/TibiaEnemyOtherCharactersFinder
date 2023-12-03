@@ -36,7 +36,7 @@ public class ScanSeeder : IScanSeeder
 
         return new WorldScan
         {
-            CharactersOnline = charactersOnline.ToLower(),
+            CharactersOnline = string.Join("|", charactersOnline).ToLower(),
             WorldId = world.WorldId,
             ScanCreateDateTime = DateTime.UtcNow,
         };

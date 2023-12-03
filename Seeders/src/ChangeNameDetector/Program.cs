@@ -4,6 +4,7 @@ using ChangeNameDetector.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.RabbitMQ.Extensions;
+using Shared.RabbitMQ.Initializers;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
 
 namespace ChangeNameDetector;
@@ -26,10 +27,12 @@ public class Program
 
             Log.Information("Starting application");
 
-            await host.StartAsync();
+            var initializer = ActivatorUtilities.CreateInstance<InitializationRabbitMqTaskRunner>(host.Services);
+            await initializer.StartAsync();
+            // await host.StartAsync();
             var service = ActivatorUtilities.CreateInstance<ChangeNameDetectorService>(host.Services);
             await service.Run();
-            await host.StopAsync();
+            // await host.StopAsync();
 
             Log.Information("Ending application properly");
         }
