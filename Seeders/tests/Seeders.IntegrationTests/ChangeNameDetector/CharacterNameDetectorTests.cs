@@ -14,6 +14,7 @@ using Shared.RabbitMQ.Configuration;
 using Shared.RabbitMq.Conventions;
 using Shared.RabbitMQ.EventBus;
 using Shared.RabbitMQ.Events;
+using Shared.RabbitMQ.Initializers;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
@@ -236,7 +237,12 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         receivedObjects.Count.Should().Be(0);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public async Task InitializeAsync()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var initialization = scope.ServiceProvider.GetRequiredService<InitializationRabbitMqTaskRunner>();
+        await initialization.StartAsync();
+    }
 
     public Task DisposeAsync() => _resetDatabase();
 

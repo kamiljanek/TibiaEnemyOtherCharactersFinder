@@ -44,6 +44,7 @@ The more player plays, the more likely result will be close to true.
 - EF Core 7.0
 - Postgres - version 14.2
 - RabbitMq
+- SignalR
 - TestContainers - documentation [_here_](https://github.com/testcontainers/testcontainers-dotnet)
 - BenchmarkDotNet
 - Dapper
@@ -68,6 +69,14 @@ The more player plays, the more likely result will be close to true.
 - `GetFilteredCharacters` - returns list of character names based on a fragment of the name, sorted in ascending order.
 - `GetFilteredCharactersPrompt` - returns list of character names starts at fragment of the name, sorted in ascending order.
 - `GetWorlds` - returns filtered worlds.
+ 
+**Life Time Character Tracker:**
+- Now you can track your enemies whether is online or not.
+- To track specific character use WebSockets to connect with `{baseUrl}/characters-track-hub`.
+- Ones you connected send message <span style="text-decoration: underline; color: green;">{"protocol":"json","version":1}</span> to handshake with server.
+- Now you can join to group to track your enemy sending <span style="text-decoration: underline; color: green;">{"arguments":["your_enemy_character_name"],"target":"JoinGroup","type":1}</span> just put your enemy name.
+- To stop tracking just send message <span style="text-decoration: underline; color: green;">{"arguments":["your_enemy_character_name"],"target":"LeaveGroup","type":1}</span> just put your enemy name or disconnect connection to stop tracking all enemies.
+- Check postman example [_here_](https://www.rafaagahbichelab.dev/articles/signalr-dotnet-postman) 
 
 
 ---

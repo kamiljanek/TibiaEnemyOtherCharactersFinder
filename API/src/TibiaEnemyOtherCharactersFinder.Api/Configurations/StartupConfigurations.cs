@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
+﻿using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.RateLimiting;
 using Serilog.AspNetCore;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Policies;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services.BackgroundServices;
 
 namespace TibiaEnemyOtherCharactersFinder.Api.Configurations;
 
@@ -29,6 +32,23 @@ public static class StartupConfigurations
         };
     }
 
+    public static Action<SwaggerUIOptions> SwaggerUiConfiguration(IApplicationBuilder app)
+    {
+        return options =>
+        {
+            var descriptionsProvider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+
+            // Build a swagger endpoint for each discovered API version
+            foreach (var description in descriptionsProvider.ApiVersionDescriptions)
+            {
+                var url = $"/swagger/{description.GroupName}/swagger.json";
+                var name = description.GroupName.ToUpperInvariant();
+                options.SwaggerEndpoint(url, name);
+                options.RoutePrefix = string.Empty;
+            }
+        };
+    }
+
     public static void ConfigureOptions(IServiceCollection services)
     {
         services.AddOptions<ConnectionStringsSection>()
@@ -38,6 +58,11 @@ public static class StartupConfigurations
 
         services.AddOptions<DapperConfigurationSection>()
             .BindConfiguration(DapperConfigurationSection.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddOptions<BackgroundServiceTimerSection>()
+            .BindConfiguration(BackgroundServiceTimerSection.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
     }

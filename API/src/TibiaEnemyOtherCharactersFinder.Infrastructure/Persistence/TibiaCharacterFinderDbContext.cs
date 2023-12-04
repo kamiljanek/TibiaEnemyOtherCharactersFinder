@@ -13,8 +13,10 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
     public DbSet<World> Worlds { get; set; }
     public DbSet<WorldScan> WorldScans { get; set; }
     public DbSet<Character> Characters { get; set; }
-    public DbSet<CharacterCorrelation> CharacterCorrelations { get; set; }
     public DbSet<CharacterAction> CharacterActions { get; set; }
+    public DbSet<CharacterCorrelation> CharacterCorrelations { get; set; }
+    public DbSet<TrackedCharacter> TrackedCharacters { get; set; }
+    public DbSet<OnlineCharacter> OnlineCharacters { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,91 +24,168 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        modelBuilder.Entity<World>(w =>
+        #region Worlds
+
+        modelBuilder.Entity<World>(e =>
         {
-            w.Property(wo => wo.Name)
+            e.Property(w => w.Name)
+                .HasMaxLength(20)
                 .IsRequired();
-            w.Property(wo => wo.Url)
+            e.Property(w => w.Url)
+                .HasMaxLength(200)
                 .IsRequired();
-            w.Property(wo => wo.IsAvailable)
+            e.Property(w => w.IsAvailable)
                 .IsRequired();
-            w.HasMany(wo => wo.WorldScans)
+            e.HasMany(w => w.WorldScans)
                 .WithOne(ws => ws.World)
                 .HasForeignKey(ws => ws.WorldId)
                 .OnDelete(DeleteBehavior.NoAction);
-            w.HasMany(wo => wo.Characters)
-                .WithOne(wo => wo.World)
-                .HasForeignKey(wo => wo.WorldId)
+            e.HasMany(w => w.Characters)
+                .WithOne(c => c.World)
+                .HasForeignKey(c => c.WorldId)
                 .OnDelete(DeleteBehavior.NoAction);
-            w.HasMany(wo => wo.CharacterLogoutOrLogins)
-                .WithOne(wo => wo.World)
-                .HasForeignKey(wo => wo.WorldId)
+            e.HasMany(w => w.CharacterLogoutOrLogins)
+                .WithOne(ca => ca.World)
+                .HasForeignKey(ca => ca.WorldId)
                 .OnDelete(DeleteBehavior.NoAction);
 
         });
 
-        modelBuilder.Entity<WorldScan>(w =>
+        #endregion
+
+        #region WorldScans
+
+        modelBuilder.Entity<WorldScan>(e =>
         {
-            w.Property(ws => ws.WorldScanId)
+            e.Property(ws => ws.WorldScanId)
                 .IsRequired();
-            w.Property(ws => ws.CharactersOnline)
+            e.Property(ws => ws.CharactersOnline)
                 .IsRequired();
-            w.Property(ws => ws.WorldId)
+            e.Property(ws => ws.WorldId)
                 .IsRequired();
-            w.Property(ws => ws.ScanCreateDateTime)
+            e.Property(ws => ws.ScanCreateDateTime)
                 .IsRequired();
-            w.Property(ws => ws.IsDeleted)
+            e.Property(ws => ws.IsDeleted)
                 .IsRequired()
                 .HasDefaultValue(false);
         });
 
-        modelBuilder.Entity<Character>(c =>
+        #endregion
+
+        #region Characters
+
+        modelBuilder.Entity<Character>(e =>
         {
-            c.HasIndex(ch => ch.Name);
-            c.HasIndex(ch => ch.CharacterId);
-            c.Property(ch => ch.CharacterId)
+            e.HasIndex(c => c.Name);
+            e.HasIndex(c => c.CharacterId);
+            e.Property(c => c.CharacterId)
                 .IsRequired();
-            c.Property(ch => ch.Name)
+            e.Property(c => c.Name)
+                .HasMaxLength(100)
                 .IsRequired();
-            c.Property(ch => ch.FoundInScan)
+            e.Property(c => c.FoundInScan)
                 .IsRequired()
                 .HasDefaultValue(false);
-            c.Property(ch => ch.VerifiedDate);
-            c.Property(ch => ch.TradedDate);
-            c.HasMany(ch => ch.LogoutCharacterCorrelations)
-                .WithOne(ws => ws.LogoutCharacter)
-                .HasForeignKey(ch => ch.LogoutCharacterId)
+            e.Property(c => c.VerifiedDate);
+            e.Property(c => c.TradedDate);
+            e.HasMany(c => c.LogoutCharacterCorrelations)
+                .WithOne(cc => cc.LogoutCharacter)
+                .HasForeignKey(cc => cc.LogoutCharacterId)
                 .OnDelete(DeleteBehavior.Cascade);
-            c.HasMany(ch => ch.LoginCharacterCorrelations)
-                .WithOne(ws => ws.LoginCharacter)
-                .HasForeignKey(ch => ch.LoginCharacterId)
+            e.HasMany(c => c.LoginCharacterCorrelations)
+                .WithOne(cc => cc.LoginCharacter)
+                .HasForeignKey(cc => cc.LoginCharacterId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<CharacterAction>(c =>
+        #endregion
+
+        #region CharacterActions
+
+        modelBuilder.Entity<CharacterAction>(e =>
         {
-            c.HasIndex(ca => ca.CharacterName);
-            c.Property(ca => ca.CharacterActionId).IsRequired();
-            c.Property(ca => ca.CharacterName).IsRequired();
-            c.Property(ca => ca.WorldScanId).IsRequired();
-            c.Property(ca => ca.IsOnline).IsRequired();
-            c.Property(ca => ca.WorldId).IsRequired();
-            c.Property(ca => ca.LogoutOrLoginDate).IsRequired();
+            e.HasIndex(ca => ca.CharacterName);
+            e.Property(ca => ca.CharacterActionId)
+                .IsRequired();
+            e.Property(ca => ca.CharacterName)
+                .HasMaxLength(100)
+                .IsRequired();
+            e.Property(ca => ca.WorldScanId)
+                .IsRequired();
+            e.Property(ca => ca.IsOnline)
+                .IsRequired();
+            e.Property(ca => ca.WorldId)
+                .IsRequired();
+            e.Property(ca => ca.LogoutOrLoginDate)
+                .IsRequired();
         });
 
-        modelBuilder.Entity<CharacterCorrelation>(o =>
+        #endregion
+
+        #region CharacterCorrelations
+
+        modelBuilder.Entity<CharacterCorrelation>(e =>
         {
-            o.HasIndex(cc => cc.LogoutCharacterId);
-            o.HasIndex(cc => cc.LoginCharacterId);
-            o.HasKey(cc => cc.CorrelationId);
-            o.Property(cc => cc.CorrelationId).IsRequired();
-            o.Property(cc => cc.LogoutCharacterId).IsRequired();
-            o.Property(cc => cc.LoginCharacterId).IsRequired();
-            o.Property(cc => cc.NumberOfMatches).IsRequired();
-            o.Property(cc => cc.CreateDate).IsRequired()
+            e.HasIndex(cc => cc.LogoutCharacterId);
+            e.HasIndex(cc => cc.LoginCharacterId);
+            e.HasKey(cc => cc.CorrelationId);
+            e.Property(cc => cc.CorrelationId)
+                .IsRequired();
+            e.Property(cc => cc.LogoutCharacterId)
+                .IsRequired();
+            e.Property(cc => cc.LoginCharacterId)
+                .IsRequired();
+            e.Property(cc => cc.NumberOfMatches)
+                .IsRequired();
+            e.Property(cc => cc.CreateDate)
+                .IsRequired()
                 .HasDefaultValue(new DateOnly(2022, 12, 06));
-            o.Property(cc => cc.LastMatchDate).IsRequired()
+            e.Property(cc => cc.LastMatchDate)
+                .IsRequired()
                 .HasDefaultValue(new DateOnly(2022, 12, 06));
         });
+
+        #endregion
+
+        #region TrackedCharacters
+
+        modelBuilder.Entity<TrackedCharacter>(e =>
+        {
+            e.HasIndex(tc => tc.Name);
+            e.HasIndex(tc => tc.WorldName);
+            e.HasKey(tc => new { tc.Name, tc.ConnectionId });
+            e.Property(tc => tc.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+            e.Property(tc => tc.WorldName)
+                .HasMaxLength(20)
+                .IsRequired();
+            e.Property(tc => tc.ConnectionId)
+                .HasMaxLength(100)
+                .IsRequired();
+            e.Property(tc => tc.StartTrackDateTime)
+                .IsRequired();
+        });
+
+        #endregion
+
+        #region OnlineCharacters
+
+        modelBuilder.Entity<OnlineCharacter>(e =>
+        {
+            e.HasIndex(oc => oc.Name);
+            e.HasIndex(oc => oc.WorldName);
+            e.HasKey(oc => oc.Name);
+            e.Property(oc => oc.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+            e.Property(oc => oc.WorldName)
+                .HasMaxLength(20)
+                .IsRequired();
+            e.Property(oc => oc.OnlineDateTime)
+                .IsRequired();
+        });
+
+        #endregion
     }
 }

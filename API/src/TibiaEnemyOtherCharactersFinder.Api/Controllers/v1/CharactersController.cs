@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
@@ -25,6 +26,7 @@ public class CharactersController : TibiaBaseController
     /// <param name="ct">Cancellation token</param>
     /// <returns>Searched character with details and 10 most scored possible other character names with number of matches.</returns>
     [HttpGet("{characterName}")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOtherCharacters([FromRoute] [Required] string characterName, CancellationToken ct = default)
@@ -42,6 +44,7 @@ public class CharactersController : TibiaBaseController
     /// <param name="ct">Cancellation token</param>
     /// <returns>A list of character names with total count.</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,6 +67,7 @@ public class CharactersController : TibiaBaseController
     /// <param name="ct">Cancellation token</param>
     /// <returns>A list of character names.</returns>
     [HttpGet("prompt")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

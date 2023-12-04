@@ -15,6 +15,7 @@ using RabbitMqSubscriber.Events;
 using RabbitMqSubscriber.Handlers;
 using RabbitMqSubscriber.Subscribers;
 using Shared.RabbitMQ.Extensions;
+using Shared.RabbitMQ.Initializers;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 using TibiaEnemyOtherCharactersFinder.Api;
@@ -117,6 +118,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             services.AddSingleton<IEventSubscriber, DeleteCharacterCorrelationsEventSubscriber>();
             services.AddSingleton<IEventSubscriber, MergeTwoCharactersEventSubscriber>();
             services.AddSingleton<IEventResultHandler, EventResultHandler>();
+            services.AddSingleton<InitializationRabbitMqTaskRunner>();
             services.AddRabbitMqPublisher(Configuration);
             services.AddRabbitMqSubscriber(Configuration);
         });
