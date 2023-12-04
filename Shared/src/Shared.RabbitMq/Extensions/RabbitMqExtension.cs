@@ -59,7 +59,7 @@ public static class RabbitMqExtension
                 .AddSingleton(new RabbitMqConnection(rabbitMqConnection))
                 .AddTransient<IRabbitMqInitializer, RabbitMqInitializer>()
                 .AddSingleton<MessageSerializer>()
-                .AddHostedService<InitializationRabbitMqTaskRunner>();
+                .AddSingleton<InitializationRabbitMqTaskRunner>();
         }
         catch (BrokerUnreachableException ex)
         {

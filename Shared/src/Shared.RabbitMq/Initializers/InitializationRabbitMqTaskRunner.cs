@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Shared.RabbitMQ.Initializers;
 
-public sealed class InitializationRabbitMqTaskRunner : IHostedService
+public sealed class InitializationRabbitMqTaskRunner
 {
     private readonly ILogger<InitializationRabbitMqTaskRunner> _logger;
     private readonly IServiceProvider _serviceProvider;

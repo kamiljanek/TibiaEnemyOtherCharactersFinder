@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TibiaEnemyOtherCharactersFinder.Application.Queries.World;
 
@@ -22,6 +23,8 @@ public class WorldsController : TibiaBaseController
     /// <param name="ct">Cancellation token</param>
     /// <returns>Worlds count, names, urls and availability.</returns>
     [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetWorlds([FromQuery] bool? available, CancellationToken ct = default)
     {
         var result = await _mediator.Send(new GetActiveWorldsQuery(available), ct);

@@ -5,6 +5,7 @@ using RabbitMqSubscriber.Configurations;
 using RabbitMqSubscriber.Subscribers;
 using Serilog;
 using Shared.RabbitMQ.Extensions;
+using Shared.RabbitMQ.Initializers;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Builders;
 
 namespace RabbitMqSubscriber;
@@ -28,7 +29,9 @@ public class Program
 
             Log.Information("Starting application");
 
-            await host.StartAsync();
+            var initializer = ActivatorUtilities.CreateInstance<InitializationRabbitMqTaskRunner>(host.Services);
+            await initializer.StartAsync();
+            // await host.StartAsync();
             var service = ActivatorUtilities.CreateInstance<TibiaSubscriber>(host.Services);
             service.Subscribe();
             await host.WaitForShutdownAsync();

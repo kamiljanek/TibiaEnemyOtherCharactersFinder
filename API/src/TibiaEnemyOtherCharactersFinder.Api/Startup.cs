@@ -7,12 +7,14 @@ using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using TibiaEnemyOtherCharactersFinder.Api.Configurations;
 using TibiaEnemyOtherCharactersFinder.Api.Filters;
 using TibiaEnemyOtherCharactersFinder.Api.Swagger;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Middlewares;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Services.BackgroundServices;
 
 namespace TibiaEnemyOtherCharactersFinder.Api;
 
@@ -42,6 +44,7 @@ public class Startup
         services.AddRateLimiter(StartupConfigurations.RateLimitedConfiguration);
         services.AddRouting(options => { options.LowercaseUrls = true; });
         services.AddMediatR(typeof(Startup));
+        services.AddSignalR();
 
         services.AddDistributedMemoryCache();
         services.AddSession(options =>
@@ -94,19 +97,8 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            var descriptionsProvider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+        app.UseSwaggerUI(StartupConfigurations.SwaggerUiConfiguration(app));
 
-            // Build a swagger endpoint for each discovered API version
-            foreach (var description in descriptionsProvider.ApiVersionDescriptions)
-            {
-                var url = $"/swagger/{description.GroupName}/swagger.json";
-                var name = description.GroupName.ToUpperInvariant();
-                options.SwaggerEndpoint(url, name);
-                options.RoutePrefix = string.Empty;
-            }
-        });
 
         app.UseHttpsRedirection();
         app.UseRouting();
@@ -121,6 +113,12 @@ public class Startup
         app.UseRateLimiter();
         app.UseSerilogRequestLogging(StartupConfigurations.SerilogRequestLoggingConfiguration);
         app.UseCors("TibiaEnemyOtherCharacterFinderApi");
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
+        app.UseSignalrHubs();
     }
+
+
 }

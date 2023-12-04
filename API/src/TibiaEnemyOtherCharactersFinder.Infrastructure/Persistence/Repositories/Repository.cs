@@ -22,8 +22,7 @@ public class Repository : IRepository
     {
         for (int retryCount = 0; retryCount < 3; retryCount++)
         {
-            await using var transaction =
-                await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
             try
             {
@@ -35,7 +34,7 @@ public class Repository : IRepository
             {
                 await transaction.RollbackAsync();
                 _logger.LogError("Method {method} during {action} failed, attempt {retryCount}. Error message: {ErrorMessage}",
-                    nameof(ExecuteInTransactionAsync), action.Target?.GetType().ReflectedType?.FullName, retryCount + 1, ex.Message);
+                    nameof(ExecuteInTransactionAsync), action.Target?.GetType().ReflectedType?.Name, retryCount + 1, ex.Message);
             }
         }
 
@@ -218,10 +217,10 @@ public class Repository : IRepository
 
     public async Task RemoveImposibleCorrelationsAsync()
     {
-        var charactersToRemove = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
+        var onlinePlayersAtSameTime = _dbContext.Characters.Where(c => c.FoundInScan).Select(c => c.CharacterId);
 
         await _dbContext.CharacterCorrelations
-            .Where(cc => charactersToRemove.Contains(cc.LoginCharacterId) && charactersToRemove.Contains(cc.LogoutCharacterId))
+            .Where(cc => onlinePlayersAtSameTime.Contains(cc.LoginCharacterId) && onlinePlayersAtSameTime.Contains(cc.LogoutCharacterId))
             .ExecuteDeleteAsync();
     }
 

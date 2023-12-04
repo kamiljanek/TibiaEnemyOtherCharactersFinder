@@ -23,7 +23,7 @@ public class TibiaDataClient : ITibiaDataClient
         _retryPolicy = Policy.Handle<TaskCanceledException>().Or<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 
-    public async Task<List<string>> FetchWorldsNames()
+    public async Task<IReadOnlyList<string>> FetchWorldsNames()
     {
         var currentRetry = 0;
 
@@ -38,7 +38,7 @@ public class TibiaDataClient : ITibiaDataClient
 
                 string content = await response.Content.ReadAsStringAsync();
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldsResult>(content);
-                var worldNames = contentDeserialized.worlds.regular_worlds.Select(world => world.name).ToList();
+                var worldNames = contentDeserialized.worlds.regular_worlds.Select(world => world.name).ToArray();
 
                 return worldNames;
             }
@@ -55,11 +55,11 @@ public class TibiaDataClient : ITibiaDataClient
                     nameof(FetchWorldsNames), currentRetry, exception);
             }
 
-            return new List<string>();
+            return Array.Empty<string>();
         });
     }
 
-    public async Task<string> FetchCharactersOnline(string worldName)
+    public async Task<IReadOnlyList<string>> FetchCharactersOnline(string worldName)
     {
         var currentRetry = 0;
 
@@ -76,18 +76,17 @@ public class TibiaDataClient : ITibiaDataClient
                 if (string.IsNullOrWhiteSpace(content))
                 {
                     _logger.LogInformation("Server '{serverName}' is off.", worldName);
-                    return string.Empty;
+                    return Array.Empty<string>();
                 }
 
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldInformationResult>(content);
                 if (contentDeserialized.worlds.world.online_players is null || !contentDeserialized.worlds.world.online_players.Any())
                 {
                     _logger.LogInformation("Server '{serverName}' is out of players at that moment.", worldName);
-                    return string.Empty;
+                    return Array.Empty<string>();
                 }
 
-                var onlinePlayers = contentDeserialized.worlds.world.online_players.Select(x => x.name).ToList();
-                return string.Join("|", onlinePlayers);
+                return contentDeserialized.worlds.world.online_players.Select(x => x.name).ToArray();
             }
             catch (TaskCanceledException exception)
             {
@@ -102,7 +101,7 @@ public class TibiaDataClient : ITibiaDataClient
                     nameof(FetchCharactersOnline), worldName, currentRetry, exception);
             }
 
-            return string.Empty;
+            return Array.Empty<string>();
         });
     }
 
