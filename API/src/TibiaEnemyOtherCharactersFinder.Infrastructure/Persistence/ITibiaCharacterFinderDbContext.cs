@@ -20,5 +20,6 @@ public interface ITibiaCharacterFinderDbContext
     DbSet<OnlineCharacter> OnlineCharacters { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task ExecuteRawSqlAsync(string rawSql, int? timeOut = null, CancellationToken cancellationToken = default);
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
 }

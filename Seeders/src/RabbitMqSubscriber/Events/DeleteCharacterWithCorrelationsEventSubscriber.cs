@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client.Events;
@@ -6,7 +7,7 @@ using RabbitMqSubscriber.Handlers;
 using RabbitMqSubscriber.Subscribers;
 using Shared.RabbitMQ.Conventions;
 using Shared.RabbitMQ.Events;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace RabbitMqSubscriber.Events;
 
@@ -15,18 +16,18 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
     private readonly ILogger<DeleteCharacterWithCorrelationsEventSubscriber> _logger;
     private readonly IEventResultHandler _eventResultHandler;
     private readonly IRabbitMqConventionProvider _conventionProvider;
-    private readonly IRepository _repository;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
 
     public DeleteCharacterWithCorrelationsEventSubscriber(
         ILogger<DeleteCharacterWithCorrelationsEventSubscriber> logger,
         IEventResultHandler eventResultHandler,
         IRabbitMqConventionProvider conventionProvider,
-        IRepository repository)
+        ITibiaCharacterFinderDbContext dbContext)
     {
         _logger = logger;
         _eventResultHandler = eventResultHandler;
         _conventionProvider = conventionProvider;
-        _repository = repository;
+        _dbContext = dbContext;
     }
 
     public string GetQueueName()
@@ -41,12 +42,41 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<DeleteCharacterWithCorrelationsEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
-        var isCommitedProperly = await _repository.ExecuteInTransactionAsync(async () =>
+        var isCommitedProperly = await ExecuteInTransactionAsync(async () =>
         {
-            var character = await _repository.GetCharacterByIdAsync(eventObject.CharacterId, cancellationToken: cancellationToken);
-            await _repository.DeleteCharacterByIdAsync(character.CharacterId);
+            var character = await _dbContext.Characters
+                .Where(c => c.CharacterId == eventObject.CharacterId)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+
+            await _dbContext.Characters
+                .Where(c => c.CharacterId == character.CharacterId)
+                .ExecuteDeleteAsync(cancellationToken);
         });
 
         _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(DeleteCharacterWithCorrelationsEvent), payload);
+    }
+
+    private async Task<bool> ExecuteInTransactionAsync(Func<Task> action)
+    {
+        for (int retryCount = 0; retryCount < 3; retryCount++)
+        {
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            try
+            {
+                await action.Invoke();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError("Method {method} during {action} failed, attempt {retryCount}. Error message: {ErrorMessage}",
+                    nameof(ExecuteInTransactionAsync), action.Target?.GetType().ReflectedType?.Name, retryCount + 1, ex.Message);
+            }
+        }
+
+        return false;
     }
 }

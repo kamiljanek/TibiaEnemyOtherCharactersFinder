@@ -188,4 +188,17 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
 
         #endregion
     }
+
+    /// <param name="rawSql">Sql command to execute</param>
+    /// <param name="timeOut">Optional value in seconds</param>
+    /// <param name="cancellationToken">Optional cancellation token</param>
+    public async Task ExecuteRawSqlAsync(string rawSql, int? timeOut = null, CancellationToken cancellationToken = default)
+    {
+        if (timeOut is not null)
+        {
+            Database.SetCommandTimeout(TimeSpan.FromSeconds((double)timeOut));
+        }
+
+        await Database.ExecuteSqlRawAsync(rawSql, cancellationToken);
+    }
 }

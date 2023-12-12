@@ -1,5 +1,6 @@
-﻿using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+﻿using Microsoft.EntityFrameworkCore;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace CharacterAnalyser.Managers;
 
@@ -9,11 +10,11 @@ public class CharacterActionsManager
     private IReadOnlyList<string> _logoutNames;
     private IReadOnlyList<string> _firstScanNames;
 
-    private readonly IRepository _repository;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
 
-    public CharacterActionsManager(IRepository repository)
+    public CharacterActionsManager(ITibiaCharacterFinderDbContext dbContext)
     {
-        _repository = repository;
+        _dbContext = dbContext;
     }
 
     public async Task SeedCharacterActions(List<WorldScan> twoWorldScans)
@@ -22,12 +23,19 @@ public class CharacterActionsManager
         var loginCharacters = CreateCharactersActionsAsync(_loginNames, twoWorldScans[1], isOnline: true);
 
         var characterActionsToAdd = logoutCharacters.Concat(loginCharacters);
-        await _repository.AddRangeAsync(characterActionsToAdd);
+        await _dbContext.CharacterActions.AddRangeAsync(characterActionsToAdd);
+        await _dbContext.SaveChangesAsync();
 
-        await _repository.SetCharacterFoundInScanAsync(_firstScanNames, foundInScan: true);
+        await _dbContext.Characters
+            .Where(ch => _firstScanNames.Contains(ch.Name))
+            .ExecuteUpdateAsync(update => update.SetProperty(c => c.FoundInScan, c => true));
     }
 
-    public IReadOnlyList<string> GetAndSetLoginNames(List<WorldScan> twoWorldScans) => _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToArray();
+    public IReadOnlyList<string> GetAndSetLoginNames(List<WorldScan> twoWorldScans)
+    {
+        _loginNames = GetNames(twoWorldScans[1]).Except(GetNames(twoWorldScans[0])).ToArray();
+        return _loginNames;
+    }
 
     public IReadOnlyList<string> GetAndSetLogoutNames(List<WorldScan> twoWorldScans)
     {

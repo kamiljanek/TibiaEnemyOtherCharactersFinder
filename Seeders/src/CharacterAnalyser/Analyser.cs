@@ -2,40 +2,52 @@
 using CharacterAnalyser.ActionRules.Rules;
 using CharacterAnalyser.Decorators;
 using CharacterAnalyser.Managers;
+using Microsoft.EntityFrameworkCore;
 using Shared.Database.Queries.Sql;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace CharacterAnalyser;
 
 public class Analyser : ActionRule, IAnalyser
 {
-    private List<short> _uniqueWorldIds = new();
-
-    private readonly IRepository _repository;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
     private readonly IAnalyserLogDecorator _logDecorator;
     private readonly CharacterActionsManager _characterActionsManager;
+    private readonly WorldScansProcessor _processor;
 
-    public List<short> UniqueWorldIds => _uniqueWorldIds;
-
-    public Analyser(IRepository repository, IAnalyserLogDecorator logDecorator)
+    public Analyser(ITibiaCharacterFinderDbContext dbContext, IAnalyserLogDecorator logDecorator)
     {
-        _repository = repository;
+        _dbContext = dbContext;
         _logDecorator = logDecorator;
-        _characterActionsManager = new CharacterActionsManager(repository);
+        _characterActionsManager = new CharacterActionsManager(dbContext);
+        _processor = new WorldScansProcessor(dbContext, logDecorator);
+
     }
 
-    public async Task<bool> HasDataToAnalyse()
+    public async Task<List<short>> GetDistinctWorldIdsFromRemainingScans()
     {
-        var availableWorldIds = _repository.NumberOfAvailableWorldScans();
-        _uniqueWorldIds = await _repository.GetDistinctWorldIdsFromWorldScansAsync();
+        var result = await _dbContext.WorldScans
+            .Where(scan => !scan.IsDeleted)
+            .GroupBy(scan => scan.WorldId)
+            .Where(group => group.Count() >= 2)
+            .Select(group => group.Key)
+            .OrderBy(id => id)
+            .ToListAsync();
 
-        return availableWorldIds > _uniqueWorldIds.Count;
+        return result;
     }
 
     public async Task<List<WorldScan>> GetWorldScansToAnalyseAsync(short worldId)
     {
-        return await _repository.GetFirstTwoWorldScansAsync(worldId);
+        var result = await _dbContext.WorldScans
+            .Where(scan => scan.WorldId == worldId && !scan.IsDeleted)
+            .OrderBy(scan => scan.ScanCreateDateTime)
+            .Take(2)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return result;
     }
 
     public async Task Seed(List<WorldScan> twoWorldScans)
@@ -47,46 +59,29 @@ public class Analyser : ActionRule, IAnalyser
             IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionsManager.GetAndSetLogoutNames(twoWorldScans))) ||
             IsBroken(new CharacterNameListCannotBeEmptyRule(_characterActionsManager.GetAndSetLoginNames(twoWorldScans))))
         {
-            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
+            await SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
             return;
         }
 
-        await ClearCharacterActionsAsync();
-        await ResetFoundInScanOnCharactersAsync();
+        await _dbContext.ExecuteRawSqlAsync(GenerateQueries.ClearCharacterActions);
+        await _dbContext.ExecuteRawSqlAsync(GenerateQueries.UpdateCharactersSetFoundInScanFalse);
 
         try
         {
-            await SeedAndAnalyseCharacters(twoWorldScans);
+            await _logDecorator.Decorate(_characterActionsManager.SeedCharacterActions, twoWorldScans);
+            await _processor.ProcessAsync(twoWorldScans);
         }
         finally
         {
-            await _repository.SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
-            await _repository.ClearChangeTracker();
+            await SoftDeleteWorldScanAsync(twoWorldScans[0].WorldScanId);
+            _dbContext.ChangeTracker.Clear();
         }
     }
 
-
-    private async Task SeedAndAnalyseCharacters(List<WorldScan> twoWorldScans)
+    private async Task SoftDeleteWorldScanAsync(int scanId)
     {
-        await _logDecorator.Decorate(_characterActionsManager.SeedCharacterActions, twoWorldScans);
-        await _logDecorator.Decorate(SeedCharacters, twoWorldScans);
-        await _logDecorator.Decorate(_repository.UpdateCorrelationsIfExistAsync, twoWorldScans);
-        await _logDecorator.Decorate(_repository.CreateCorrelationsIfNotExistAsync, twoWorldScans);
-        await _logDecorator.Decorate(_repository.RemoveImposibleCorrelationsAsync, twoWorldScans);
-    }
-
-    private async Task SeedCharacters()
-    {
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.CreateCharactersIfNotExists);
-    }
-
-    private async Task ClearCharacterActionsAsync()
-    {
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.ClearCharacterActions);
-    }
-
-    private async Task ResetFoundInScanOnCharactersAsync()
-    {
-        await _repository.ExecuteRawSqlAsync(GenerateQueries.UpdateCharactersSetFoundInScanFalse);
+        await _dbContext.WorldScans
+            .Where(ws => ws.WorldScanId == scanId)
+            .ExecuteUpdateAsync(update => update.SetProperty(ws => ws.IsDeleted, true));
     }
 }

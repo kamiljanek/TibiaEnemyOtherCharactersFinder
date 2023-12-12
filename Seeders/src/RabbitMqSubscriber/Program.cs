@@ -31,7 +31,6 @@ public class Program
 
             var initializer = ActivatorUtilities.CreateInstance<InitializationRabbitMqTaskRunner>(host.Services);
             await initializer.StartAsync();
-            // await host.StartAsync();
             var service = ActivatorUtilities.CreateInstance<TibiaSubscriber>(host.Services);
             service.Subscribe();
             await host.WaitForShutdownAsync();

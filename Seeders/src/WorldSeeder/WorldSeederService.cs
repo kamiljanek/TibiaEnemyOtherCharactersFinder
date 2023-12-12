@@ -1,6 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace WorldSeeder;
 
@@ -8,22 +9,22 @@ public class WorldSeederService : IWorldSeederService
 {
     private const string MainUrl = "https://www.tibia.com/community/?subtopic=worlds";
 
-    private readonly IRepository _repository;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
     private readonly ITibiaDataClient _tibiaDataClient;
 
     private IReadOnlyList<string> _worldsNamesFromTibiaDataProvider;
     private List<World> _worldsFromDb;
 
-    public WorldSeederService(IRepository repository, ITibiaDataClient tibiaDataClient)
+    public WorldSeederService(ITibiaCharacterFinderDbContext dbContext, ITibiaDataClient tibiaDataClient)
     {
-        _repository = repository;
+        _dbContext = dbContext;
         _tibiaDataClient = tibiaDataClient;
     }
 
     public async Task SetProperties()
     {
         _worldsNamesFromTibiaDataProvider = await _tibiaDataClient.FetchWorldsNames();
-        _worldsFromDb = await _repository.GetWorldsAsNoTrackingAsync();
+        _worldsFromDb = await _dbContext.Worlds.AsNoTracking().ToListAsync();
     }
 
     public async Task Seed()
@@ -36,7 +37,8 @@ public class WorldSeederService : IWorldSeederService
                 })
                 .ToList();
 
-            await _repository.AddRangeAsync(newWorlds);
+            await _dbContext.Worlds.AddRangeAsync(newWorlds);
+            await _dbContext.SaveChangesAsync();
     }
 
     public async Task TurnOffIfWorldIsUnavailable()
@@ -47,7 +49,10 @@ public class WorldSeederService : IWorldSeederService
 
             foreach (var world in newWorlds)
             {
-                await _repository.UpdateWorldAsync(world);
+                await _dbContext.Worlds
+                    .Where(w => w.WorldId == world.WorldId)
+                    .ExecuteUpdateAsync(update => update
+                        .SetProperty(w => w.IsAvailable, world.IsAvailable));
             }
     }
 

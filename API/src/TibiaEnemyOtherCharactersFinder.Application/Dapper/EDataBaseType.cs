@@ -2,6 +2,5 @@
 
 public enum EDataBaseType
 {
-    SqlServer,
     PostgreSql
 }

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.WorldSeeders;
@@ -33,9 +32,8 @@ public class TurnOffIfWorldIsUnavailableOnWorldSeederTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
-        var worldSeeder = new WorldSeeder.WorldSeederService(repository, _tibiaDataClientMock.Object);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ITibiaCharacterFinderDbContext>();
+        var worldSeeder = new WorldSeeder.WorldSeederService(dbContext, _tibiaDataClientMock.Object);
         await worldSeeder.SetProperties();
         
         // Act

@@ -25,23 +25,25 @@ public class CharacterTrackNotifier : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
-            var uniqueNames = _dbContext.TrackedCharacters.Select(tc => tc.Name).Distinct();
-            if (!uniqueNames.Any())
+            if (await _dbContext.Database.CanConnectAsync(stoppingToken))
             {
-                continue;
-            }
+                var uniqueNames = _dbContext.TrackedCharacters.Select(tc => tc.Name).Distinct();
+                if (uniqueNames.Any())
+                {
+                    var foundedNames = _dbContext.OnlineCharacters.Where(oc => uniqueNames.Contains(oc.Name))
+                        .Select(oc => oc.Name);
 
-            var foundedNames = _dbContext.OnlineCharacters.Where(oc => uniqueNames.Contains(oc.Name)).Select(oc => oc.Name);
+                    var notFoundedNames = uniqueNames.Except(foundedNames);
 
-            var notFoundedNames = uniqueNames.Except(foundedNames);
+                    var listOfData = new List<CharacterTrackedHubEvent>();
+                    listOfData.AddRange(foundedNames.Select(foundedName => new CharacterTrackedHubEvent(foundedName, true)));
+                    listOfData.AddRange(notFoundedNames.Select(notFoundedName => new CharacterTrackedHubEvent(notFoundedName, false)));
 
-            var listOfData = new List<CharacterTrackedHubEvent>();
-            listOfData.AddRange(foundedNames.Select(foundedName => new CharacterTrackedHubEvent(foundedName, true)));
-            listOfData.AddRange(notFoundedNames.Select(notFoundedName => new CharacterTrackedHubEvent(notFoundedName, false)));
-
-            foreach (var data in listOfData)
-            {
-                await _trackHubWrapper.PublishToGroupAsync(data.Name, data);
+                    foreach (var data in listOfData)
+                    {
+                        await _trackHubWrapper.PublishToGroupAsync(data.Name, data);
+                    }
+                }
             }
         }
     }

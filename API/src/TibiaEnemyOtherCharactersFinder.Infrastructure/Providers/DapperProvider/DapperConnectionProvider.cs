@@ -22,9 +22,6 @@ public class DapperConnectionProvider : IDapperConnectionProvider
     {
         switch (module)
         {
-            case EDataBaseType.SqlServer:
-                return GetConnection(_connectionStringsOptions.SqlServer, _dapperOptions.CommandTimeout);
-
             case EDataBaseType.PostgreSql:
                 return GetConnection(_connectionStringsOptions.PostgreSql, _dapperOptions.CommandTimeout);
 

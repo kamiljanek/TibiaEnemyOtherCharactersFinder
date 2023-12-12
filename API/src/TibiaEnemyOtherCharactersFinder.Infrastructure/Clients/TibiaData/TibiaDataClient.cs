@@ -45,8 +45,8 @@ public class TibiaDataClient : ITibiaDataClient
             catch (TaskCanceledException)
             {
                 currentRetry++;
-                _logger.LogError("TaskCanceledException during invoke method {method}, attempt {retryCount}.",
-                    nameof(FetchWorldsNames), currentRetry);
+                _logger.LogError("{exceptionName} during invoke method {method}, attempt {retryCount}.",
+                    nameof(TaskCanceledException), nameof(FetchWorldsNames), currentRetry);
             }
             catch (Exception exception)
             {
@@ -91,8 +91,8 @@ public class TibiaDataClient : ITibiaDataClient
             catch (TaskCanceledException exception)
             {
                 currentRetry++;
-                _logger.LogError("TaskCanceledException during invoke method {method}, world: '{worldName}', attempt {retryCount}. Exception {exception}",
-                    nameof(FetchCharactersOnline), worldName, currentRetry, exception);
+                _logger.LogError("{exceptionName} during invoke method {method}, world: '{worldName}', attempt {retryCount}. Exception {exception}",
+                    nameof(TaskCanceledException), nameof(FetchCharactersOnline), worldName, currentRetry, exception);
             }
             catch (Exception exception)
             {
@@ -123,8 +123,8 @@ public class TibiaDataClient : ITibiaDataClient
             catch (TaskCanceledException)
             {
                 currentRetry++;
-                _logger.LogError("TaskCanceledException during invoke method {method}, character: '{characterName}', attempt {retryCount}.",
-                    nameof(FetchCharacter), characterName, currentRetry);
+                _logger.LogError("{exceptionName} during invoke method {method}, character: '{characterName}', attempt {retryCount}.",
+                    nameof(TaskCanceledException), nameof(FetchCharacter), characterName, currentRetry);
             }
             catch (Exception exception)
             {
