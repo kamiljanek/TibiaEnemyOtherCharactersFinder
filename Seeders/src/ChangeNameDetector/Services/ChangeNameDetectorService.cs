@@ -72,7 +72,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             // If name from databese was found in former names than merge proper correlations.
             else
             {
-                var fechedCharacterName = fechedCharacter.characters.character.name;
+                var fechedCharacterName = fechedCharacter.Character.Character.Name;
 
                 var newCharacter = await _dbContext.Characters.Where(c => c.Name == fechedCharacterName.ToLower()).FirstOrDefaultAsync();
 

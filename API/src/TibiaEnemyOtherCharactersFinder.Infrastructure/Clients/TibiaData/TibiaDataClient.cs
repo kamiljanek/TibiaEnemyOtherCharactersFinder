@@ -80,13 +80,13 @@ public class TibiaDataClient : ITibiaDataClient
                 }
 
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataWorldInformationResult>(content);
-                if (contentDeserialized.worlds.world.online_players is null || !contentDeserialized.worlds.world.online_players.Any())
+                if (contentDeserialized.world.online_players is null || !contentDeserialized.world.online_players.Any())
                 {
                     _logger.LogInformation("Server '{serverName}' is out of players at that moment.", worldName);
                     return Array.Empty<string>();
                 }
 
-                return contentDeserialized.worlds.world.online_players.Select(x => x.name).ToArray();
+                return contentDeserialized.world.online_players.Select(x => x.name).ToArray();
             }
             catch (TaskCanceledException exception)
             {
@@ -105,7 +105,7 @@ public class TibiaDataClient : ITibiaDataClient
         });
     }
 
-    public async Task<TibiaDataCharacterInformationResult> FetchCharacter(string characterName)
+    public async Task<TibiaDataCharacterResult> FetchCharacter(string characterName)
     {
         var currentRetry = 0;
 
@@ -115,10 +115,10 @@ public class TibiaDataClient : ITibiaDataClient
             try
             {
                 using var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
+                // response.EnsureSuccessStatusCode();
 
                 string content = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<TibiaDataCharacterInformationResult>(content);
+                return JsonConvert.DeserializeObject<TibiaDataCharacterResult>(content);
             }
             catch (TaskCanceledException)
             {
