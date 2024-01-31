@@ -1,33 +1,36 @@
+using Microsoft.EntityFrameworkCore;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace WorldScanSeeder;
 
 public class ScanSeeder : IScanSeeder
 {
-    private readonly IRepository _repository;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
     private readonly ITibiaDataClient _tibiaDataClient;
 
     private List<World> _availableWorlds;
 
     public List<World> AvailableWorlds => _availableWorlds;
 
-    public ScanSeeder(IRepository repository, ITibiaDataClient tibiaDataClient)
+    public ScanSeeder(ITibiaCharacterFinderDbContext dbContext, ITibiaDataClient tibiaDataClient)
     {
-        _repository = repository;
+        _dbContext = dbContext;
         _tibiaDataClient = tibiaDataClient;
     }
 
     public async Task SetProperties()
     {
-        _availableWorlds = await _repository.GetAvailableWorldsAsync();
+        _availableWorlds = await _dbContext.Worlds.Where(w => w.IsAvailable).ToListAsync();
     }
 
     public async Task Seed(World availableWorld)
     {
         var worldScan = await CreateWorldScanAsync(availableWorld);
-        await _repository.AddAsync(worldScan);
+
+        await _dbContext.WorldScans.AddAsync(worldScan);
+        await _dbContext.SaveChangesAsync();
     }
 
     private async Task<WorldScan> CreateWorldScanAsync(World world)

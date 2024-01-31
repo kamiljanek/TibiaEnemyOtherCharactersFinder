@@ -1,6 +1,9 @@
 ﻿using System.Net;
 using FluentAssertions;
+using Moq;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
+using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
+using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;

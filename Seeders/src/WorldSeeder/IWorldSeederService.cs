@@ -4,6 +4,8 @@ namespace WorldSeeder;
 
 public interface IWorldSeederService : ISeederService
 {
-    public Task SetProperties();
-    public Task TurnOffIfWorldIsUnavailable();
+    Task SetProperties();
+    Task TurnOffIfWorldIsUnavailable();
+    Task TurnOnIfWorldIsAvailable();
+
 }

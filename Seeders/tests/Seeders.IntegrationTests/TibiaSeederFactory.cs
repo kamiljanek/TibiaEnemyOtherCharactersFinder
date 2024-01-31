@@ -107,6 +107,7 @@ public class TibiaSeederFactory : WebApplicationFactory<Startup>, IAsyncLifetime
             services.AddSingleton(Options.Create(new ConnectionStringsSection { PostgreSql = _dbContainer.GetConnectionString() }));
             services.AddDbContext<TibiaCharacterFinderDbContext>(options => options.UseNpgsql(_dbContainer.GetConnectionString()).UseSnakeCaseNamingConvention());
             services.AddSingleton<CharacterActionsManager>();
+            services.AddSingleton<IAnalyserService, AnalyserService>();
             services.AddSingleton<IAnalyser, Analyser>();
             services.AddSingleton<ICleaner, Cleaner>();
             services.AddSingleton<IAnalyserLogDecorator, AnalyserLogDecorator>();

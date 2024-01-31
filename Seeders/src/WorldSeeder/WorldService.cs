@@ -18,5 +18,6 @@ public class WorldService : IWorldService
         await _logDecorator.Decorate(_worldSeederService.SetProperties);
         await _logDecorator.Decorate(_worldSeederService.Seed);
         await _logDecorator.Decorate(_worldSeederService.TurnOffIfWorldIsUnavailable);
+        await _logDecorator.Decorate(_worldSeederService.TurnOnIfWorldIsAvailable); // TODO: add unit test for that
     }
 }

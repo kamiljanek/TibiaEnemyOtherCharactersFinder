@@ -3,7 +3,6 @@ using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
-using TibiaEnemyOtherCharactersFinder.Application.Exceptions;
 using TibiaEnemyOtherCharactersFinder.Application.Validations;
 
 namespace TibiaEnemyOtherCharactersFinder.Application.Queries.Character;
@@ -43,18 +42,13 @@ public class
             PageSize = request.PageSize
         };
 
-        var result = (await connection.QueryAsync<(string name, int totalCount)>(GenerateQueries.GetFilteredCharactersWithCount, parameters)).ToList();
+        var result =
+            (await connection.QueryAsync<(string name, int totalCount)>(GenerateQueries.GetFilteredCharactersWithCount,
+                parameters)).ToList();
 
-        if (result.FirstOrDefault().totalCount == 0)
-        {
-            throw new NotFoundException(nameof(Character), request.SearchText);
-        }
-
-        var characterMatching = new FilteredCharactersDto()
-        {
-            TotalCount = result.FirstOrDefault().totalCount,
-            Names = result.Select(n => n.name).ToArray()
-        };
+        var characterMatching = result.Count == 0
+            ? new FilteredCharactersDto { TotalCount = 0, Names = Array.Empty<string>() }
+            : new FilteredCharactersDto { TotalCount = result.First().totalCount, Names = result.Select(n => n.name).ToArray() };
 
         return characterMatching;
     }

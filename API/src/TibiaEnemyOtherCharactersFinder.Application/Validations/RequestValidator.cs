@@ -24,9 +24,20 @@ public class RequestValidator : IRequestValidator
     {
         string trimmedSearchText = searchText.Trim();
 
-        if (!trimmedSearchText.All(c => (char.IsLetter(c) && (c is >= 'a' and <= 'z' || c is >= 'A' and <= 'Z')) || char.IsWhiteSpace(c) || c is '+'))
+        if (!trimmedSearchText.All(c =>
+                char.IsLetter(c) ||
+                c == 'ä' ||
+                c == 'ö' ||
+                c == 'ü' ||
+                c == 'ß' ||
+                c == '.' ||
+                c == '+' ||
+                c == '-' ||
+                c == '\'' ||
+                char.IsWhiteSpace(c)))
         {
-            throw new TibiaValidationException(new ValidationFailure(nameof(searchText), "Input has unacceptable characters."));
+            throw new TibiaValidationException(new ValidationFailure(nameof(searchText),
+                "Input has unacceptable characters."));
         }
     }
 

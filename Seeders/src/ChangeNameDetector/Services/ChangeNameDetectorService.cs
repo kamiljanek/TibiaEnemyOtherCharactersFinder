@@ -1,9 +1,11 @@
 ﻿using ChangeNameDetector.Validators;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.RabbitMQ.EventBus;
 using Shared.RabbitMQ.Events;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace ChangeNameDetector.Services;
 
@@ -11,19 +13,19 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
 {
     private readonly ILogger<ChangeNameDetectorService> _logger;
     private readonly INameDetectorValidator _validator;
-    private readonly IRepository _repository;
+    private readonly ITibiaCharacterFinderDbContext _dbContext;
     private readonly ITibiaDataClient _tibiaDataClient;
     private readonly IEventPublisher _publisher;
 
     public ChangeNameDetectorService(ILogger<ChangeNameDetectorService> logger,
         INameDetectorValidator validator,
-        IRepository repository,
+        ITibiaCharacterFinderDbContext dbContext,
         ITibiaDataClient tibiaDataClient,
         IEventPublisher publisher)
     {
         _logger = logger;
         _validator = validator;
-        _repository = repository;
+        _dbContext = dbContext;
         _tibiaDataClient = tibiaDataClient;
         _publisher = publisher;
     }
@@ -32,7 +34,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
     {
         while (true)
         {
-            var character = await _repository.GetFirstCharacterByVerifiedDateAsync();
+            var character = await GetFirstCharacterByVerifiedDateAsync();
             if (character is null)
             {
                 break;
@@ -70,13 +72,15 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             // If name from databese was found in former names than merge proper correlations.
             else
             {
-                var newCharacter = await _repository.GetCharacterByNameAsync(fechedCharacter.characters.character.name);
+                var fechedCharacterName = fechedCharacter.Character.Character.Name;
+
+                var newCharacter = await _dbContext.Characters.Where(c => c.Name == fechedCharacterName.ToLower()).FirstOrDefaultAsync();
 
                 if (newCharacter is null)
                 {
                     // If new character name is not yet in the databese just change old name to new one.
-                    await _repository.UpdateCharacterNameAsync(character.Name, fechedCharacter.characters.character.name);
-                    _logger.LogInformation("Character name '{character}' updated to '{newCharacter}'", character.Name, fechedCharacter.characters.character.name.ToLower());
+                    await UpdateCharacterNameAsync(character.Name, fechedCharacterName);
+                    _logger.LogInformation("Character name '{character}' updated to '{newCharacter}'", character.Name, fechedCharacterName.ToLower());
                 }
                 else
                 {
@@ -85,8 +89,38 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
                 }
             }
 
-            await _repository.UpdateCharacterVerifiedDate(character.CharacterId);
-            await _repository.ClearChangeTracker();
+            await UpdateCharacterVerifiedDate(character.CharacterId);
+            _dbContext.ChangeTracker.Clear();
         }
+    }
+
+    private async Task<Character> GetFirstCharacterByVerifiedDateAsync()
+    {
+        var visibilityOfTradeProperty = DateOnly.FromDateTime(DateTime.Now.AddDays(-31));
+        var scanPeriod = DateOnly.FromDateTime(DateTime.Now.AddDays(-15));
+
+        return await _dbContext.Characters
+            .Where(c => (!c.TradedDate.HasValue || c.TradedDate < visibilityOfTradeProperty)
+                        && (!c.VerifiedDate.HasValue || c.VerifiedDate < scanPeriod))
+            .OrderByDescending(c => c.VerifiedDate == null)
+            .ThenBy(c => c.VerifiedDate)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
+
+    private async Task UpdateCharacterNameAsync(string oldName, string newName)
+    {
+        await _dbContext.Characters
+            .Where(c => c.Name == oldName.ToLower())
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(c => c.Name, newName.ToLower()));
+    }
+
+    private async Task UpdateCharacterVerifiedDate(int characterId)
+    {
+        await _dbContext.Characters
+            .Where(c => c.CharacterId == characterId)
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(c => c.VerifiedDate, DateOnly.FromDateTime(DateTime.Now)));
     }
 }

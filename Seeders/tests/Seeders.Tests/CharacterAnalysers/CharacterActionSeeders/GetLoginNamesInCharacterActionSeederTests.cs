@@ -1,14 +1,14 @@
 using CharacterAnalyser.Managers;
 using FluentAssertions;
 using Moq;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Domain.Entities;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.Tests.CharacterAnalysers.CharacterActionSeeders;
 
 public class GetLoginNamesInCharacterActionSeederTests
 {
-    private readonly Mock<IRepository> _repositoryMock = new();
+    private readonly Mock<ITibiaCharacterFinderDbContext> _dbContextMock = new();
 
     public GetLoginNamesInCharacterActionSeederTests()
     {
@@ -23,7 +23,7 @@ public class GetLoginNamesInCharacterActionSeederTests
             new() { WorldScanId = 3217, WorldId = 1, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "aphov|armystrong|asiier|braws|burntmeat|fosani|friedbert|ganancia adra|guga falido|just mojito|kinaduh|kineador|kiperr the third"},
             new() { WorldScanId = 3302, WorldId = 1, ScanCreateDateTime = new DateTime(2022,11,30,20,28,36, DateTimeKind.Utc), CharactersOnline = "aphov|armystrong|asiier|braws|brytiaggo|fresita linda|friedbert|ganancia adra|guga falido|just mojito|kinaduh|kineador"},
         };
-        var characterActionSeeder = new CharacterActionsManager(_repositoryMock.Object);
+        var characterActionSeeder = new CharacterActionsManager(_dbContextMock.Object);
         
         // Act
         var loginNames = characterActionSeeder.GetAndSetLoginNames(worldScans);
@@ -41,7 +41,7 @@ public class GetLoginNamesInCharacterActionSeederTests
             new() { WorldScanId = 3217, WorldId = 1, ScanCreateDateTime = new DateTime(2022,11,30,20,23,12, DateTimeKind.Utc), CharactersOnline = "aphov|armystrong|asiier|braws|burntmeat|fosani|friedbert|ganancia adra|guga falido|just mojito|kinaduh|kineador|kiperr the third"},
             new() { WorldScanId = 3302, WorldId = 1, ScanCreateDateTime = new DateTime(2022,11,30,20,28,36, DateTimeKind.Utc), CharactersOnline = "aphov|armystrong|asiier|braws|ganancia adra|guga falido|just mojito|kinaduh|kineador"},
         };
-        var characterActionSeeder = new CharacterActionsManager(_repositoryMock.Object);
+        var characterActionSeeder = new CharacterActionsManager(_dbContextMock.Object);
         
         // Act
         var loginNames = characterActionSeeder.GetAndSetLoginNames(worldScans);

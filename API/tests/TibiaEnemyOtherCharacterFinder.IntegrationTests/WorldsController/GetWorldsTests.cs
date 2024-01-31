@@ -19,8 +19,8 @@ public class GetWorldsTests : CharactersControllerTestTemplate, IClassFixture<Ti
     {
         // Arrange
         var client = _factory.CreateClient();
-        var available = true;
-        var additionalParameters = $"?{nameof(available)}={available}";
+        var isAvailable = true;
+        var additionalParameters = $"?{nameof(isAvailable)}={isAvailable}";
 
         // Act
         var response = await client.GetAsync($"{ControllerBase}{additionalParameters}");
@@ -38,8 +38,8 @@ public class GetWorldsTests : CharactersControllerTestTemplate, IClassFixture<Ti
     {
         // Arrange
         var client = _factory.CreateClient();
-        var available = false;
-        var additionalParameters = $"?{nameof(available)}={available}";
+        var isAvailable = false;
+        var additionalParameters = $"?{nameof(isAvailable)}={isAvailable}";
 
         // Act
         var response = await client.GetAsync($"{ControllerBase}{additionalParameters}");
