@@ -65,18 +65,35 @@ The more player plays, the more likely result will be close to true.
 - All data analyser mechanism with optimization data storage, also work if character changed name or was traded
 
 **Endpoints:**
-- `GetOtherCharacters` - returns character details with 10 most scores possible other character names.
-- `GetFilteredCharacters` - returns list of character names based on a fragment of the name, sorted in ascending order.
-- `GetFilteredCharactersPrompt` - returns list of character names starts at fragment of the name, sorted in ascending order.
-- `GetWorlds` - returns filtered worlds.
+- GET`/health` - health check.
+- GET`/api/tibia-eocf/v1/characters/{characterName}` - returns character details with 10 most scores possible other character names.
+- GET`/api/tibia-eocf/v1/characters` (params `(string)searchText`,`(int)page`,`(int)pageSize`) - returns list of character names based on a fragment of the name, sorted in ascending order.
+- GET`/api/tibia-eocf/v1/characters/prompt` (params `(string)searchText`,`(int)page`,`(int)pageSize`) - returns list of character names starts at fragment of the name, sorted in ascending order.
+- GET`/api/tibia-eocf/v1/worlds` (params `(bool?)isAvailable`) - returns filtered worlds.
  
 **Life Time Character Tracker:**
-- Now you can track your enemies whether is online or not.
-- To track specific character use WebSockets to connect with `{baseUrl}/characters-track-hub`.
-- Ones you connected send message <span style="text-decoration: underline; color: green;">{"protocol":"json","version":1}</span> to handshake with server.
-- Now you can join to group to track your enemy sending <span style="text-decoration: underline; color: green;">{"arguments":["your_enemy_character_name"],"target":"JoinGroup","type":1}</span> just put your enemy name.
-- To stop tracking just send message <span style="text-decoration: underline; color: green;">{"arguments":["your_enemy_character_name"],"target":"LeaveGroup","type":1}</span> just put your enemy name or disconnect connection to stop tracking all enemies.
-- Check postman example [_here_](https://www.rafaagahbichelab.dev/articles/signalr-dotnet-postman) 
+
+<i>Track your enemies whether is online or not.</i>
+
+To track specific character use WebSockets to connect with:
+```console 
+{baseUrl}/characters-track-hub
+```
+Ones you connected send message:
+```console
+{"protocol":"json","version":1}
+```
+Now join to group to track enemy sending:
+```console
+{"arguments":["your_enemy_character_name"],"target":"JoinGroup","type":1}
+```
+To stop tracking one character just send message 
+```console
+{"arguments":["your_enemy_character_name"],"target":"LeaveGroup","type":1}
+```
+or disconnect connection to stop tracking all enemies.
+
+Try with <u>Postman</u>. Example [_here_](https://www.rafaagahbichelab.dev/articles/signalr-dotnet-postman) 
 
 
 ---
@@ -175,7 +192,6 @@ Project is: _still in progress_ .
 
 ### To do:
 - Add autorization and autentication
-- Health Checks
 - Kubernetes
 - Frontend
 

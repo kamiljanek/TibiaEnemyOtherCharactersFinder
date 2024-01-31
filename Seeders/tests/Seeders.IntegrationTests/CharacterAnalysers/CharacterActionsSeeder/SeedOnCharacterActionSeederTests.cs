@@ -1,7 +1,7 @@
 using CharacterAnalyser.Managers;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TibiaEnemyOtherCharactersFinder.Application.Persistence;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace Seeders.IntegrationTests.CharacterAnalysers.CharacterActionsSeeder;
@@ -24,10 +24,15 @@ public class SeedOnCharacterActionSeederTests : IAsyncLifetime
         // Arrange
         using var scope = _factory.Services.CreateScope();
         var seeder = scope.ServiceProvider.GetRequiredService<CharacterActionsManager>();
-        var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ITibiaCharacterFinderDbContext>();
 
-        var worldScans = await repository.GetFirstTwoWorldScansAsync(worldId: 11);
+        var worldScans = await dbContext.WorldScans
+            .Where(scan => scan.WorldId == 11 && !scan.IsDeleted)
+            .OrderBy(scan => scan.ScanCreateDateTime)
+            .Take(2)
+            .AsNoTracking()
+            .ToListAsync();
+
         seeder.GetAndSetLoginNames(worldScans);
         seeder.GetAndSetLogoutNames(worldScans);
         

@@ -5,7 +5,6 @@ namespace CharacterAnalyser;
 
 public interface IAnalyser : ISeeder<List<WorldScan>>
 {
-    List<short> UniqueWorldIds { get; }
-    Task<bool> HasDataToAnalyse();
+    Task<List<short>> GetDistinctWorldIdsFromRemainingScans();
     Task<List<WorldScan>> GetWorldScansToAnalyseAsync(short worldId);
 }

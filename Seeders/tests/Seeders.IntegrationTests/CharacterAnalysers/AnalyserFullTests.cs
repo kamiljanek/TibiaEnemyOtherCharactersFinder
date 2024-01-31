@@ -24,21 +24,14 @@ public class AnalyserFullTests : IAsyncLifetime
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
-        var analyser = scope.ServiceProvider.GetRequiredService<IAnalyser>();
+        var analyser = scope.ServiceProvider.GetRequiredService<IAnalyserService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<TibiaCharacterFinderDbContext>();
         
         await _factory.ClearDatabaseAsync(dbContext);
         await SeedDatabaseAsync(dbContext);
         
         // Act
-        while (await analyser.HasDataToAnalyse())
-        {
-            foreach (var worldId in analyser.UniqueWorldIds)
-            {
-                var worldScans = await analyser.GetWorldScansToAnalyseAsync(worldId);
-                await analyser.Seed(worldScans);
-            }
-        }
+        await analyser.Run();
 
         // Assert
         var scans = dbContext.WorldScans.AsNoTracking().ToList();

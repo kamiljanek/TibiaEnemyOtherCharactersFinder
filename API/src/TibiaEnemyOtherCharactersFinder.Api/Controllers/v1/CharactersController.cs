@@ -47,7 +47,6 @@ public class CharactersController : TibiaBaseController
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFilteredCharacters(
         [FromQuery] [Required] string searchText,
         [FromQuery] [Required] int page = 1,

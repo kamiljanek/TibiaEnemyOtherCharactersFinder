@@ -3,18 +3,16 @@ using MediatR;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Swashbuckle.AspNetCore.SwaggerUI;
 using TibiaEnemyOtherCharactersFinder.Api.Configurations;
 using TibiaEnemyOtherCharactersFinder.Api.Filters;
 using TibiaEnemyOtherCharactersFinder.Api.Swagger;
 using TibiaEnemyOtherCharactersFinder.Infrastructure;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.HealthChecks;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Middlewares;
-using TibiaEnemyOtherCharactersFinder.Infrastructure.Services.BackgroundServices;
 
 namespace TibiaEnemyOtherCharactersFinder.Api;
 
@@ -45,6 +43,8 @@ public class Startup
         services.AddRouting(options => { options.LowercaseUrls = true; });
         services.AddMediatR(typeof(Startup));
         services.AddSignalR();
+        services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("Database");
 
         services.AddDistributedMemoryCache();
         services.AddSession(options =>
@@ -99,7 +99,7 @@ public class Startup
         app.UseSwagger();
         app.UseSwaggerUI(StartupConfigurations.SwaggerUiConfiguration(app));
 
-
+        app.UseTibiaHealthChecks();
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
@@ -119,6 +119,4 @@ public class Startup
         });
         app.UseSignalrHubs();
     }
-
-
 }
