@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using FluentValidation.Results;
 using MediatR;
 using Shared.Database.Queries.Sql;
 using TibiaEnemyOtherCharactersFinder.Application.Dapper;

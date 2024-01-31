@@ -43,16 +43,30 @@ public class WorldSeederService : IWorldSeederService
 
     public async Task TurnOffIfWorldIsUnavailable()
     {
-            var newWorlds = _worldsFromDb
+            var unavailableWorlds = _worldsFromDb
                 .Where(world => !_worldsNamesFromTibiaDataProvider.Contains(world.Name))
             .Select(world => { world.IsAvailable = false; return world; }).ToList();
 
-            foreach (var world in newWorlds)
+            foreach (var world in unavailableWorlds)
             {
                 await _dbContext.Worlds
                     .Where(w => w.WorldId == world.WorldId)
                     .ExecuteUpdateAsync(update => update
                         .SetProperty(w => w.IsAvailable, world.IsAvailable));
+            }
+    }
+
+    public async Task TurnOnIfWorldIsAvailable()
+    {
+            var worldsToTurnOn = _worldsFromDb
+                .Where(world => _worldsNamesFromTibiaDataProvider.Contains(world.Name) && !world.IsAvailable);
+
+            foreach (var world in worldsToTurnOn)
+            {
+                await _dbContext.Worlds
+                    .Where(w => w.WorldId == world.WorldId)
+                    .ExecuteUpdateAsync(update => update
+                        .SetProperty(w => w.IsAvailable, true));
             }
     }
 
