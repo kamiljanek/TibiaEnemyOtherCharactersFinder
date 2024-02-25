@@ -12,8 +12,7 @@ public record GetFilteredCharactersByFragmentNamePromptQuery(
     int Page,
     int PageSize) : IRequest<List<string>>;
 
-public class
-    GetFilteredCharacterListByFragmentNameQueryNewHandler : IRequestHandler<GetFilteredCharactersByFragmentNamePromptQuery, List<string>>
+public class GetFilteredCharacterListByFragmentNameQueryNewHandler : IRequestHandler<GetFilteredCharactersByFragmentNamePromptQuery, List<string>>
 {
     private readonly IDapperConnectionProvider _connectionProvider;
     private readonly IRequestValidator _validator;

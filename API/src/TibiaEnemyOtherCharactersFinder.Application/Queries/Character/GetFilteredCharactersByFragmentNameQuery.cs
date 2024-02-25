@@ -12,8 +12,7 @@ public record GetFilteredCharactersByFragmentNameQuery(
     int Page,
     int PageSize) : IRequest<FilteredCharactersDto>;
 
-public class
-    GetFilteredCharacterListByFragmentNameQueryHandler : IRequestHandler<GetFilteredCharactersByFragmentNameQuery,
+public class GetFilteredCharacterListByFragmentNameQueryHandler : IRequestHandler<GetFilteredCharactersByFragmentNameQuery,
         FilteredCharactersDto>
 {
     private readonly IDapperConnectionProvider _connectionProvider;
