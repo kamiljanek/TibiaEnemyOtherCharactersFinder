@@ -81,13 +81,13 @@ public class TibiaDataV3Client : ITibiaDataClient
                 }
 
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3WorldResponse>(content);
-                if (contentDeserialized.Worlds.OnlinePlayers is null || !contentDeserialized.Worlds.OnlinePlayers.Any())
+                if (contentDeserialized.Worlds.World.OnlinePlayers is null || !contentDeserialized.Worlds.World.OnlinePlayers.Any())
                 {
                     _logger.LogInformation("Server '{serverName}' is out of players at that moment.", worldName);
                     return Array.Empty<string>();
                 }
 
-                return contentDeserialized.Worlds.OnlinePlayers.Select(x => x.Name).ToArray();
+                return contentDeserialized.Worlds.World.OnlinePlayers.Select(x => x.Name).ToArray();
             }
             catch (TaskCanceledException exception)
             {
