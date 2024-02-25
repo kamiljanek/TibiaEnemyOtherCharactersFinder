@@ -113,32 +113,6 @@ OFFSET ((@Page - 1) * @PageSize) ROWS
 
         /// <summary>
         /// Required parameters: 
-        ///    @Page
-        ///    @PageSize
-        ///    @SearchText
-        /// </summary>
-        public const string GetFilteredCharactersStartsAtSearchText = @"SELECT c.name
-FROM characters c
-WHERE c.name >= @SearchText
-ORDER BY c.name
-OFFSET ((@Page - 1) * @PageSize) ROWS
-    LIMIT @PageSize;";
-
-        /// <summary>
-        /// Required parameters: 
-        ///    @Page
-        ///    @PageSize
-        ///    @SearchText
-        /// </summary>
-        public const string GetFilteredCharactersWithCount = @"SELECT c.name, COUNT(*) OVER () AS TotalCount
-FROM characters c
-WHERE c.name LIKE '%' || @SearchText || '%'
-ORDER BY c.name
-OFFSET ((@Page - 1) * @PageSize) ROWS
-    LIMIT @PageSize;";
-
-        /// <summary>
-        /// Required parameters: 
         ///    @CharacterName
         /// </summary>
         public const string GetOtherPossibleCharacters = @"WITH character_id_CTE AS (SELECT character_id FROM characters WHERE name = @CharacterName)
@@ -244,4 +218,3 @@ WHERE
     }
 
 }
-
