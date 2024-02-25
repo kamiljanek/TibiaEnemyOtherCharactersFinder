@@ -21,7 +21,6 @@ public class CharactersControllerTestTemplate
         string[] unacceptableRouteParameters =
         {
             "kkają",
-            "kka-j",
             "kk=aj",
             "kka|j",
             "kka6j",

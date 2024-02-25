@@ -34,7 +34,7 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
         {
             throw new TibiaDataApiConnectionException();
         }
-        if (string.IsNullOrWhiteSpace(character.Character?.Character?.Name))
+        if (string.IsNullOrWhiteSpace(character.Name))
         {
             throw new NotFoundException(nameof(Character), request.Name);
         }
@@ -42,22 +42,22 @@ public class GetCharacterWithCorrelationsQueryHandler : IRequestHandler<GetChara
         using var connection = _connectionProvider.GetConnection(EDataBaseType.PostgreSql);
         var parameters = new
         {
-            CharacterName = character.Character.Character.Name.ToLower()
+            CharacterName = character.Name.ToLower()
         };
 
-        var correlations = await connection.QueryAsync<CorrelationResult>(GenerateQueries.GetOtherPossibleCharacters, parameters);
+        var correlations = (await connection.QueryAsync<CorrelationResult>(GenerateQueries.GetOtherPossibleCharacters, parameters)).ToArray();
         var result = new CharacterWithCorrelationsResult
         {
-            FormerNames = character.Character.Character.FormerNames ?? Array.Empty<string>(),
-            FormerWorlds = character.Character.Character.FormerWorlds ?? Array.Empty<string>(),
-            Name = character.Character.Character.Name,
-            Level = character.Character.Character.Level,
-            Traded = character.Character.Character.Traded,
-            Vocation = character.Character.Character.Vocation,
-            World = character.Character.Character.World,
-            LastLogin = character.Character.Character.LastLogin,
-            OtherVisibleCharacters = character.Character.OtherCharacters is null ? Array.Empty<string>() : character.Character.OtherCharacters.Select(ch => ch.Name).ToList(),
-            PossibleInvisibleCharacters = correlations is null ? Array.Empty<CorrelationResult>() : correlations.ToList()
+            FormerNames = character.FormerNames ?? Array.Empty<string>(),
+            FormerWorlds = character.FormerWorlds ?? Array.Empty<string>(),
+            Name = character.Name,
+            Level = character.Level,
+            Traded = character.Traded,
+            Vocation = character.Vocation,
+            World = character.World,
+            LastLogin = character.LastLogin,
+            OtherVisibleCharacters = character.OtherCharacters ?? Array.Empty<string>(),
+            PossibleInvisibleCharacters = correlations
         };
 
         return result;

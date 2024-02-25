@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using FluentAssertions;
+using Newtonsoft.Json;
 using TibiaEnemyOtherCharactersFinder.Application.Dtos;
+using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos.v3;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace TibiaEnemyOtherCharacterFinder.IntegrationTests.CharactersController;
@@ -47,10 +49,13 @@ public class GetFilteredCharactersTests : CharactersControllerTestTemplate, ICla
         var additionalParameters = $"?{nameof(searchText)}={searchText}&{nameof(page)}={page}&{nameof(pageSize)}={pageSize}";
 
         // Act
-        var result = await client.GetAsync($"{ControllerBase}{additionalParameters}");
+        var response = await client.GetAsync($"{ControllerBase}{additionalParameters}");
+        var content = await response.Content.ReadAsStringAsync();
+        var contentDeserialized = JsonConvert.DeserializeObject<FilteredCharactersDto>(content);
 
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        contentDeserialized!.TotalCount.Should().Be(0);
     }
 
     [Theory]

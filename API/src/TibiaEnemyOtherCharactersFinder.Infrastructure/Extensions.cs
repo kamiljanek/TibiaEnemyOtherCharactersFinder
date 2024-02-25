@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TibiaEnemyOtherCharactersFinder.Application.Configuration.Settings;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Clients.TibiaData;
+using TibiaEnemyOtherCharactersFinder.Infrastructure.Configuration;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Hubs;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Policies;
@@ -40,17 +41,7 @@ namespace TibiaEnemyOtherCharactersFinder.Infrastructure
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddHttpClient<ITibiaDataClient, TibiaDataClient>("TibiaDataClient", httpClient =>
-                {
-                    httpClient.BaseAddress =
-                        new Uri(configuration[
-                            $"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.BaseAddress)}"]);
-                    httpClient.Timeout =
-                        TimeSpan.Parse(
-                            configuration[$"{TibiaDataSection.SectionName}:{nameof(TibiaDataSection.Timeout)}"]);
-                })
-                .AddHttpMessageHandler<HttpClientDecompressionHandler>()
-                .AddPolicyHandler(CommunicationPolicies.GetTibiaDataRetryPolicy());
+            services.AddTibiaHttpClient(configuration);
 
             return services;
         }
