@@ -8,7 +8,13 @@ public class TibiaDataV3WorldResponse
     public InformationResponseV3 Information { get; set; }
 
     [JsonProperty("worlds")]
-    public WorldResponseV3 Worlds { get; set; }
+    public WorldInfoResponseV3 Worlds { get; set; }
+}
+
+public class WorldInfoResponseV3
+{
+    [JsonProperty("world")]
+    public WorldResponseV3 World { get; set; }
 }
 
 
