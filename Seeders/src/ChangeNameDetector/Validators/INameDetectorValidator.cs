@@ -5,7 +5,7 @@ namespace ChangeNameDetector.Validators;
 
 public interface INameDetectorValidator
 {
-    public bool IsCharacterChangedName(TibiaDataCharacterResult fechedCharacter, Character character);
-    public bool IsCharacterTraded(TibiaDataCharacterResult fechedCharacter);
-    public bool IsCharacterExist(TibiaDataCharacterResult fechedCharacter);
+    public bool IsCharacterChangedName(CharacterResult fechedCharacter, Character character);
+    public bool IsCharacterTraded(CharacterResult fechedCharacter);
+    public bool IsCharacterExist(CharacterResult fechedCharacter);
 }

@@ -25,7 +25,7 @@ public class RequestValidator : IRequestValidator
         string trimmedSearchText = searchText.Trim();
 
         if (!trimmedSearchText.All(c =>
-                char.IsLetter(c) ||
+                c is >= 'A' and <= 'Z' || c is >= 'a' and <= 'z' ||
                 c == 'ä' ||
                 c == 'ö' ||
                 c == 'ü' ||

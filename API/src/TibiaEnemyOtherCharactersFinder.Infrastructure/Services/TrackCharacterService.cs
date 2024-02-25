@@ -26,12 +26,12 @@ public class TrackCharacterService : ITrackCharacterService
         {
             throw new TibiaDataApiConnectionException();
         }
-        if (string.IsNullOrWhiteSpace(fetchedCharacter.Character.Character.Name))
+        if (string.IsNullOrWhiteSpace(fetchedCharacter.Name))
         {
             throw new NotFoundException(nameof(Character), characterName);
         }
 
-        var entity = new TrackedCharacter(characterName, fetchedCharacter.Character.Character.World, connectionId);
+        var entity = new TrackedCharacter(characterName, fetchedCharacter.World, connectionId);
         _dbContext.TrackedCharacters.Add(entity);
         await _dbContext.SaveChangesAsync();
     }

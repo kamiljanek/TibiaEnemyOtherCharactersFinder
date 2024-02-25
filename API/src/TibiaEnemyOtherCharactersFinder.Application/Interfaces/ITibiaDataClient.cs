@@ -6,5 +6,5 @@ public interface ITibiaDataClient
 {
     public Task<IReadOnlyList<string>> FetchWorldsNames();
     public Task<IReadOnlyList<string>> FetchCharactersOnline(string worldName);
-    Task<TibiaDataCharacterResult> FetchCharacter(string characterName);
+    Task<CharacterResult> FetchCharacter(string characterName);
 }
