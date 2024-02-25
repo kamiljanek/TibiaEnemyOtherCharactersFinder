@@ -302,7 +302,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
     }
 
     private void SetupTibiaDataServiceMock(string characterName,
-        params (bool Flag, Func<TibiaDataCharacterResult> PrepareFunction)[] preparations)
+        params (bool Flag, Func<CharacterResult> PrepareFunction)[] preparations)
     {
         var preparation = preparations
             .FirstOrDefault(p => p.Flag);
@@ -314,100 +314,70 @@ public class CharacterNameDetectorTests : IAsyncLifetime
             .ReturnsAsync(result);
     }
 
-    private TibiaDataCharacterResult PrepareExistingTibiaDataCharacter(string name)
+    private CharacterResult PrepareExistingTibiaDataCharacter(string name)
     {
-        return new TibiaDataCharacterResult()
+        return new CharacterResult()
         {
-            Character = new CharacterInfo()
-            {
-                Character = new CharacterResult()
-                {
-                    Name = name,
-                    Level = 100,
-                    Vocation = "Druid",
-                    World = "Adra",
-                    LastLogin = "2020-08-31T13:47:00Z",
-                    Traded = false
-                }
-            }
+            Name = name,
+            Level = 100,
+            Vocation = "Druid",
+            World = "Adra",
+            LastLogin = "2020-08-31T13:47:00Z",
+            Traded = false
         };
     }
 
-    private TibiaDataCharacterResult PrepareNonExistingTibiaDataCharacter()
+    private CharacterResult PrepareNonExistingTibiaDataCharacter()
     {
-        return new TibiaDataCharacterResult()
+        return new CharacterResult()
         {
-            Character = new CharacterInfo()
-            {
-                Character = new CharacterResult()
-                {
-                    Name = "",
-                    Level = 0,
-                    Vocation = "",
-                    World = "",
-                    LastLogin = "",
-                    Traded = false
-                }
-            }
+            Name = "",
+            Level = 0,
+            Vocation = "",
+            World = "",
+            LastLogin = "",
+            Traded = false
         };
     }
 
-    private TibiaDataCharacterResult PrepareTradedTibiaDataCharacter(string name)
+    private CharacterResult PrepareTradedTibiaDataCharacter(string name)
     {
-        return new TibiaDataCharacterResult()
+        return new CharacterResult()
         {
-            Character = new CharacterInfo()
-            {
-                Character = new CharacterResult()
-                {
-                    Name = name,
-                    Level = 100,
-                    Vocation = "Druid",
-                    World = "Adra",
-                    LastLogin = "2020-08-31T13:47:00Z",
-                    Traded = true
-                }
-            }
+            Name = name,
+            Level = 100,
+            Vocation = "Druid",
+            World = "Adra",
+            LastLogin = "2020-08-31T13:47:00Z",
+            Traded = true
         };
     }
 
-    private TibiaDataCharacterResult PrepareChangedNameCharacter(string name)
+    private CharacterResult PrepareChangedNameCharacter(string name)
     {
-        return new TibiaDataCharacterResult()
+        return new CharacterResult()
         {
-            Character = new CharacterInfo()
-            {
-                Character = new CharacterResult()
-                {
-                    Name = "asiier",
-                    FormerNames = new[] { name, "test2" },
-                    Level = 100,
-                    Vocation = "Druid",
-                    World = "Adra",
-                    LastLogin = "2020-08-31T13:47:00Z",
-                    Traded = false
-                }
-            }
+            Name = "asiier",
+            FormerNames = new[] { name, "test2" },
+            Level = 100,
+            Vocation = "Druid",
+            World = "Adra",
+            LastLogin = "2020-08-31T13:47:00Z",
+            Traded = false
         };
     }
 
-    private TibiaDataCharacterResult PrepareChangedNameCharacterWithNameNonExistentInDatabase(string name)
+    private CharacterResult PrepareChangedNameCharacterWithNameNonExistentInDatabase(string name)
     {
-        return new TibiaDataCharacterResult()
+        return new CharacterResult()
         {
-            Character = new CharacterInfo()
-            {
-                Character = new CharacterResult()
-                {
-                    Name = "test",
-                    FormerNames = new[] { name, "test2" },
-                    Level = 100,
-                    Vocation = "Druid",
-                    World = "Adra",
-                    LastLogin = "2020-08-31T13:47:00Z",
-                    Traded = false
-                }
-            }
+            Name = "test",
+            FormerNames = new[] { name, "test2" },
+            Level = 100,
+            Vocation = "Druid",
+            World = "Adra",
+            LastLogin = "2020-08-31T13:47:00Z",
+            Traded = false
         };
     }
 }

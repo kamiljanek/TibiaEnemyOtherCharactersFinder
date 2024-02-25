@@ -1,4 +1,5 @@
-﻿using ChangeNameDetector.Validators;
+﻿using System.Diagnostics;
+using ChangeNameDetector.Validators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.RabbitMQ.EventBus;
@@ -34,6 +35,8 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
     {
         while (true)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var character = await GetFirstCharacterByVerifiedDateAsync();
             if (character is null)
             {
@@ -49,7 +52,9 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             // If Character was not Traded and Character Name is still in database just Update Verified Date.
             if (!_validator.IsCharacterChangedName(fechedCharacter, character) && !_validator.IsCharacterTraded(fechedCharacter))
             {
-                _logger.LogInformation("Character '{characterName}' was not traded, was not changed name", character.Name);
+                stopwatch.Stop();
+                _logger.LogInformation("Character '{characterName}' was not traded, was not changed name. Checked in execution time : {time} ms",
+                    character.Name, stopwatch.ElapsedMilliseconds);
             }
 
 
@@ -72,7 +77,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
             // If name from databese was found in former names than merge proper correlations.
             else
             {
-                var fechedCharacterName = fechedCharacter.Character.Character.Name;
+                var fechedCharacterName = fechedCharacter.Name;
 
                 var newCharacter = await _dbContext.Characters.Where(c => c.Name == fechedCharacterName.ToLower()).FirstOrDefaultAsync();
 
