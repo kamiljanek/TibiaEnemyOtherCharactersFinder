@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Retry;
+using TibiaEnemyOtherCharactersFinder.Application.Exceptions;
 using TibiaEnemyOtherCharactersFinder.Application.Interfaces;
 using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos;
 using TibiaEnemyOtherCharactersFinder.Application.TibiaData.Dtos.v3;
@@ -26,50 +27,50 @@ public class TibiaDataV3Client : ITibiaDataClient
 
     public async Task<IReadOnlyList<string>> FetchWorldsNames()
     {
-        var currentRetry = 0;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}worlds");
+        var retryCount = 1;
 
         return await _retryPolicy.ExecuteAsync(async () =>
         {
             try
             {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}worlds");
                 using var response = await _httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
 
                 string content = await response.Content.ReadAsStringAsync();
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3WorldsResponse>(content);
+                if (string.IsNullOrWhiteSpace(contentDeserialized.Worlds.RecordDate))
+                {
+                    throw new TibiaDataApiEmptyResponseException();
+                }
                 var worldNames = contentDeserialized.Worlds.RegularWorlds.Select(world => world.Name).ToArray();
 
                 return worldNames;
             }
             catch (TaskCanceledException)
             {
-                currentRetry++;
                 _logger.LogError("{exceptionName} during invoke method {method}, attempt {retryCount}.",
-                    nameof(TaskCanceledException), nameof(FetchWorldsNames), currentRetry);
+                    nameof(TaskCanceledException), nameof(FetchWorldsNames), retryCount);
+                throw;
             }
             catch (Exception exception)
             {
-                currentRetry++;
                 _logger.LogError("Method {method} problem, attempt {retryCount}. Exception {exception}",
-                    nameof(FetchWorldsNames), currentRetry, exception);
+                    nameof(FetchWorldsNames), retryCount, exception);
+                throw;
             }
-
-            return Array.Empty<string>();
         });
     }
 
     public async Task<IReadOnlyList<string>> FetchCharactersOnline(string worldName)
     {
-        var currentRetry = 0;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}world/{worldName}");
+        var retryCount = 1;
 
         return await _retryPolicy.ExecuteAsync(async () =>
         {
             try
             {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}world/{worldName}");
                 using var response = await _httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
 
@@ -81,6 +82,11 @@ public class TibiaDataV3Client : ITibiaDataClient
                 }
 
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3WorldResponse>(content);
+                if (string.IsNullOrWhiteSpace(contentDeserialized.Worlds.World.CreationDate))
+                {
+                    throw new TibiaDataApiEmptyResponseException();
+                }
+
                 if (contentDeserialized.Worlds.World.OnlinePlayers is null || !contentDeserialized.Worlds.World.OnlinePlayers.Any())
                 {
                     _logger.LogInformation("Server '{serverName}' is out of players at that moment.", worldName);
@@ -91,51 +97,58 @@ public class TibiaDataV3Client : ITibiaDataClient
             }
             catch (TaskCanceledException exception)
             {
-                currentRetry++;
-                _logger.LogError("{exceptionName} during invoke method {method}, world: '{worldName}', attempt {retryCount}. Exception {exception}",
-                    nameof(TaskCanceledException), nameof(FetchCharactersOnline), worldName, currentRetry, exception);
+                _logger.LogError(
+                    "{exceptionName} during invoke method {method}, world: '{worldName}', attempt {retryCount}. Exception {exception}",
+                    nameof(TaskCanceledException), nameof(FetchCharactersOnline), worldName, retryCount++, exception);
+                throw;
             }
             catch (Exception exception)
             {
-                currentRetry++;
-                _logger.LogError("Method {method} problem, world: '{worldName}', attempt {retryCount}. Exception {exception}",
-                    nameof(FetchCharactersOnline), worldName, currentRetry, exception);
+                _logger.LogError(
+                    "Method {method} problem, world: '{worldName}', attempt {retryCount}. Exception {exception}",
+                    nameof(FetchCharactersOnline), worldName, retryCount++, exception);
+                throw;
             }
-
-            return Array.Empty<string>();
         });
     }
 
     public async Task<CharacterResult> FetchCharacter(string characterName)
     {
-        var currentRetry = 0;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}character/{characterName}");
-        return await _retryPolicy.ExecuteAsync(async () =>
+        for (int retryCount = 1; retryCount <= 3; retryCount++)
         {
             try
             {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}character/{characterName}");
                 using var response = await _httpClient.SendAsync(request);
-                // response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode();
 
                 string content = await response.Content.ReadAsStringAsync();
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3CharacterResponse>(content);
+                if (string.IsNullOrWhiteSpace(contentDeserialized.Characters.Character.Name))
+                {
+                    if (retryCount == 3)
+                    {
+                        return contentDeserialized.MapToCharacterResult();
+                    }
+
+                    throw new TibiaDataApiEmptyResponseException();
+                }
 
                 return contentDeserialized.MapToCharacterResult();
             }
             catch (TaskCanceledException)
             {
-                currentRetry++;
-                _logger.LogError("{exceptionName} during invoke method {method}, character: '{characterName}', attempt {retryCount}.",
-                    nameof(TaskCanceledException), nameof(FetchCharacter), characterName, currentRetry);
+                _logger.LogError(
+                    "{exceptionName} during invoke method {method}, character: '{characterName}', attempt {retryCount}.",
+                    nameof(TaskCanceledException), nameof(FetchCharacter), characterName, retryCount);
             }
             catch (Exception exception)
             {
-                currentRetry++;
-                _logger.LogError("Method {method} problem, attempt {retryCount}. Exception {exception}", nameof(FetchCharacter), currentRetry, exception);
+                _logger.LogError("Method {method} problem, attempt {retryCount}. Exception {exception}",
+                    nameof(FetchCharacter), retryCount, exception);
             }
+        }
 
-            return null;
-        });
+        return null;
     }
 }

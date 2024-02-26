@@ -59,7 +59,7 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
 
     private async Task<bool> ExecuteInTransactionAsync(Func<Task> action)
     {
-        for (int retryCount = 0; retryCount < 3; retryCount++)
+        for (int retryCount = 1; retryCount <= 3; retryCount++)
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
@@ -73,7 +73,7 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
             {
                 await transaction.RollbackAsync();
                 _logger.LogError("Method {method} during {action} failed, attempt {retryCount}. Error message: {ErrorMessage}",
-                    nameof(ExecuteInTransactionAsync), action.Target?.GetType().ReflectedType?.Name, retryCount + 1, ex.Message);
+                    nameof(ExecuteInTransactionAsync), action.Target?.GetType().ReflectedType?.Name, retryCount, ex.Message);
             }
         }
 
