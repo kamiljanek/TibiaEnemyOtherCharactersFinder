@@ -114,7 +114,7 @@ public class TibiaDataV3Client : ITibiaDataClient
 
     public async Task<CharacterResult> FetchCharacter(string characterName)
     {
-        for (int retryCount = 1; retryCount <= 3; retryCount++)
+        for (int retryCount = 1; retryCount <= 6; retryCount++)
         {
             try
             {
@@ -126,7 +126,7 @@ public class TibiaDataV3Client : ITibiaDataClient
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3CharacterResponse>(content);
                 if (string.IsNullOrWhiteSpace(contentDeserialized.Characters.Character.Name))
                 {
-                    if (retryCount == 3)
+                    if (retryCount == 6)
                     {
                         return contentDeserialized.MapToCharacterResult();
                     }
@@ -144,8 +144,8 @@ public class TibiaDataV3Client : ITibiaDataClient
             }
             catch (Exception exception)
             {
-                _logger.LogError("Method {method} problem, attempt {retryCount}. Exception {exception}",
-                    nameof(FetchCharacter), retryCount, exception);
+                _logger.LogError("Method {method} problem, character: '{characterName}', attempt {retryCount}. Exception {exception}",
+                    nameof(FetchCharacter), characterName, retryCount, exception.Message);
             }
         }
 

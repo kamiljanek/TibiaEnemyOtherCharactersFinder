@@ -11,13 +11,13 @@ public class EventResultHandler : IEventResultHandler
     {
         _logger = logger;
     }
-    public void HandleTransactionResult(bool isCommitedProperly, string eventName, string payload)
+    public void HandleTransactionResult(bool isCommitedProperly, string eventName, string payload, string characterName)
     {
         switch (isCommitedProperly)
         {
             case true:
-                _logger.LogInformation("Transaction '{event}' commited properly. Payload {payload}",
-                    eventName, payload);
+                _logger.LogInformation("Transaction '{event}' commited properly. Character name '{characterName}'. Payload {payload}",
+                    eventName, characterName, payload);
                 break;
             case false:
                 _logger.LogError("Transaction '{event}' failed. Check dead letter for analyse problem. Payload {payload}",

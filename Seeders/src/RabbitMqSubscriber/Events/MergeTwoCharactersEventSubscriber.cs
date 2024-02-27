@@ -98,7 +98,7 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
                 .ExecuteDeleteAsync(cancellationToken);
         });
 
-        _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(MergeTwoCharactersEvent), payload);
+        _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(MergeTwoCharactersEvent), payload, oldCharacter.Name);
 
         await _dbContext.Characters
             .Where(c => c.CharacterId == oldCharacter.CharacterId)

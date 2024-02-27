@@ -7,6 +7,7 @@ using RabbitMqSubscriber.Handlers;
 using RabbitMqSubscriber.Subscribers;
 using Shared.RabbitMQ.Conventions;
 using Shared.RabbitMQ.Events;
+using TibiaEnemyOtherCharactersFinder.Domain.Entities;
 using TibiaEnemyOtherCharactersFinder.Infrastructure.Persistence;
 
 namespace RabbitMqSubscriber.Events;
@@ -42,10 +43,10 @@ public class DeleteCharacterCorrelationsEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<DeleteCharacterCorrelationsEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
-
+        Character character = new Character();
         var isCommitedProperly = await ExecuteInTransactionAsync(async () =>
         {
-            var character = await _dbContext.Characters
+            character = await _dbContext.Characters
                 .Where(c => c.CharacterId == eventObject.CharacterId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
@@ -60,7 +61,7 @@ public class DeleteCharacterCorrelationsEventSubscriber : IEventSubscriber
                     .SetProperty(c => c.TradedDate, DateOnly.FromDateTime(DateTime.Now)), cancellationToken);
         });
 
-        _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(DeleteCharacterCorrelationsEvent), payload);
+        _eventResultHandler.HandleTransactionResult(isCommitedProperly, nameof(DeleteCharacterCorrelationsEvent), payload, character.Name);
     }
 
     private async Task<bool> ExecuteInTransactionAsync(Func<Task> action)
