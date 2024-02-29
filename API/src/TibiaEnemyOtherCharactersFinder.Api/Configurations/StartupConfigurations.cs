@@ -26,6 +26,7 @@ public static class StartupConfigurations
             diagnosticContext.Set("UserId", httpContext.Items["UserId"]);
             diagnosticContext.Set("RequestBody", httpContext.Items["Body"]);
             diagnosticContext.Set("Referer", httpContext.Request.Headers.Referer);
+            diagnosticContext.Set("Origin", httpContext.Request.Headers.Origin);
             diagnosticContext.Set("RequestQuery", httpContext.Request.Query);
             diagnosticContext.Set("Cookies", httpContext.Request.Cookies);
             diagnosticContext.Set("SessionId", httpContext.Session.Id);
