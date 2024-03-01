@@ -22,7 +22,7 @@ public class TibiaDataV3Client : ITibiaDataClient
         _httpClient = httpClient;
         _logger = logger;
         _apiVersion = tibiaData.Value.ApiVersion;
-        _retryPolicy = Policy.Handle<TaskCanceledException>().Or<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        _retryPolicy = Policy.Handle<TaskCanceledException>().Or<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(1.5, retryAttempt)));
     }
 
     public async Task<IReadOnlyList<string>> FetchWorldsNames()
@@ -114,7 +114,9 @@ public class TibiaDataV3Client : ITibiaDataClient
 
     public async Task<CharacterResult> FetchCharacter(string characterName)
     {
-        for (int retryCount = 1; retryCount <= 6; retryCount++)
+        var retryCount = 1;
+
+        return await _retryPolicy.ExecuteAsync(async () =>
         {
             try
             {
@@ -126,7 +128,7 @@ public class TibiaDataV3Client : ITibiaDataClient
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3CharacterResponse>(content);
                 if (string.IsNullOrWhiteSpace(contentDeserialized.Characters.Character.Name))
                 {
-                    if (retryCount == 6)
+                    if (retryCount == 4)
                     {
                         return contentDeserialized.MapToCharacterResult();
                     }
@@ -140,15 +142,15 @@ public class TibiaDataV3Client : ITibiaDataClient
             {
                 _logger.LogError(
                     "{exceptionName} during invoke method {method}, character: '{characterName}', attempt {retryCount}.",
-                    nameof(TaskCanceledException), nameof(FetchCharacter), characterName, retryCount);
+                    nameof(TaskCanceledException), nameof(FetchCharacter), characterName, retryCount++);
+                throw;
             }
             catch (Exception exception)
             {
                 _logger.LogError("Method {method} problem, character: '{characterName}', attempt {retryCount}. Exception {exception}",
-                    nameof(FetchCharacter), characterName, retryCount, exception.Message);
+                    nameof(FetchCharacter), characterName, retryCount++, exception.Message);
+                throw;
             }
-        }
-
-        return null;
+        });
     }
 }
