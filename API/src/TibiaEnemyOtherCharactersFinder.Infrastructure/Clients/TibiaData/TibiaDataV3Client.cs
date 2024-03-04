@@ -56,7 +56,7 @@ public class TibiaDataV3Client : ITibiaDataClient
             catch (Exception exception)
             {
                 _logger.LogError("Method {method} problem, attempt {retryCount}. Exception {exception}",
-                    nameof(FetchWorldsNames), retryCount, exception);
+                    nameof(FetchWorldsNames), retryCount, exception.Message);
                 throw;
             }
         });
@@ -99,14 +99,14 @@ public class TibiaDataV3Client : ITibiaDataClient
             {
                 _logger.LogError(
                     "{exceptionName} during invoke method {method}, world: '{worldName}', attempt {retryCount}. Exception {exception}",
-                    nameof(TaskCanceledException), nameof(FetchCharactersOnline), worldName, retryCount++, exception);
+                    nameof(TaskCanceledException), nameof(FetchCharactersOnline), worldName, retryCount++, exception.Message);
                 throw;
             }
             catch (Exception exception)
             {
                 _logger.LogError(
                     "Method {method} problem, world: '{worldName}', attempt {retryCount}. Exception {exception}",
-                    nameof(FetchCharactersOnline), worldName, retryCount++, exception);
+                    nameof(FetchCharactersOnline), worldName, retryCount++, exception.Message);
                 throw;
             }
         });
