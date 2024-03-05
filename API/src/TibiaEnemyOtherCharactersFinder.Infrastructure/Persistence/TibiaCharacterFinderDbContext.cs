@@ -96,6 +96,9 @@ public class TibiaCharacterFinderDbContext : DbContext, ITibiaCharacterFinderDbC
                 .WithOne(cc => cc.LoginCharacter)
                 .HasForeignKey(cc => cc.LoginCharacterId)
                 .OnDelete(DeleteBehavior.Cascade);
+            e.Property(c => c.DeleteApproachNumber)
+                .IsRequired()
+                .HasDefaultValue(0);
         });
 
         #endregion
