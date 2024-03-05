@@ -32,6 +32,11 @@ public class Character : IEntity
     /// </summary>
     public DateOnly? TradedDate { get; set; }
 
+    /// <summary>
+    /// Number of character delete approach
+    /// </summary>
+    public int DeleteApproachNumber { get; set; }
+
     // Associations
     public World World { get; set; }
     public List<CharacterCorrelation> LogoutCharacterCorrelations { get; set; }
