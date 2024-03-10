@@ -16,6 +16,7 @@ public class TibiaDataV3Client : ITibiaDataClient
     private readonly ILogger<TibiaDataV3Client> _logger;
     private readonly string _apiVersion;
     private readonly AsyncRetryPolicy _retryPolicy;
+    private readonly AsyncRetryPolicy _withoutRetryPolicy;
 
     public TibiaDataV3Client(HttpClient httpClient, IOptions<TibiaDataSection> tibiaData, ILogger<TibiaDataV3Client> logger)
     {
@@ -23,6 +24,7 @@ public class TibiaDataV3Client : ITibiaDataClient
         _logger = logger;
         _apiVersion = tibiaData.Value.ApiVersion;
         _retryPolicy = Policy.Handle<TaskCanceledException>().Or<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(1.5, retryAttempt)));
+        _withoutRetryPolicy = Policy.Handle<TaskCanceledException>().Or<Exception>().WaitAndRetryAsync(0, i => TimeSpan.FromSeconds(i));
     }
 
     public async Task<IReadOnlyList<string>> FetchWorldsNames()
@@ -112,11 +114,12 @@ public class TibiaDataV3Client : ITibiaDataClient
         });
     }
 
-    public async Task<CharacterResult> FetchCharacter(string characterName)
+    public async Task<CharacterResult> FetchCharacter(string characterName, bool withRetryPolicy = true)
     {
-        var retryCount = 1;
+        var retryCount = withRetryPolicy ? 1 : 4;
+        var retry = withRetryPolicy ? _retryPolicy : _withoutRetryPolicy;
 
-        return await _retryPolicy.ExecuteAsync(async () =>
+        return await retry.ExecuteAsync(async () =>
         {
             try
             {
@@ -128,7 +131,7 @@ public class TibiaDataV3Client : ITibiaDataClient
                 var contentDeserialized = JsonConvert.DeserializeObject<TibiaDataV3CharacterResponse>(content);
                 if (string.IsNullOrWhiteSpace(contentDeserialized.Characters.Character.Name))
                 {
-                    if (retryCount == 4)
+                    if (retryCount > 3)
                     {
                         return contentDeserialized.MapToCharacterResult();
                     }
