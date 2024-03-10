@@ -49,7 +49,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
 
         foreach (var character in charactersBeforeDetector)
         {
-            _tibiaDataClientMock.Setup(r => r.FetchCharacter(character.Name)).ReturnsAsync(PrepareExistingTibiaDataCharacter(character.Name));
+            _tibiaDataClientMock.Setup(r => r.FetchCharacter(character.Name, false)).ReturnsAsync(PrepareExistingTibiaDataCharacter(character.Name));
         }
 
         var changeNameDetector = new ChangeNameDetectorService(logger, validator, dbContextBefore, _tibiaDataClientMock.Object, busPublisher);
@@ -310,7 +310,7 @@ public class CharacterNameDetectorTests : IAsyncLifetime
         var result = preparation.Flag ? preparation.PrepareFunction.Invoke() : PrepareExistingTibiaDataCharacter(characterName);
 
         _tibiaDataClientMock
-            .Setup(r => r.FetchCharacter(characterName))
+            .Setup(r => r.FetchCharacter(characterName, false))
             .ReturnsAsync(result);
     }
 

@@ -106,8 +106,9 @@ public class TibiaDataV4Client : ITibiaDataClient
         });
     }
 
-    public async Task<CharacterResult> FetchCharacter(string characterName)
+    public async Task<CharacterResult> FetchCharacter(string characterName, bool withRetryPolicy = true)
     {
+        // TODO: not implemented properly
         var currentRetry = 0;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_apiVersion}/character/{characterName}");
