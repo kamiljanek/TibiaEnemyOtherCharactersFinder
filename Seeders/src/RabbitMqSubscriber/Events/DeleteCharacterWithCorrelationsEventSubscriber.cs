@@ -43,6 +43,8 @@ public class DeleteCharacterWithCorrelationsEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<DeleteCharacterWithCorrelationsEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
+        Thread.Sleep(3000);
+
         var character = new Character();
         var isCommitedProperly = await ExecuteInTransactionAsync(async () =>
         {

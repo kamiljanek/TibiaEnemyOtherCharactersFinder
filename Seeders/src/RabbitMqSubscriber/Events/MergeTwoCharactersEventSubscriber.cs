@@ -45,6 +45,8 @@ public class MergeTwoCharactersEventSubscriber : IEventSubscriber
         var eventObject = JsonConvert.DeserializeObject<MergeTwoCharactersEvent>(payload);
         _logger.LogInformation("Event {Event} subscribed. Payload: {Payload}", eventObject.GetType().Name, payload);
 
+        Thread.Sleep(3000);
+
         var oldCharacter = await _dbContext.Characters
             .Where(c => c.CharacterId == eventObject.OldCharacterId)
             .AsNoTracking()
