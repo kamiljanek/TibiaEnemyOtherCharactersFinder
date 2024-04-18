@@ -102,7 +102,7 @@ public class ChangeNameDetectorService : IChangeNameDetectorService
     private async Task<Character> GetFirstCharacterByVerifiedDateAsync()
     {
         var visibilityOfTradeProperty = DateOnly.FromDateTime(DateTime.Now.AddDays(-31));
-        var scanPeriod = DateOnly.FromDateTime(DateTime.Now.AddDays(-15));
+        var scanPeriod = DateOnly.FromDateTime(DateTime.Now.AddDays(-20));
 
         return await _dbContext.Characters
             .Where(c => (!c.TradedDate.HasValue || c.TradedDate < visibilityOfTradeProperty)

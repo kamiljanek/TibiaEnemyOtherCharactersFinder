@@ -26,9 +26,9 @@ public class CharacterActionsManager
         await _dbContext.CharacterActions.AddRangeAsync(characterActionsToAdd);
         await _dbContext.SaveChangesAsync();
 
-        // Take only 500 shuffled elements because database needs too much time to execute delete ImposibleCorrelations
+        // Take only 300 shuffled elements because database needs too much time to execute delete ImposibleCorrelations
         await _dbContext.Characters
-            .Where(ch => _firstScanNames.Take(500).Contains(ch.Name))
+            .Where(ch => _firstScanNames.Take(300).Contains(ch.Name))
             .ExecuteUpdateAsync(update => update.SetProperty(c => c.FoundInScan, c => true));
     }
 
