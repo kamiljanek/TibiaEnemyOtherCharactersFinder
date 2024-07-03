@@ -1,4 +1,4 @@
-# Repository moved to [TibiaStalker](https://github.com/TibiaStalker/tibiastalker-api)
+# Repository moved to [TibiaStalker](https://github.com/TibiaStalker/tibiastalker-frontend)
 
 ## _Tibia Enemy Other Characters Finder_
 
